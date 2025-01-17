@@ -2,7 +2,7 @@ import useProduct from "@api/useProduct";
 import StarRating from "@components/Rate/StarRating";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import notImg from "../assets/images/logos/web.png";
+import notImg from "../../../../assets/assets/images/logos/web.png";
 import { toast } from "react-toastify";
 import { Button } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

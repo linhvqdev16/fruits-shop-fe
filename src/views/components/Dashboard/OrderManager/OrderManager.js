@@ -12,7 +12,7 @@ function formatCurrencyVND(amount) {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
   } 
 
-const OrderManager = () => {
+function OrderManager() {
     const {getAll} = useOrder()
     const [orders, setOrder] = useState([])
     const [loading, setLoading] = useState(true)

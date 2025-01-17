@@ -8,8 +8,8 @@ const HTTP_STATUS = Object.freeze({
 });
 
 const PROTOCOL = "http";
-const HOST = "localhost";
-const PORT = "44391";
+const HOST = "103.82.28.130";
+const PORT = "8016/service";
 
 const LANG = Object.freeze({
     vi: "Tiếng Việt",

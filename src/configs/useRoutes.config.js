@@ -11,20 +11,20 @@ import Register from "@views/components/Login/Register";
 import Contact from "@views/Contact";
 import Dashboard from "@views/components/Dashboard/Dashboard";
 import Checkout from "@views/components/Checkout/Checkout";
-import ProductManager from "@views/components/Dashboard/ProductManager/ProductManager";
-import Detail from "@views/components/Dashboard/ProductManager/Detail";
-import Edit from "@views/components/Dashboard/ProductManager/Edit";
-import BranchManager from "@views/components/Dashboard/BranchManager/BranchManager";
-import DetailBranch from "@views/components/Dashboard/BranchManager/DetailBranch";
-import EditBranch from "@views/components/Dashboard/BranchManager/EditBranch";
-import OrderManager from "@views/components/Dashboard/OrderManager/OrderManager";
-import DetailOrder from "@views/components/Dashboard/OrderManager/DetailOrder";
 import ForgotPass from "@views/components/Login/ForgotPass";
-import UserManager from "@views/components/Dashboard/UserManager/UserManager";
-import DetailAccount from "@views/components/Dashboard/UserManager/DetailAccount";
 import LayoutUser from "@views/layouts/LayoutUser";
 import ProfileUser from "@views/components/ProfileUser/ProfileUser";
 import History from "@views/components/History/History";
+import ProductManager from "@views/components/Dashboard/ProductManager/ProductManager";
+import Edit from "@views/components/ProductManager/Edit";
+import Detail from "@views/components/ProductManager/Detail";
+import BranchManager from "@views/components/BranchManager/BranchManager";
+import DetailBranch from "@views/components/BranchManager/DetailBranch";
+import EditBranch from "@views/components/BranchManager/EditBranch";
+import OrderManager from "@views/components/OrderManager/OrderManager";
+import DetailOrder from "@views/components/OrderManager/DetailOrder";
+// import UserManager from "@views/components/UserManager/UserManager";
+// import DetailAccount from "@views/components/UserManager/DetailAccount";
 const ICON_SIZE = "15px";
 const useRoutes = () => {
   const t = useTranslate();
@@ -126,9 +126,11 @@ const useRoutes = () => {
       key: "/reset-pass",
       label: "ResetPass",
       path: "/reset-pass",
-      element: <LayoutClient>
+      element:(
+        <LayoutClient>
         <ForgotPass />
       </LayoutClient>
+      )
     },
     
 
@@ -253,23 +255,23 @@ const useRoutes = () => {
       element: <Layout>
         <DetailOrder />
       </Layout>
-    },
-    {
-      key: "/dashboard/accounts",
-      label: "Accounts",
-      path: "/dashboard/accounts",
-      element: <Layout>
-        <UserManager />
-      </Layout>
-    },
-    {
-      key: "/dashboard/accounts/:userId",
-      label: "Accounts",
-      path: "/dashboard/accounts/:userId",
-      element: <Layout>
-        <DetailAccount />
-      </Layout>
     }
+    // {
+    //   key: "/dashboard/accounts",
+    //   label: "Accounts",
+    //   path: "/dashboard/accounts",
+    //   element: <Layout>
+    //     <UserManager />
+    //   </Layout>
+    // },
+    // {
+    //   key: "/dashboard/accounts/:userId",
+    //   label: "Accounts",
+    //   path: "/dashboard/accounts/:userId",
+    //   element: <Layout>
+    //     <DetailAccount />
+    //   </Layout>
+    // }
 
 
   ];
