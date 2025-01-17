@@ -23,8 +23,8 @@ import DetailBranch from "@views/components/BranchManager/DetailBranch";
 import EditBranch from "@views/components/BranchManager/EditBranch";
 import OrderManager from "@views/components/OrderManager/OrderManager";
 import DetailOrder from "@views/components/OrderManager/DetailOrder";
-// import UserManager from "@views/components/UserManager/UserManager";
-// import DetailAccount from "@views/components/UserManager/DetailAccount";
+import ManagerUser from "../views/components/ManagerUser/ManagerUser";
+import DetailUser from "../views/components/ManagerUser/DetailUser";
 const ICON_SIZE = "15px";
 const useRoutes = () => {
   const t = useTranslate();
@@ -255,23 +255,23 @@ const useRoutes = () => {
       element: <Layout>
         <DetailOrder />
       </Layout>
+    },
+    {
+      key: "/dashboard/accounts",
+      label: "Accounts",
+      path: "/dashboard/accounts",
+      element: <Layout>
+        <ManagerUser />
+      </Layout>
+    },
+    {
+      key: "/dashboard/accounts/:userId",
+      label: "Accounts",
+      path: "/dashboard/accounts/:userId",
+      element: <Layout>
+        <DetailUser />
+      </Layout>
     }
-    // {
-    //   key: "/dashboard/accounts",
-    //   label: "Accounts",
-    //   path: "/dashboard/accounts",
-    //   element: <Layout>
-    //     <UserManager />
-    //   </Layout>
-    // },
-    // {
-    //   key: "/dashboard/accounts/:userId",
-    //   label: "Accounts",
-    //   path: "/dashboard/accounts/:userId",
-    //   element: <Layout>
-    //     <DetailAccount />
-    //   </Layout>
-    // }
 
 
   ];
