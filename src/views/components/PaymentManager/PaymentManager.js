@@ -2,20 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { Button, Select, Space, Table, Tag } from 'antd';
 import { toast } from 'react-toastify';
 import { Pagination } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
-import { Image, Upload } from 'antd'
-import Delete from './DeleteBranch';
-import Detail from './DetailBranch';
-import Edit from './EditBranch';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleInfo, faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 import { Link, Navigate } from 'react-router-dom';
 import useBranch from '@api/useBranch';
-import AddBranch from './AddBranch';
-import DeleteBranch from './DeleteBranch';
-import EditBranch from './EditBranch';
+import PaymentAdd from './PaymentAdd';
+import PaymentDelete from './PaymentDelete';
+import PaymentEdit from './PaymentEdit';
 
-function BranchManager() {
+function PaymentManager() {
     const { getBranch } = useBranch()
 
     const [branch, setBranch] = useState([])
@@ -42,7 +37,6 @@ function BranchManager() {
             setTotal(data.data.totalCount)
         }
     }
-    
     // useEffect(() => {
     //     fetchData()
     // }, [JSON.stringify(tableParams), loading, searchName])
@@ -69,7 +63,6 @@ function BranchManager() {
         })
     };
     const columns = [
-
         {
             title: 'STT',
             dataIndex: 'orderNumber',
@@ -89,13 +82,6 @@ function BranchManager() {
             key: 'name',
             render: (_, record) => <p style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{record.countProduct}</p>
         },
-
-        {
-            title: 'Mô tả',
-            dataIndex: 'description',
-            key: 'description',
-            render: (text) => <p style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{new Date(text).toLocaleDateString('en-GB')}</p>
-        },
         {
             title: 'Trạng thái',
             dataIndex: 'status',
@@ -108,20 +94,21 @@ function BranchManager() {
             key: 'action',
             render: (_, record) => (
                 <Space>
-                    <DeleteBranch id={record.id} state={loading} action={setLoading} />
+                    <PaymentDelete id={record.id} state={loading} action={setLoading} />
                     <Link to={record.id}>
                         <Button type='primary' title='Detail Branch'>
                             <FontAwesomeIcon icon={faCircleInfo} />
                         </Button>
                     </Link>
-                    <EditBranch id={record.id} state={loading} action={setLoading} />
+                    <PaymentEdit id={record.id} state={loading} action={setLoading} />
                 </Space>
             ),
         },
     ];
     return (
         <>
-            <AddBranch />
+
+            <PaymentAdd />
             <Table
                 dataSource={branch} columns={columns}
                 pagination={false}
@@ -139,4 +126,4 @@ function BranchManager() {
     );
 }
 
-export default BranchManager;
+export default PaymentManager;

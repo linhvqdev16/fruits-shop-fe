@@ -9,12 +9,12 @@ import useProduct from "@api/useProduct";
 import { toast } from "react-toastify";
 import { useForm } from "antd/es/form/Form";
 const getBase64 = (file) =>
-new Promise((resolve, reject) => {
-  const reader = new FileReader();
-  reader.readAsDataURL(file);
-  reader.onload = () => resolve(reader.result);
-  reader.onerror = (error) => reject(error);
-});
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (error) => reject(error);
+  });
 
 const AddProduct = () => {
   const [modal2Open, setModal2Open] = useState(false);
@@ -24,20 +24,19 @@ const AddProduct = () => {
   const [previewImage, setPreviewImage] = useState('');
 
 
-  const {getAllBranch} = useBranch()
-  const {getAllOrigin} = useOrigin()
+  const { getAllBranch } = useBranch()
+  const { getAllOrigin } = useOrigin()
   // const {getAllOrigin} = useOrigin()
   const [branch, setBranch] = useState([])
   const [origin, setOrigin] = useState([])
 
 
-const handleRemove = () => {
-  console.log('delete');
-}
+  const handleRemove = () => {
+    console.log('delete');
+  }
   const fetchbranch = async () => {
-    const {success, data} = await getAllBranch();
-
-    if(data != null && success) {
+    const { success, data } = await getAllBranch();
+    if (data != null && success) {
       var databranch = data.data.map((items) => {
         return {
           value: items.id,
@@ -47,11 +46,9 @@ const handleRemove = () => {
       setBranch(databranch)
     }
   }
-
-
   const fetchOrigin = async () => {
-    const { success,data} = await getAllOrigin();
-    if(data != null && success) {
+    const { success, data } = await getAllOrigin();
+    if (data != null && success) {
       var dataOrigin = data.data.map((items) => {
         return {
           value: items.id,
@@ -61,14 +58,11 @@ const handleRemove = () => {
       setOrigin(dataOrigin)
     }
   }
-  
 
-
-
-  useEffect(() => {
-    fetchbranch()
-    fetchOrigin()
-  }, [])
+  // useEffect(() => {
+  //   fetchbranch()
+  //   fetchOrigin()
+  // }, [])
   const [fileList, setFileList] = useState([]);
   const [fileListUpload, setfileListUpload] = useState([]);
   const handlePreview = async (file) => {
@@ -79,7 +73,7 @@ const handleRemove = () => {
     setPreviewOpen(true);
   };
   const handleChangeFile = ({ fileList: newFileList }) => {
-    newFileList.forEach(items => items.status='done')
+    newFileList.forEach(items => items.status = 'done')
     setFileList(newFileList);
   };
 
@@ -102,11 +96,10 @@ const handleRemove = () => {
       </div>
     </button>
   );
-  
+
 
   const onFinish = async (values) => {
     try {
-      // Tạo đối tượng product từ các giá trị được nhập từ form
       const formData = new FormData()
       formData.append('branchId', values.branchId);
       formData.append('originId', values.originId);
@@ -119,31 +112,31 @@ const handleRemove = () => {
       fileList.forEach((file, index) => {
         formData.append(`ListFileImg`, file.originFileObj);
       });
-      const {success,data} = await createProduct(formData, { "Content-Type": "multipart/form-data"});
+      const { success, data } = await createProduct(formData, { "Content-Type": "multipart/form-data" });
       if (data.status != 'Error' && success) {
-          setModal2Open(false);
-          toast.success(data.message)
+        setModal2Open(false);
+        toast.success(data.message)
       } else {
         toast.error(data.message)
       }
     } catch (error) {
-      toast.error("loi")
+      toast.error(error.message)
     }
   };
 
   const onFinishFailed = (errorInfo) => {
     console.log("Failed:", errorInfo);
   };
-const handleChange = (value) => {
-  console.log(`Selected: ${value}`);
-};
+  const handleChange = (value) => {
+    console.log(`Selected: ${value}`);
+  };
 
- const normFile = (e) => {
-        if (Array.isArray(e)) {
-          return e;
-        }
-        return e?.fileList;
-    };
+  const normFile = (e) => {
+    if (Array.isArray(e)) {
+      return e;
+    }
+    return e?.fileList;
+  };
 
   return (
     <div>
@@ -159,7 +152,7 @@ const handleChange = (value) => {
         }}
         onClick={() => setModal2Open(true)}
       >
-        <PlusSquareOutlined /> Thêm
+        <PlusSquareOutlined /> Thêm mới
       </Button>
 
       <Modal
@@ -176,27 +169,23 @@ const handleChange = (value) => {
           onFinishFailed={onFinishFailed}
           initialValues={{ layout: "horizontal" }}
           layout="vertical"
-          
+
         >
           <Row gutter={[16, 16]}>
             <Col span={8}>
               <Form.Item
-                label="Tên sách"
-                name="productName"
-                rules={[{ required: true, message: "Please input product name!" }]}
-               
+                label="Mã sản phẩm"
+                name="code"
+                rules={[{ required: true, message: "Please input product code!" }]}
               >
-                <Input placeholder="Product Name" />
-               
+                <Input placeholder="Mã sản phẩm" />
               </Form.Item>
             </Col>
-
-
             <Col span={8}>
               <Form.Item
-                label="Danh mục"
-                name="branchId"
-                rules={[{ required: true, message: "Please input Branch!" }]}
+                label="Loại sản phẩm"
+                name="categoryId"
+                rules={[{ required: true, message: "Please input category type!" }]}
               >
                 <Select
                   placeholder="Please select"
@@ -205,143 +194,103 @@ const handleChange = (value) => {
                     width: '100%'
                   }}
                   options={branch}
-                  />
+                />
               </Form.Item>
-             
+            </Col>
 
-          </Col>
-         
-          <Col span={8}>
-            <Form.Item
-              label="Loại sách"
-              name="originId"
-              rules={[{ required: true, message: "Please input Origin" }]}
-            >
-              <Select
-                placeholder="Please select"
-                onChange={handleChange}
-                style={{
-                  width: '100%',
+            <Col span={8}>
+              <Form.Item
+                label="Kiểu sản phẩm"
+                name="typeId"
+                rules={[{ required: true, message: "Please input product type" }]}
+              >
+                <Select
+                  placeholder="Please select"
+                  onChange={handleChange}
+                  style={{
+                    width: '100%',
+                  }}
+                  options={origin}
+                />
+              </Form.Item>
+            </Col>
+
+            <Col span={8}>
+              <Form.Item
+                label="Giá sản phẩm"
+                name="price"
+                rules={[{ required: true, message: "Please input product price!" }]}
+              >
+                <Input placeholder="Price" type="number" />
+              </Form.Item>
+            </Col>
+
+            <Col span={8}>
+              <Form.Item
+                label="Số lượng"
+                name="stock"
+                rules={[
+                  { required: true, message: "Please input product quantity!" },
+                ]}
+              >
+                <Input placeholder="Quantity" type="number" />
+              </Form.Item>
+            </Col>
+
+            <Col span={8}>
+              <Form.Item
+                label="Mô tả"
+                name="description"
+                rules={[
+                  { required: false, message: "Please input product description!" },
+                ]}
+              >
+                <Input.TextArea placeholder="Description" rows={5}/>
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+
+              <Form.Item
+                label="Hình ảnh"
+                name="listFileImg"
+                getValueFromEvent={e => {
+                  if (Array.isArray(e)) {
+                    var elist = [];
+                    console.log(e.fileList);
+                    e.fileList.forEach(element => {
+                      elist.push(element.originFileObj)
+                    })
+                  }
+                  return elist
                 }}
-                options={origin}
-              />
-
-            </Form.Item>
-          </Col>
-          
-          <Col span={8}>
-            <Form.Item
-              label="Giá sản phẩm"
-              name="productPrice"
-              rules={[{ required: true, message: "Please input product price!" }]}
-            >
-              <Input placeholder="Price" type="text" />
-            </Form.Item>
-          </Col>
-         
-          <Col span={8}>
-            <Form.Item
-              label="Số lượng"
-              name="productQuantity"
-              rules={[
-                { required: true, message: "Please input product quantity!"},
-              ]}
-            >
-              <Input placeholder="Quantity" type="text" />
-            </Form.Item>
-          </Col>
-          
-          <Col span={8}>
-            <Form.Item
-              label="Mô tả"
-              name="productDescription"
-              rules={[
-                { required: false, message: "Please input product description!" },
-              ]}
-            >
-              <Input.TextArea placeholder="Description" />
-            </Form.Item>
-          
-          </Col>
-          
-          {/* <Col span={8}>
-          
-            <Form.Item
-              label="Material"
-              name="productMaterial"
-              rules={[
-                { required: true, message: "Please input product material!" },
-              ]}
-            >
-              <Input placeholder="Material" />
-            </Form.Item>
-
-          </Col> */}
-          
-          
-          
-         
-          
-         
-         
-          {/* <Col span={8}>
-            <Form.Item
-              label="Type"
-              name="productType"
-              rules={[{ required: true, message: "Please input product type!" }]}
-            >
-              <Input placeholder="Type" />
-            </Form.Item>
-          </Col> */}
-         
-          
-       
-          <Col span={8}>
-            
-
-          <Form.Item
-              label="Hình ảnh"
-              name="listFileImg"
-              getValueFromEvent={e => {
-                if (Array.isArray(e)) {
-                  var elist = [];
-                  console.log( e.fileList);
-                  e.fileList.forEach(element => {
-                    elist.push(element.originFileObj)
-                  })
-                } 
-               
-                return elist
-              }}
-            >
-
-            <Upload
-              listType="picture-card"
-              name="listFileImg"
-              fileList={fileList}
-              onRemove={() => {
-                handleRemove();
-              }}
-              onPreview={handlePreview}
-              onChange={handleChangeFile}
-            >
-              {fileList.length < 0 ? null : uploadButton}
-            </Upload>
-            {previewImage && (
-              <Image
-                wrapperStyle={{
-                  display: 'none',
-                }}
-                preview={{
-                  visible: previewOpen,
-                  onVisibleChange: (visible) => setPreviewOpen(visible),
-                  afterOpenChange: (visible) => !visible && setPreviewImage(''),
-                }}
-                src={previewImage}
-              />
-            )}
-            </Form.Item>
-          </Col>
+              >
+                <Upload
+                  listType="picture-card"
+                  name="listFileImg"
+                  fileList={fileList}
+                  onRemove={() => {
+                    handleRemove();
+                  }}
+                  onPreview={handlePreview}
+                  onChange={handleChangeFile}
+                >
+                  {fileList.length < 0 ? null : uploadButton}
+                </Upload>
+                {previewImage && (
+                  <Image
+                    wrapperStyle={{
+                      display: 'none',
+                    }}
+                    preview={{
+                      visible: previewOpen,
+                      onVisibleChange: (visible) => setPreviewOpen(visible),
+                      afterOpenChange: (visible) => !visible && setPreviewImage(''),
+                    }}
+                    src={previewImage}
+                  />
+                )}
+              </Form.Item>
+            </Col>
           </Row>
           <Form.Item>
             <Button type="primary" htmlType="submit" >

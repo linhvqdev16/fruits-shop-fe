@@ -1,10 +1,10 @@
 import useRequest from './useRequest'
 
 const useAuth = () => {
-	const { createPostRequest,createPutRequest,createGetRequest, cancel } = useRequest('User')
-	const login = ({ UserName, Password }) => createPostRequest({
+	const { createPostRequest,createPutRequest,createGetRequest, cancel } = useRequest('user')
+	const login = ({ userName, password }) => createPostRequest({
 		endpoint: '/login',
-		data: {UserName,Password }
+		data: {userName,password }
 	})
 	const register = (data) => createPostRequest({
 		endpoint: '/register',

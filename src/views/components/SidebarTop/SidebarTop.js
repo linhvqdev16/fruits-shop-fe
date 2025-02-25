@@ -2,6 +2,7 @@ import useUser from "@store/useUser";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import userProfile from '../Dashboard/assets/images/profile/user-1.jpg'
+import { IconBellRinging} from '@tabler/icons-react';
 const SidebarTop = (data) => {
   const navigate = useNavigate()
   const { resetData } = useUser();
@@ -23,15 +24,16 @@ const SidebarTop = (data) => {
                 <i class="ti ti-menu-2"></i>
               </a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link nav-icon-hover" href="javascript:void(0)">
-                <i class="ti ti-bell-ringing"></i>
-                <div class="notification bg-primary rounded-circle"></div>
-              </a>
-            </li>
           </ul>
           <div class="navbar-collapse px-0" id="navbarNav">
             <ul class="navbar-nav flex-row ms-auto align-items-center">
+              
+            <li class="nav-item">
+              <a class="nav-link nav-icon-hover" href="javascript:void(0)">
+               <IconBellRinging stroke={2} size={35}/>
+                <div class="notification bg-primary rounded-circle"></div>
+              </a>
+            </li>
               <li class="nav-item dropdown">
                 <a
                   class="nav-link nav-icon-hover"

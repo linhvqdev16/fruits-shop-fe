@@ -3,7 +3,7 @@ import useBranch from "@api/useBranch";
 import { Button, Col, Form, Input, Modal, Row, Select, message } from "antd";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-function AddBranch() {
+function ProductTypeAdd() {
 
     const [modal2Open, setModal2Open] = useState(false);
     const [form] = Form.useForm()
@@ -50,7 +50,7 @@ function AddBranch() {
   
         <Modal
           width={'50%'}
-          title="Thêm mới loại sách"
+          title="Thêm mới kiểu sản phẩm"
           centered
           visible={modal2Open}
           onCancel={() => setModal2Open(false)}
@@ -70,7 +70,7 @@ function AddBranch() {
                   name="code"
                   rules={[{ required: true, message: "Please input category code!" }]}
                 >
-                  <Input placeholder="Category code auto generate" readOnly="true" />
+                  <Input placeholder="Type code auto generate" readOnly="true" />
                 </Form.Item>
               </Col>      
             </Row>
@@ -80,9 +80,9 @@ function AddBranch() {
                 <Form.Item
                   label="Tên thể loại"
                   name="name"
-                  rules={[{ required: true, message: "Please input category name!" }]}
+                  rules={[{ required: true, message: "Please input type name!" }]}
                 >
-                  <Input placeholder="Please input category name" />
+                  <Input placeholder="Please input type name" />
                 </Form.Item>
               </Col>      
             </Row>
@@ -92,9 +92,9 @@ function AddBranch() {
                 <Form.Item
                   label="Mô tả"
                   name="description"
-                  rules={[{ required: true, message: "Please input category description!" }]}
+                  rules={[{ required: true, message: "Please input type description!" }]}
                 >
-                  <Input placeholder="Please input category description" />
+                  <Input placeholder="Please input type description" />
                 </Form.Item>
               </Col>      
             </Row>
@@ -109,4 +109,4 @@ function AddBranch() {
       </div></>  );
 }
 
-export default AddBranch;
+export default ProductTypeAdd;

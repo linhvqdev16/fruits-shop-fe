@@ -20,13 +20,8 @@ function ProductManager() {
       } 
         
     const { getAll } = useProduct()
-
     const [product, setProduct] = useState([])
-
     const [loading, setLoading] = useState(false);
-
-
-
     const [total, setTotal] = useState();
     const [tableParams, setTableParams] = useState({
       pagination: {
@@ -65,64 +60,62 @@ function ProductManager() {
             pageSize: pageSize
         }})
     };
-
-    
-
-      
     const columns = [
         {
-            title: 'Name',
-            dataIndex: 'productName',
-            key: 'productName',
+            title: 'STT',
+            dataIndex: 'number',
+            key: 'number',
             render: (text) => <a style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{text}</a>,
         },
         {
-            title: 'Price ',
-            dataIndex: 'prodcutPrice',
+            title: 'Tên sản phẩm',
+            dataIndex: 'name',
+            key: 'name',
+            render: (text) => <a style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{text}</a>,
+        },
+        {
+            title: 'Mã sản phẩm',
+            dataIndex: 'code',
+            key: 'code',
+            render: (text) => <a style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{text}</a>,
+        },
+        {
+            title: 'Giá sản phẩm',
+            dataIndex: 'price',
             render: (text) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{formatCurrencyVND(text)}</p>,
         },
         {
-            title: 'Number',
-            dataIndex: 'productQuanlity',
-            key: 'productQuanlity',
-      ///
+            title: 'Số lượng',
+            dataIndex: 'stock',
+            key: 'stock',
             render: (_, record) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{record.productQuanlity + record.productSold >= 0 ? (record.productQuanlity + record.productSold) : 0 }</p>,
             
         },
-    
         {
-            title: 'Category',
-            dataIndex: 'branchName',
-            key: 'branchName',
+            title: 'Loại sản phẩm',
+            dataIndex: 'categoryName',
+            key: 'categoryName',
             render: (_, record) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{record.branchName}</p>
         },
-        // {
-        //     title: 'Rate',
-        //     dataIndex: 'rate',
-        //     key: 'rate',
-        // },
-        // {
-        //     title: 'Views',
-        //     dataIndex: 'views',
-        //     key: 'views',
-        // },
         {
-            title: 'Sold',
-            dataIndex: 'productSold',
-            key: 'productSold',
+            title: 'Kiểu sản phẩm',
+            dataIndex: 'typeName',
+            key: 'typeName',
+            render: (_, record) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{record.branchName}</p>
+        },
+        {
+            title: 'Mô tả',
+            dataIndex: 'description',
+            key: 'description',
             render: (_, record) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{record.productSold}</p>
         },
         {
-            title: 'Available',
-            dataIndex: 'Available',
-            key: 'Available',
-            // render: (_, record) => <p>{record.productQuanlity - record.productSold >= 0 ? (record.productQuanlity - record.productSold) : 0 }</p>,
-            //sửa
+            title: 'Số lượng đã bán',
+            dataIndex: 'soldQuantity',
+            key: 'soldQuantity',
             render: (_, record) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{record.productQuanlity }</p>,
-
         },
         {
-
             title: 'Action',
             key: 'action',
             render: (_, record) => (

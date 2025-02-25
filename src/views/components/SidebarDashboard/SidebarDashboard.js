@@ -1,11 +1,7 @@
 import React from "react";
 import logdark from '../Dashboard/assets/images/logos/dark-logo.svg'
 import { Link } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import product from '../Dashboard/assets/images/logos/product.png'
-import branch from '../Dashboard/assets/images/logos/nullability.png'
-import dashboard from '../Dashboard/assets/images/logos/dashboard.png'
-import order from '../Dashboard/assets/images/logos/order.png'
 const SidebarDashboard = () => {
   return (
     <>
@@ -26,13 +22,12 @@ const SidebarDashboard = () => {
               <i class="ti ti-x fs-8"></i>
             </div>
           </div>
-
-          <nav class="sidebar-nav scroll-sidebar" data-simplebar="">
-            <ul id="sidebarnav">
+          <nav class="sidebar-nav" data-simplebar="">
+            <ul id="sidebarnav" style={{marginLeft: '0px'}}>
               <li class="sidebar-item">
                 <Link to={'/dashboard'} className="sidebar-link" aria-expanded="false" >
                 <span>
-                    <img src={dashboard}/>
+                    <img src={product}/>
                   </span>
                   <span class="hide-menu" style={{fontSize:"16px", color:"black", fontWeight:"500"}}>Dashboard</span>
                 </Link>
@@ -43,35 +38,27 @@ const SidebarDashboard = () => {
                   <span>
                   <img src={product} />
                     </span>
-                    <span class="hide-menu" style={{fontSize:"16px", color:"black", fontWeight:"500"}}>Sản phẩm</span>
+                    <span class="hide-menu" style={{fontSize:"16px", color:"black", fontWeight:"500"}}>Quản lý sản phẩm</span>
                 </Link>
               </li>           
               <li class="sidebar-item">
                 <Link to={'/dashboard/branch'} className="sidebar-link" aria-expanded="false">
                   <span>
-                      <img src={branch}/>
+                  <img src={product} />
                     </span>
-                    <span class="hide-menu" style={{fontSize:"16px", color:"black", fontWeight:"500"}}>Danh mục</span>
+                    <span class="hide-menu" style={{fontSize:"16px", color:"black", fontWeight:"500"}}>Quản lý loại sản phẩm</span>
                 </Link>
               </li>  
               <li class="sidebar-item">
-                <Link to={'/dashboard/product'} className="sidebar-link" aria-expanded="false">
+                <Link to={'/dashboard/type'} className="sidebar-link" aria-expanded="false">
                   <span>
                   <img src={product} />
                     </span>
-                    <span class="hide-menu" style={{fontSize:"16px", color:"black", fontWeight:"500"}}>Loại sách</span>
+                    <span class="hide-menu" style={{fontSize:"16px", color:"black", fontWeight:"500"}}>Quản lý kiểu sản phẩm</span>
                 </Link>
               </li> 
               <li class="sidebar-item">
-                <Link to={'/dashboard/product'} className="sidebar-link" aria-expanded="false">
-                  <span>
-                  <img src={product} />
-                    </span>
-                    <span class="hide-menu" style={{fontSize:"16px", color:"black", fontWeight:"500"}}>Cấu hình quyền</span>
-                </Link>
-              </li>  
-              <li class="sidebar-item">
-                <Link to={'/dashboard/product'} className="sidebar-link" aria-expanded="false">
+                <Link to={'/dashboard/payment'} className="sidebar-link" aria-expanded="false">
                   <span>
                   <img src={product} />
                     </span>
@@ -81,7 +68,7 @@ const SidebarDashboard = () => {
               <li class="sidebar-item">
                 <Link to={'/dashboard/order'} className="sidebar-link" aria-expanded="false">
                   <span>
-                      <img src={order}/>
+                      <img src={product}/>
                     </span>
                     <span class="hide-menu" style={{fontSize:"16px", color:"black", fontWeight:"500"}}>Đơn hàng</span>
                 </Link>
@@ -89,11 +76,20 @@ const SidebarDashboard = () => {
               <li class="sidebar-item">
                 <Link to={'/dashboard/accounts'} className="sidebar-link" aria-expanded="false">
                   <span>
-                      <img src={order}/>
+                      <img src={product}/>
                     </span>
-                    <span class="hide-menu" style={{fontSize:"16px", color:"black", fontWeight:"500"}}>Tài khoản</span>
+                    <span class="hide-menu" style={{fontSize:"16px", color:"black", fontWeight:"500"}}>Quản lý user</span>
                 </Link>
-              </li>           
+              </li>
+              
+              <li class="sidebar-item">
+                <Link to={'/dashboard/role'} className="sidebar-link" aria-expanded="false">
+                  <span>
+                  <img src={product} />
+                    </span>
+                    <span class="hide-menu" style={{fontSize:"16px", color:"black", fontWeight:"500"}}>Quản lý quyền</span>
+                </Link>
+              </li>         
             </ul>
           </nav>
         </div>

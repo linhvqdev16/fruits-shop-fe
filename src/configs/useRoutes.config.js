@@ -15,9 +15,9 @@ import ForgotPass from "@views/components/Login/ForgotPass";
 import LayoutUser from "@views/layouts/LayoutUser";
 import ProfileUser from "@views/components/ProfileUser/ProfileUser";
 import History from "@views/components/History/History";
-import ProductManager from "@views/components/Dashboard/ProductManager/ProductManager";
 import Edit from "@views/components/ProductManager/Edit";
 import Detail from "@views/components/ProductManager/Detail";
+import ProductManager from "@views/components/ProductManager/ProductManager";
 import BranchManager from "@views/components/BranchManager/BranchManager";
 import DetailBranch from "@views/components/BranchManager/DetailBranch";
 import EditBranch from "@views/components/BranchManager/EditBranch";
@@ -25,19 +25,16 @@ import OrderManager from "@views/components/OrderManager/OrderManager";
 import DetailOrder from "@views/components/OrderManager/DetailOrder";
 import ManagerUser from "../views/components/ManagerUser/ManagerUser";
 import DetailUser from "../views/components/ManagerUser/DetailUser";
-const ICON_SIZE = "15px";
+import ProductTypeManager from "../views/components/ProductType/ProductTypeManager";
+import ProductTypeDetail from "../views/components/ProductType/ProductTypeDetail";
+import RoleManager from "../views/components/RoleManager/RoleManager";
+import RoleDetail from "../views/components/RoleManager/RoleDetail";
+import PaymentManager from "../views/components/PaymentManager/PaymentManager";
+import PaymentDetail from "../views/components/PaymentManager/PaymentDetail";
+
+
 const useRoutes = () => {
   const t = useTranslate();
-  function getItem(label, key, path, icon, element, type) {
-    return {
-      label,
-      key,
-      icon,
-      path,
-      element,
-      type,
-    };
-  }
   const publicRoutes = [
     {
       key: "/dashboard",
@@ -126,13 +123,13 @@ const useRoutes = () => {
       key: "/reset-pass",
       label: "ResetPass",
       path: "/reset-pass",
-      element:(
+      element: (
         <LayoutClient>
-        <ForgotPass />
-      </LayoutClient>
+          <ForgotPass />
+        </LayoutClient>
       )
     },
-    
+
 
     {
       key: "/dashboard",
@@ -201,18 +198,79 @@ const useRoutes = () => {
       element: <Layout>
         <BranchManager />
       </Layout>,
-     
+
     },
     {
       key: "/dashboard/branch/:id",
       label: "Branch",
       path: "/dashboard/branch/:id",
       element: <Layout>
-        < DetailBranch/>
+        < DetailBranch />
       </Layout>,
-     
+
     },
 
+    // product type
+    {
+      key: "/dashboard/type",
+      label: "Product Type",
+      path: "/dashboard/type",
+      element: <Layout>
+        <ProductTypeManager />
+      </Layout>,
+    },
+
+    {
+      key: "/dashboard/type/:id",
+      label: "Product Type Detail",
+      path: "/dashboard/type/:id",
+      element: <Layout>
+        < ProductTypeDetail />
+      </Layout>,
+
+    },
+
+    // role
+    {
+      key: "/dashboard/role",
+      label: "Product Type",
+      path: "/dashboard/role",
+      element: <Layout>
+        <RoleManager />
+      </Layout>,
+    },
+
+    {
+      key: "/dashboard/role/:id",
+      label: "Product Type Detail",
+      path: "/dashboard/role/:id",
+      element: <Layout>
+        < RoleDetail />
+      </Layout>,
+
+    },
+
+    // payment
+    {
+      key: "/dashboard/payment",
+      label: "Product Type",
+      path: "/dashboard/payment",
+      element: <Layout>
+        <PaymentManager />
+      </Layout>,
+    },
+
+    {
+      key: "/dashboard/payment/:id",
+      label: "Product Type Detail",
+      path: "/dashboard/payment/:id",
+      element: <Layout>
+        < PaymentDetail />
+      </Layout>,
+
+    },
+
+    // user
     {
       key: "/user-profile",
       label: "UserProfile",
@@ -237,7 +295,7 @@ const useRoutes = () => {
       element: <Layout>
         <EditBranch />
       </Layout>,
-     
+
     },
     //order
     {
@@ -272,8 +330,6 @@ const useRoutes = () => {
         <DetailUser />
       </Layout>
     }
-
-
   ];
 
   return {

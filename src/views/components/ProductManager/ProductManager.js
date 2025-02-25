@@ -3,16 +3,12 @@ import { Button, Select, Space, Table, Tag } from 'antd';
 import useProduct from '@api/useProduct';
 import { toast } from 'react-toastify';
 import { Pagination } from 'antd';
-import AddProduct from '@views/components/addProductDashboard/AddProduct';
-import { PlusOutlined } from '@ant-design/icons';
-import { Image, Upload } from 'antd'
 import Delete from './DeleteProduct';
-import Detail from './Detail';
-import Edit from './Edit';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleInfo, faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 import { Link, Navigate } from 'react-router-dom';
 import { render } from '@testing-library/react';
+import AddProduct from '../addProductDashboard/AddProduct';
   
 function ProductManager() {
     function formatCurrencyVND(amount) {
@@ -25,8 +21,6 @@ function ProductManager() {
 
     const [loading, setLoading] = useState(false);
 
-
-
     const [total, setTotal] = useState();
     const [tableParams, setTableParams] = useState({
       pagination: {
@@ -35,6 +29,7 @@ function ProductManager() {
       },
     });
     const fetchData = async () => {
+        debugger;
         const {success,data} = await getAll(tableParams.pagination);
         if(!success || data.status == 'Error') {
             toast.error('Có lỗi xảy ra')
@@ -44,9 +39,9 @@ function ProductManager() {
             setTotal(data.data.totalCount)
         }
     }
-    useEffect(() => {
-        fetchData()
-    }, [JSON.stringify(tableParams), loading])
+    // useEffect(() => {
+    //     fetchData()
+    // }, [JSON.stringify(tableParams), loading])
 
 
     const handleTableChange = (pagination, filters, sorter) => {
@@ -65,59 +60,59 @@ function ProductManager() {
             pageSize: pageSize
         }})
     };
-
-    
-
-      
     const columns = [
         {
-            title: 'Name',
-            dataIndex: 'productName',
-            key: 'productName',
+            title: 'STT',
+            dataIndex: 'number',
+            key: 'number',
             render: (text) => <a style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{text}</a>,
         },
         {
-            title: 'Price ',
-            dataIndex: 'prodcutPrice',
+            title: 'Tên sản phẩm',
+            dataIndex: 'name',
+            key: 'name',
+            render: (text) => <a style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{text}</a>,
+        },
+        {
+            title: 'Mã sản phẩm',
+            dataIndex: 'code',
+            key: 'code',
+            render: (text) => <a style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{text}</a>,
+        },
+        {
+            title: 'Giá sản phẩm',
+            dataIndex: 'price',
             render: (text) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{formatCurrencyVND(text)}</p>,
         },
         {
-            title: 'Number',
-            dataIndex: 'productQuanlity',
-            key: 'productQuanlity',
-      ///
+            title: 'Số lượng',
+            dataIndex: 'stock',
+            key: 'stock',
             render: (_, record) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{record.productQuanlity + record.productSold >= 0 ? (record.productQuanlity + record.productSold) : 0 }</p>,
             
         },
-    
         {
-            title: 'Category',
-            dataIndex: 'branchName',
-            key: 'branchName',
+            title: 'Loại sản phẩm',
+            dataIndex: 'categoryName',
+            key: 'categoryName',
             render: (_, record) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{record.branchName}</p>
         },
-        // {
-        //     title: 'Rate',
-        //     dataIndex: 'rate',
-        //     key: 'rate',
-        // },
-        // {
-        //     title: 'Views',
-        //     dataIndex: 'views',
-        //     key: 'views',
-        // },
         {
-            title: 'Sold',
-            dataIndex: 'productSold',
-            key: 'productSold',
+            title: 'Kiểu sản phẩm',
+            dataIndex: 'typeName',
+            key: 'typeName',
+            render: (_, record) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{record.branchName}</p>
+        },
+        {
+            title: 'Mô tả',
+            dataIndex: 'description',
+            key: 'description',
             render: (_, record) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{record.productSold}</p>
         },
         {
-            title: 'Available',
-            dataIndex: 'Available',
-            key: 'Available',
-            // render: (_, record) => <p>{record.productQuanlity - record.productSold >= 0 ? (record.productQuanlity - record.productSold) : 0 }</p>,
-            //sửa
+            title: 'Số lượng đã bán',
+            dataIndex: 'soldQuantity',
+            key: 'soldQuantity',
             render: (_, record) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{record.productQuanlity }</p>,
 
         },
@@ -144,10 +139,8 @@ function ProductManager() {
             ),
         },
         ];
-
     return ( 
         <>
-
             <AddProduct />
             <Table 
                 dataSource={product} columns={columns}     
@@ -165,5 +158,4 @@ function ProductManager() {
         </> 
     );
 }
-
 export default ProductManager;

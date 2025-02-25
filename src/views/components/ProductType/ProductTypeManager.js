@@ -4,18 +4,18 @@ import { toast } from 'react-toastify';
 import { Pagination } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { Image, Upload } from 'antd'
-import Delete from './DeleteBranch';
-import Detail from './DetailBranch';
-import Edit from './EditBranch';
+import Delete from './PrductTypeDelete';
+import Detail from './ProductTypeDetail';
+import Edit from './ProductTypeEdit';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleInfo, faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 import { Link, Navigate } from 'react-router-dom';
 import useBranch from '@api/useBranch';
-import AddBranch from './AddBranch';
-import DeleteBranch from './DeleteBranch';
-import EditBranch from './EditBranch';
+import AddBranch from './ProductTypeAdd';
+import DeleteBranch from './PrductTypeDelete';
+import EditBranch from './ProductTypeEdit';
 
-function BranchManager() {
+function ProductTypeManager() {
     const { getBranch } = useBranch()
 
     const [branch, setBranch] = useState([])
@@ -42,11 +42,9 @@ function BranchManager() {
             setTotal(data.data.totalCount)
         }
     }
-    
     // useEffect(() => {
     //     fetchData()
     // }, [JSON.stringify(tableParams), loading, searchName])
-
     const handleChangeName = (e) => {
         setSearchName(e.target.value)
     }
@@ -69,7 +67,6 @@ function BranchManager() {
         })
     };
     const columns = [
-
         {
             title: 'STT',
             dataIndex: 'orderNumber',
@@ -139,4 +136,4 @@ function BranchManager() {
     );
 }
 
-export default BranchManager;
+export default ProductTypeManager;

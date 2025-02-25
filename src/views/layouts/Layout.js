@@ -6,8 +6,6 @@ import SidebarTop from '@views/components/SidebarTop/SidebarTop'
 
 const Layout = ({ children }) => {
 	return (
-
-
 		<div
         class="page-wrapper"
         id="main-wrapper"
@@ -20,21 +18,13 @@ const Layout = ({ children }) => {
         <SidebarDashboard />
         <div class="body-wrapper">
           <SidebarTop />
-          <div class="container-fluid">
+          <div class="container-fluid" style={{maxWidth: '100%'}}>
 		  <Body>
 					{children}
 				</Body>
           </div>
         </div>
       </div>
-
-		// <AntdLayout style={{ maxHeight: '100vh', minHeight: '100vh' }}>
-		// 	<SidebarDashboard />
-		// 	<AntdLayout>
-				
-		// 	</AntdLayout>
-		// </AntdLayout>
 	)
 }
-
 export default Layout

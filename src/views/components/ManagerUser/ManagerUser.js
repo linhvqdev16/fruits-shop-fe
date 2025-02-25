@@ -6,6 +6,7 @@ import useAuth from '@api/useAuth';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { Pagination, Table, Space, Button } from 'antd';
+import UserAddOrChange from './UserAddOrChange'
 
 function formatCurrencyVND(amount) {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
@@ -17,7 +18,7 @@ function ManagerUser() {
     const {getUser} = useAuth();
 
     const [orders, setOrder] = useState([])
-    const [loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(false)
     const [total,setTotal] = useState(0)
     const [tableParams, setTableParams] = useState({
         pagination: {
@@ -39,9 +40,9 @@ function ManagerUser() {
             toast.error(data.message)
         }
     }
-    useEffect(() => {
-        fetchData()    
-    }, [JSON.stringify(tableParams), loading])
+    // useEffect(() => {
+    //     fetchData()    
+    // }, [JSON.stringify(tableParams), loading])
 
     const handleTableChange = (pagination, filters, sorter) => {
         setTableParams({
@@ -63,18 +64,29 @@ function ManagerUser() {
         })
     }
     const columns = [
-
         {
-            title: 'UserName',
-            dataIndex: 'userName',
-            key: 'userName',
-            render: (_, record) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{record.userName}</p>
+            title: 'STT',
+            dataIndex: 'orderNumber',
+            key: 'orderNumber',
+            render: (_, record) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{record.orderNumber}</p>
         },
         {
-            title: 'Phone',
-            dataIndex: 'phone',
-            key: 'phone',
-            render: (_, record) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{record.phone}</p>
+            title: 'User code',
+            dataIndex: 'code',
+            key: 'code',
+            render: (_, record) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{record.code}</p>
+        },
+        {
+            title: 'Full name',
+            dataIndex: 'fullName',
+            key: 'fullName',
+            render: (_, record) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{record.fullName}</p>
+        },
+        {
+            title: 'PhoneNumber',
+            dataIndex: 'phoneNumber',
+            key: 'phoneNumber',
+            render: (_, record) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{record.phoneNumber}</p>
         },
         {
             title: 'Email',
@@ -83,11 +95,29 @@ function ManagerUser() {
             render: (_, record) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{record.email}</p>
         },
         {
-            title: 'RoleName',
-            dataIndex: 'roleName',
-            key: 'roleName',
-            render: (_, record) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{record.roleName}</p>
+            title: 'Date birth',
+            dataIndex: 'dateBirth',
+            key: 'dateBirth',
+            render: (_, record) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{record.dateBirth}</p>
         },
+        {
+            title: 'UserName',
+            dataIndex: 'userName',
+            key: 'userName',
+            render: (_, record) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{record.userName}</p>
+        },
+        {
+            title: 'Gender',
+            dataIndex: 'gender',
+            key: 'gender',
+            render: (_, record) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{record.gender}</p>
+        },
+           {
+            title: 'RoleCode',
+            dataIndex: 'roleCode',
+            key: 'roleCode',
+            render: (_, record) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{record.roleCode}</p>
+        },  
         {
             title: 'Action',
             key: 'action',
@@ -107,6 +137,7 @@ function ManagerUser() {
     return (
 
         <>
+        <UserAddOrChange/>
          <Table 
                 dataSource={user}   
                 columns={columns}

@@ -38,19 +38,19 @@ const Login = () => {
 
   const handleLogin = async () => {
     const { success, data } = await login({
-      UserName: formik.values["username"],
-      Password: formik.values["password"],
+      userName: formik.values["username"],
+      password: formik.values["password"],
     });
-
-    if (data.status == "Error") {
+    debugger;
+    if (!data.success) {
       toast.error(data.message);
     } else {
       toast.success(data.message);
-      if(data.data.roleName.includes('Admin')) {
-        changeData({username: data.data.userName, token:  data.data.accessTken})
+      if(data.data.data.roleCode.includes('ADMIN') || data.data.data.roleCode.includes('EMPLOYEE')) {
+        changeData({username: data.data.data.userName, token:  data.data.token})
         navigate('/dashboard')
       } else {
-        changeData({username: data.data.userName, token:  data.data.accessTken})
+        changeData({username: data.data.data.userName, token:  data.data.token})
         navigate('/')
       }
     }
