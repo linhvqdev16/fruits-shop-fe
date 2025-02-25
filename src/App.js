@@ -43,21 +43,6 @@ const App = () => {
     </Routes>
   );
 
-
-  const renderRoutePrivate = (routes) => (
-    <Routes>
-      {routes.map((route) =>
-        "children" in route ? (
-          <Route key={route.key} {...route}>
-            {renderRoute(route.children)}
-          </Route>
-        ) : (
-          <Route key={route.key} {...route} />
-        )
-      )}
-    </Routes>
-  );
-
   useEffect(() => {
   	token ? setReady(true) : setReady(false);
   }, [])

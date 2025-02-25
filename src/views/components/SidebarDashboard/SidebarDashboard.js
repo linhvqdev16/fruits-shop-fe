@@ -53,7 +53,31 @@ const SidebarDashboard = () => {
                     </span>
                     <span class="hide-menu" style={{fontSize:"16px", color:"black", fontWeight:"500"}}>Danh mục</span>
                 </Link>
-              </li>           
+              </li>  
+              <li class="sidebar-item">
+                <Link to={'/dashboard/product'} className="sidebar-link" aria-expanded="false">
+                  <span>
+                  <img src={product} />
+                    </span>
+                    <span class="hide-menu" style={{fontSize:"16px", color:"black", fontWeight:"500"}}>Loại sách</span>
+                </Link>
+              </li> 
+              <li class="sidebar-item">
+                <Link to={'/dashboard/product'} className="sidebar-link" aria-expanded="false">
+                  <span>
+                  <img src={product} />
+                    </span>
+                    <span class="hide-menu" style={{fontSize:"16px", color:"black", fontWeight:"500"}}>Cấu hình quyền</span>
+                </Link>
+              </li>  
+              <li class="sidebar-item">
+                <Link to={'/dashboard/product'} className="sidebar-link" aria-expanded="false">
+                  <span>
+                  <img src={product} />
+                    </span>
+                    <span class="hide-menu" style={{fontSize:"16px", color:"black", fontWeight:"500"}}>Cổng thanh toán</span>
+                </Link>
+              </li>              
               <li class="sidebar-item">
                 <Link to={'/dashboard/order'} className="sidebar-link" aria-expanded="false">
                   <span>

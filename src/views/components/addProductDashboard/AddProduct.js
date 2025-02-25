@@ -181,7 +181,7 @@ const handleChange = (value) => {
           <Row gutter={[16, 16]}>
             <Col span={8}>
               <Form.Item
-                label="Tên sản phẩm"
+                label="Tên sách"
                 name="productName"
                 rules={[{ required: true, message: "Please input product name!" }]}
                
@@ -213,7 +213,7 @@ const handleChange = (value) => {
          
           <Col span={8}>
             <Form.Item
-              label="Thương hiệu"
+              label="Loại sách"
               name="originId"
               rules={[{ required: true, message: "Please input Origin" }]}
             >

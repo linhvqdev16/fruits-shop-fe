@@ -39,7 +39,7 @@ function Navbar() {
             <small className="me-3">
               <i className="fas fa-envelope me-2 text-secondary"></i>
               <a href="#" className="text-white">
-                tien71095@gmail.com
+                demo@gmail.com
               </a>
             </small>
           </div>
@@ -60,7 +60,7 @@ function Navbar() {
       <div className="container px-0" >
         <nav className="navbar navbar-light  navbar-expand-xl" style={{backgroundColor:"#F4F6F8 "}}>
           <Link to="/" className="navbar-brand">
-            <h1 className="text-primary display-6">Food Shop</h1>
+            <h1 className="text-primary display-6">Book Store</h1>
           </Link>
           <button
             className="navbar-toggler py-2 px-3"
