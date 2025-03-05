@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { useToast } from "@utils/toastContext";
 
 
-const ProductTypeAdd = ({fetchData}) => {
+const ProductTypeAdd = ({fetchData, modelItem}) => {
 
   const [modal2Open, setModal2Open] = useState(false);
   const [form] = Form.useForm()
@@ -45,6 +45,9 @@ const ProductTypeAdd = ({fetchData}) => {
   };
 
   const showModel = () => {
+    if(modelItem){
+      form.setFieldsValue({ code: modelItem.code, name: modelItem.name, description: modelItem.description });
+    }
     setModal2Open(true); 
     fetchGenerateCode();
   }

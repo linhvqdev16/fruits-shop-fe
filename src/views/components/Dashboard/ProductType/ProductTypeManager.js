@@ -14,6 +14,7 @@ function ProductTypeManager() {
     const [types, setType] = useState([])
     const [loading, setLoading] = useState(false);
     const [total, setTotal] = useState();
+    const [selectedItem, setSelectedItem] = useState();
 
     const [tableParams, setTableParams] = useState({
         pagination: {
@@ -87,8 +88,12 @@ function ProductTypeManager() {
     );
 
     const handleMenuClick = (action, record) => {
-        console.log(`${action} action on row`, record);
+         if(action === 'Edit'){
+            debugger;
+            setSelectedItem(record);
+         }
     };
+    
 
     const columns = [
         {
@@ -173,7 +178,7 @@ function ProductTypeManager() {
                     </Form.Item>
                 </Col>
                 <Col span={8} style={{ textAlign: 'right' }}>
-                    <ProductTypeAdd fetchData={fetchData} />
+                    <ProductTypeAdd fetchData={fetchData} modelItem={null}/>
                 </Col>
             </Row>
             <Table
@@ -183,6 +188,7 @@ function ProductTypeManager() {
                 loading={loading}
                 onChange={handleTableChange}
             />
+            {(<ProductTypeAdd fetchData={fetchData} modelItem={selectedItem} />)}
             <Pagination
                 showSizeChanger
                 onChange={onShowSizeChange}
