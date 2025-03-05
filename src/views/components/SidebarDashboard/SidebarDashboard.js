@@ -1,8 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import logdark from '../Dashboard/assets/images/logos/dark-logo.svg'
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import product from '../Dashboard/assets/images/logos/product.png'
+import { Sidebar, Menu, MenuItem, SubMenu } from 'react-pro-sidebar';
+import {IconLayoutDashboard, IconBookUpload,IconLogout2,IconDeviceDesktopCog    } from '@tabler/icons-react'
 const SidebarDashboard = () => {
+  const [activeMenu, setActiveMenu] = useState('');
+  const location = useLocation();
+
+  const handleMenuClick = (menuName) => {
+    setActiveMenu(menuName);
+  };
+  const isActiveMenu = (menuName) => {
+    return activeMenu == menuName;
+  };
   return (
     <>
       <aside class="left-sidebar">
@@ -23,74 +34,107 @@ const SidebarDashboard = () => {
             </div>
           </div>
           <nav class="sidebar-nav" data-simplebar="">
-            <ul id="sidebarnav" style={{marginLeft: '0px'}}>
-              <li class="sidebar-item">
-                <Link to={'/dashboard'} className="sidebar-link" aria-expanded="false" >
-                <span>
-                    <img src={product}/>
-                  </span>
-                  <span class="hide-menu" style={{fontSize:"16px", color:"black", fontWeight:"500"}}>Dashboard</span>
-                </Link>
-              </li>
-
-              <li class="sidebar-item">
-                <Link to={'/dashboard/product'} className="sidebar-link" aria-expanded="false">
-                  <span>
-                  <img src={product} />
-                    </span>
-                    <span class="hide-menu" style={{fontSize:"16px", color:"black", fontWeight:"500"}}>Quản lý sản phẩm</span>
-                </Link>
-              </li>           
-              <li class="sidebar-item">
-                <Link to={'/dashboard/branch'} className="sidebar-link" aria-expanded="false">
-                  <span>
-                  <img src={product} />
-                    </span>
-                    <span class="hide-menu" style={{fontSize:"16px", color:"black", fontWeight:"500"}}>Quản lý loại sản phẩm</span>
-                </Link>
-              </li>  
-              <li class="sidebar-item">
-                <Link to={'/dashboard/type'} className="sidebar-link" aria-expanded="false">
-                  <span>
-                  <img src={product} />
-                    </span>
-                    <span class="hide-menu" style={{fontSize:"16px", color:"black", fontWeight:"500"}}>Quản lý kiểu sản phẩm</span>
-                </Link>
-              </li> 
-              <li class="sidebar-item">
-                <Link to={'/dashboard/payment'} className="sidebar-link" aria-expanded="false">
-                  <span>
-                  <img src={product} />
-                    </span>
-                    <span class="hide-menu" style={{fontSize:"16px", color:"black", fontWeight:"500"}}>Cổng thanh toán</span>
-                </Link>
-              </li>              
-              <li class="sidebar-item">
-                <Link to={'/dashboard/order'} className="sidebar-link" aria-expanded="false">
-                  <span>
-                      <img src={product}/>
-                    </span>
-                    <span class="hide-menu" style={{fontSize:"16px", color:"black", fontWeight:"500"}}>Đơn hàng</span>
-                </Link>
-              </li>           
-              <li class="sidebar-item">
-                <Link to={'/dashboard/accounts'} className="sidebar-link" aria-expanded="false">
-                  <span>
-                      <img src={product}/>
-                    </span>
-                    <span class="hide-menu" style={{fontSize:"16px", color:"black", fontWeight:"500"}}>Quản lý user</span>
-                </Link>
-              </li>
-              
-              <li class="sidebar-item">
-                <Link to={'/dashboard/role'} className="sidebar-link" aria-expanded="false">
-                  <span>
-                  <img src={product} />
-                    </span>
-                    <span class="hide-menu" style={{fontSize:"16px", color:"black", fontWeight:"500"}}>Quản lý quyền</span>
-                </Link>
-              </li>         
-            </ul>
+            <Sidebar>
+              <Menu>
+                <MenuItem
+                  component={<Link to={'/dashboard'} className="sidebar-link" aria-expanded="false" ></Link>}
+                  onClick={() => handleMenuClick('dashboard')}
+                  className={isActiveMenu('dashboard') ? 'selected-item' : ''}
+                  active={isActiveMenu('dashboard')}
+                  icon={<IconLayoutDashboard stroke={2}/>}
+                  > Trang chủ </MenuItem>
+                <MenuItem   icon={<IconBookUpload stroke={2}/>}> Bán hàng tại quầy </MenuItem>
+                <SubMenu label="Thống kê" icon={<IconDeviceDesktopCog stroke={2}/>}>
+                <MenuItem
+                    component={<Link to={'/dashboard/product'} className="sidebar-link" aria-expanded="false" ></Link>}
+                    onClick={() => handleMenuClick('product')}
+                    className={isActiveMenu('product') ? 'selected-item' : ''}
+                    active={isActiveMenu('product')}> Đơn hàng </MenuItem>
+                     <MenuItem
+                    component={<Link to={'/dashboard/product'} className="sidebar-link" aria-expanded="false" ></Link>}
+                    onClick={() => handleMenuClick('product')}
+                    className={isActiveMenu('product') ? 'selected-item' : ''}
+                    active={isActiveMenu('product')}> Đánh giá sản phẩm </MenuItem>
+                </SubMenu>
+                <SubMenu label="Quản lý sản phẩm" icon={<IconDeviceDesktopCog stroke={2}/>}>
+                  <MenuItem
+                    component={<Link to={'/dashboard/product'} className="sidebar-link" aria-expanded="false" ></Link>}
+                    onClick={() => handleMenuClick('product')}
+                    className={isActiveMenu('product') ? 'selected-item' : ''}
+                    active={isActiveMenu('product')}> Danh sách sản phẩm </MenuItem>
+                  <MenuItem
+                    component={<Link to={'/dashboard/branch'} className="sidebar-link" aria-expanded="false" ></Link>}
+                    onClick={() => handleMenuClick('branch')}
+                    className={isActiveMenu('branch') ? 'selected-item' : ''}
+                    active={isActiveMenu('branch')}> Danh sách loại </MenuItem>
+                   <MenuItem
+                    component={<Link to={'/dashboard/type'} className="sidebar-link" aria-expanded="false" ></Link>}
+                    onClick={() => handleMenuClick('type')}
+                    className={isActiveMenu('type') ? 'selected-item' : ''}
+                    active={isActiveMenu('type')}> Danh sách gói </MenuItem>
+                </SubMenu>
+                <SubMenu label="Quản lý tài khoản" icon={<IconDeviceDesktopCog stroke={2}/>}>
+                  <MenuItem
+                    component={<Link to={'/dashboard/accounts'} className="sidebar-link" aria-expanded="false" ></Link>}
+                    onClick={() => handleMenuClick('accounts')}
+                    className={isActiveMenu('accounts') ? 'selected-item' : ''}
+                    active={isActiveMenu('accounts')}> Khách hàng </MenuItem>
+                  <MenuItem
+                    component={<Link to={'/dashboard/accounts'} className="sidebar-link" aria-expanded="false" ></Link>}
+                    onClick={() => handleMenuClick('accounts')}
+                    className={isActiveMenu('accounts') ? 'selected-item' : ''}
+                    active={isActiveMenu('dashboard')}> Nhân viên </MenuItem>
+                </SubMenu>
+                <SubMenu label="Quản lý khuyến mại" icon={<IconDeviceDesktopCog stroke={2}/>}>
+                  <MenuItem
+                    component={<Link to={'/dashboard/product'} className="sidebar-link" aria-expanded="false" ></Link>}
+                    onClick={() => handleMenuClick('product')}
+                    className={isActiveMenu('product') ? 'selected-item' : ''}
+                    active={isActiveMenu('product')}> Coupon </MenuItem>
+                  <MenuItem
+                    component={<Link to={'/dashboard/product'} className="sidebar-link" aria-expanded="false" ></Link>}
+                    onClick={() => handleMenuClick('product')}
+                    className={isActiveMenu('product') ? 'selected-item' : ''}
+                    active={isActiveMenu('product')}> Discount </MenuItem>
+                </SubMenu>
+                <SubMenu label="Quản lý đơn hàng" icon={<IconDeviceDesktopCog stroke={2}/>}>
+                  <MenuItem
+                    component={<Link to={'/dashboard/order'} className="sidebar-link" aria-expanded="false" ></Link>}
+                    onClick={() => handleMenuClick('order')}
+                    className={isActiveMenu('order') ? 'selected-item' : ''}
+                    active={isActiveMenu('order')}> Đơn hàng </MenuItem>
+                  <MenuItem
+                    component={<Link to={'/dashboard/order'} className="sidebar-link" aria-expanded="false" ></Link>}
+                    onClick={() => handleMenuClick('order')}
+                    className={isActiveMenu('order') ? 'selected-item' : ''}
+                    active={isActiveMenu('order')}> Danh sách hoàn đơn </MenuItem>
+                </SubMenu>
+                <SubMenu label="Quản lý cấu hình" icon={<IconDeviceDesktopCog stroke={2}/>}>
+                  <MenuItem
+                    component={<Link to={'/dashboard/order'} className="sidebar-link" aria-expanded="false" ></Link>}
+                    onClick={() => handleMenuClick('order')}
+                    className={isActiveMenu('order') ? 'selected-item' : ''}
+                    active={isActiveMenu('order')}> Phân quyền </MenuItem>
+                  <MenuItem
+                    component={<Link to={'/dashboard/order'} className="sidebar-link" aria-expanded="false" ></Link>}
+                    onClick={() => handleMenuClick('order')}
+                    className={isActiveMenu('order') ? 'selected-item' : ''}
+                    active={isActiveMenu('order')}> Thanh toán </MenuItem>
+                    <MenuItem
+                    component={<Link to={'/dashboard/order'} className="sidebar-link" aria-expanded="false" ></Link>}
+                    onClick={() => handleMenuClick('order')}
+                    className={isActiveMenu('order') ? 'selected-item' : ''}
+                    active={isActiveMenu('order')}> Vận chuyển </MenuItem>
+                </SubMenu>
+                <MenuItem
+                  component={<Link to={'/dashboard/product'} className="sidebar-link" aria-expanded="false" ></Link>}
+                  onClick={() => handleMenuClick('dashboard')}
+                  className={isActiveMenu('dashboard') ? 'selected-item' : ''}
+                  active={isActiveMenu('dashboard')}
+                  icon={<IconLogout2 stroke={2} />}
+                  > Đăng xuất </MenuItem>
+              </Menu>
+            </Sidebar>
           </nav>
         </div>
       </aside>

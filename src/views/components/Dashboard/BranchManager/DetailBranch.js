@@ -1,5 +1,3 @@
-import useProduct from "@api/useProduct";
-import StarRating from "@components/Rate/StarRating";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";

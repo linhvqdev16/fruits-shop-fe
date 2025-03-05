@@ -3,11 +3,12 @@ import { Button, Col, Form, Input, Modal, Row, Select, message } from "antd";
 import React, { useEffect, useState } from "react";
 import { PlusOutlined } from '@ant-design/icons';
 import { Image, Upload } from 'antd';
-import useBranch from "@api/useBranch";
-import useOrigin from "@api/useOrigin";
+import useCategory from "@api/useCategory";
+import useType from "@api/useType";
 import useProduct from "@api/useProduct";
 import { toast } from "react-toastify";
 import { useForm } from "antd/es/form/Form";
+
 const getBase64 = (file) =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -17,6 +18,9 @@ const getBase64 = (file) =>
   });
 
 const AddProduct = () => {
+
+  const { generateCode } = useProduct();
+
   const [modal2Open, setModal2Open] = useState(false);
   const [form] = Form.useForm();
   const { createProduct } = useProduct();
@@ -24,45 +28,58 @@ const AddProduct = () => {
   const [previewImage, setPreviewImage] = useState('');
 
 
-  const { getAllBranch } = useBranch()
-  const { getAllOrigin } = useOrigin()
-  // const {getAllOrigin} = useOrigin()
-  const [branch, setBranch] = useState([])
-  const [origin, setOrigin] = useState([])
+  const { getList } = useCategory()
+  const { getListType } = useType()
+  const [category, setCategory] = useState([])
+  const [types, setType] = useState([])
 
 
   const handleRemove = () => {
     console.log('delete');
   }
-  const fetchbranch = async () => {
-    const { success, data } = await getAllBranch();
+
+  const fetchGenerateCode = async () => {
+    const { success, data } = await generateCode();
     if (data != null && success) {
-      var databranch = data.data.map((items) => {
-        return {
-          value: items.id,
-          label: items.branchName
-        }
-      });
-      setBranch(databranch)
-    }
-  }
-  const fetchOrigin = async () => {
-    const { success, data } = await getAllOrigin();
-    if (data != null && success) {
-      var dataOrigin = data.data.map((items) => {
-        return {
-          value: items.id,
-          label: items.originName
-        }
-      });
-      setOrigin(dataOrigin)
+      form.setFieldsValue({code: data.data});
     }
   }
 
-  // useEffect(() => {
-  //   fetchbranch()
-  //   fetchOrigin()
-  // }, [])
+  const fetchCategory = async () => {
+    const { success, data } = await getList({pageIndex: 1, pageSize: 20});
+    if (data != null && success) {
+      var dataCategory = data.data.map((item) => {
+        return {
+          value: item.id,
+          label: item.name
+        }
+      });
+      setCategory(dataCategory)
+    }
+  }
+
+
+  const fetchTypes = async () => {
+    const { success, data } = await getListType({pageIndex: 1, pageSize: 20});
+    if (data != null && success) {
+      var dataOrigin = data.data.map((item) => {
+        return {
+          value: item.id,
+          label: item.name
+        }
+      });
+      setType(dataOrigin)
+    }
+  }
+
+ 
+  const showModel = () => {
+    setModal2Open(true);
+    fetchCategory();
+    fetchTypes();
+    fetchGenerateCode();
+  }
+
   const [fileList, setFileList] = useState([]);
   const [fileListUpload, setfileListUpload] = useState([]);
   const handlePreview = async (file) => {
@@ -120,7 +137,7 @@ const AddProduct = () => {
         toast.error(data.message)
       }
     } catch (error) {
-      toast.error(error.message)
+      toast.error("loi")
     }
   };
 
@@ -148,9 +165,9 @@ const AddProduct = () => {
           background: "#1fbf39",
           marginBottom: "20px",
         }}
-        onClick={() => setModal2Open(true)}
+        onClick={() => showModel()}
       >
-        <PlusSquareOutlined /> Thêm mới
+        <PlusSquareOutlined /> Thêm
       </Button>
 
       <Modal
@@ -170,20 +187,37 @@ const AddProduct = () => {
 
         >
           <Row gutter={[16, 16]}>
-            <Col span={8}>
+
+          <Col span={12}>
               <Form.Item
                 label="Mã sản phẩm"
                 name="code"
                 rules={[{ required: true, message: "Please input product code!" }]}
+
               >
-                <Input placeholder="Mã sản phẩm" />
+                <Input placeholder="Product Name" readOnly={true}/>
+
               </Form.Item>
             </Col>
-            <Col span={8}>
+
+            <Col span={12}>
               <Form.Item
-                label="Loại sản phẩm"
+                label="Tên sách"
+                name="productName"
+                rules={[{ required: true, message: "Please input product name!" }]}
+
+              >
+                <Input placeholder="Product Name" />
+
+              </Form.Item>
+            </Col>
+
+
+            <Col span={12}>
+              <Form.Item
+                label="Danh mục"
                 name="categoryId"
-                rules={[{ required: true, message: "Please input category type!" }]}
+                rules={[{ required: true, message: "Please input category!" }]}
               >
                 <Select
                   placeholder="Please select"
@@ -191,63 +225,63 @@ const AddProduct = () => {
                   style={{
                     width: '100%'
                   }}
-                  options={branch}
+                  options={category}
                 />
               </Form.Item>
+
+
             </Col>
 
-            <Col span={8}>
+            <Col span={12}>
               <Form.Item
-                label="Kiểu sản phẩm"
-                name="typeId"
-                rules={[{ required: true, message: "Please input product type" }]}
-              >
+                label="Loại sách"
+                name="type"
+                rules={[{ required: true, message: "Please input Origin" }]}>
                 <Select
                   placeholder="Please select"
                   onChange={handleChange}
                   style={{
                     width: '100%',
                   }}
-                  options={origin}
+                  options={types}
                 />
               </Form.Item>
             </Col>
 
-            <Col span={8}>
+            <Col span={12}>
               <Form.Item
                 label="Giá sản phẩm"
-                name="price"
+                name="productPrice"
                 rules={[{ required: true, message: "Please input product price!" }]}
               >
-                <Input placeholder="Price" type="number" />
+                <Input placeholder="Price" type="text" />
               </Form.Item>
             </Col>
 
-            <Col span={8}>
+            <Col span={12}>
               <Form.Item
                 label="Số lượng"
-                name="stock"
+                name="productQuantity"
                 rules={[
                   { required: true, message: "Please input product quantity!" },
                 ]}
               >
-                <Input placeholder="Quantity" type="number" />
+                <Input placeholder="Quantity" type="text" />
               </Form.Item>
             </Col>
 
-            <Col span={8}>
+            <Col span={24}>
               <Form.Item
                 label="Mô tả"
-                name="description"
+                name="productDescription"
                 rules={[
                   { required: false, message: "Please input product description!" },
-                ]}
-              >
-                <Input.TextArea placeholder="Description" rows={5}/>
+                ]}  >
+                <Input.TextArea placeholder="Description"/>
               </Form.Item>
             </Col>
-            <Col span={8}>
 
+            <Col span={12}>
               <Form.Item
                 label="Hình ảnh"
                 name="listFileImg"

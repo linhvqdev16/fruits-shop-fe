@@ -17,7 +17,6 @@ function Detail() {
         const { success, data } = await getAllById(param.id);
         if (success && data.status != "Error") {
             setProduct(data.data);
-            debugger;
             console.log(data.data);
         } else {
             toast.error(data.message);

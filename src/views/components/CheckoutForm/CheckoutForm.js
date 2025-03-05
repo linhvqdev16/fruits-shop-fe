@@ -42,7 +42,6 @@ const CheckoutForm = () => {
         orderDescription: "order", 
         name: "order"
       });
-      debugger;
       if (data.status == "Error") {
            toast.error(data.message);
       } else {

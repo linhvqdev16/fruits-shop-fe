@@ -1,25 +1,41 @@
 import { PlusSquareOutlined } from "@ant-design/icons";
-import useBranch from "@api/useBranch";
 import { Button, Col, Form, Input, Modal, Row, Select, message } from "antd";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-function AddBranch() {
+import useCategory from "@api/useCategory"
+import { useToast } from "@utils/toastContext";
+
+const AddBranch = ({fechtList}) =>  {
 
     const [modal2Open, setModal2Open] = useState(false);
     const [form] = Form.useForm()
-    const {createBranch} = useBranch()
+    const {generateCode, addOrChange} = useCategory()
+    const { toastMsg } = useToast();
 
+    const fetchGenerateCode = async () => {
+      const { success, data } = await generateCode();
+      if (!success || data.status == 'Error') {
+        toastMsg(data.message, "error");
+      } else {
+        form.setFieldsValue({ code: data.data })
+      }
+    };
     const onFinish = async (values) => {
         try {
-            const branch = {
-              BranchName: values.BranchName
+            const models = {
+              code: values.code,
+              name: values.name, 
+              description: values.description, 
+              status: 1, 
+              isDeleted: 0
             }
-           const {success,data}  = await createBranch(branch, { "Content-Type": "multipart/form-data"})
+           const {success,data}  = await addOrChange(models)
             console.log(success,data);
            
             if (data.status != 'Error' && success) {
                 setModal2Open(false);
-                toast.success(data.message)
+                toast.success(data.message);
+                fechtList();
             } else {
                 toast.error(data.message)
             }
@@ -27,30 +43,28 @@ function AddBranch() {
           toast.error(error)
         }
       };
-
-
-      const onFinishFailed = () => {
-        
-      }
+      const showModel = () => {
+        setModal2Open(true); 
+        fetchGenerateCode();
+      };
+      const onFinishFailed = () => {};
     return ( <>  <div>
         <Button
           type="primary"
           value="large"
           style={{
-            marginTop: "40px",
-            display: "flex",
             alignItems: "center",
             background: "#1fbf39",
             marginBottom: "20px",
           }}
-          onClick={() => setModal2Open(true)}
+          onClick={() => showModel()}
         >
-          <PlusSquareOutlined /> Add
+          <PlusSquareOutlined /> Thêm mới
         </Button>
   
         <Modal
           width={'50%'}
-          title="Create new branch"
+          title="Thêm mới loại sách"
           centered
           visible={modal2Open}
           onCancel={() => setModal2Open(false)}
@@ -64,16 +78,41 @@ function AddBranch() {
             layout="vertical"
           >
             <Row gutter={[16, 16]}>
-              <Col span={8}>
+              <Col span={16}>
                 <Form.Item
-                  label="Branch Name"
-                  name="BranchName"
-                  rules={[{ required: true, message: "Please input branch name!" }]}
+                  label="Code"
+                  name="code"
+                  rules={[{ required: true, message: "Please input category code!" }]}
                 >
-                  <Input placeholder="Branch Name" />
+                  <Input placeholder="Category code auto generate" readOnly="true" />
                 </Form.Item>
               </Col>      
             </Row>
+
+            <Row gutter={[16, 16]}>
+            <Col span={16}>
+                <Form.Item
+                  label="Tên thể loại"
+                  name="name"
+                  rules={[{ required: true, message: "Please input category name!" }]}
+                >
+                  <Input placeholder="Please input category name" />
+                </Form.Item>
+              </Col>      
+            </Row>
+
+            <Row gutter={[16, 16]}>
+            <Col span={16}>
+                <Form.Item
+                  label="Mô tả"
+                  name="description"
+                  rules={[{ required: true, message: "Please input category description!" }]}
+                >
+                  <Input placeholder="Please input category description" />
+                </Form.Item>
+              </Col>      
+            </Row>
+
             <Form.Item>
               <Button type="primary" htmlType="submit" >
                 Submit

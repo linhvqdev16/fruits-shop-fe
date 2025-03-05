@@ -9,7 +9,7 @@
   transition: .2s ease-in;
   height: 100%;
   z-index: 11;
-  border-right: 1px solid rgb(229, 234, 239);
+  border-right: 0px solid rgb(229, 234, 239) !important;
 
   .scroll-sidebar {
     overflow-y: auto;

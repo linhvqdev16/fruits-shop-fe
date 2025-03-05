@@ -153,15 +153,12 @@ const OrderAddOrChange = () => {
                 type="primary"
                 value="large"
                 style={{
-                    marginTop: "40px",
-                    display: "flex",
                     alignItems: "center",
                     background: "#1fbf39",
-                    marginBottom: "20px",
+                    marginRight: "10px"
                 }}
                 onClick={() => setModal2Open(true)}
-            >
-                <PlusSquareOutlined /> Tạo đơn hàng
+            > <PlusSquareOutlined /> Tạo đơn hàng
             </Button>
 
             <Modal

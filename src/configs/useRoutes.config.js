@@ -15,22 +15,22 @@ import ForgotPass from "@views/components/Login/ForgotPass";
 import LayoutUser from "@views/layouts/LayoutUser";
 import ProfileUser from "@views/components/ProfileUser/ProfileUser";
 import History from "@views/components/History/History";
-import Edit from "@views/components/ProductManager/Edit";
-import Detail from "@views/components/ProductManager/Detail";
-import ProductManager from "@views/components/ProductManager/ProductManager";
-import BranchManager from "@views/components/BranchManager/BranchManager";
-import DetailBranch from "@views/components/BranchManager/DetailBranch";
-import EditBranch from "@views/components/BranchManager/EditBranch";
+import Edit from "@views/components/Dashboard/ProductManager/Edit";
+import Detail from "@views/components/Dashboard/ProductManager/Detail";
+import ProductManager from "@views/components/Dashboard/ProductManager/ProductManager";
+import BranchManager from "@views/components/Dashboard/BranchManager/BranchManager";
+import DetailBranch from "@views/components/Dashboard/BranchManager/DetailBranch";
+import EditBranch from "@views/components/Dashboard/BranchManager/EditBranch";
 import OrderManager from "@views/components/OrderManager/OrderManager";
 import DetailOrder from "@views/components/OrderManager/DetailOrder";
 import ManagerUser from "../views/components/ManagerUser/ManagerUser";
 import DetailUser from "../views/components/ManagerUser/DetailUser";
-import ProductTypeManager from "../views/components/ProductType/ProductTypeManager";
-import ProductTypeDetail from "../views/components/ProductType/ProductTypeDetail";
-import RoleManager from "../views/components/RoleManager/RoleManager";
-import RoleDetail from "../views/components/RoleManager/RoleDetail";
-import PaymentManager from "../views/components/PaymentManager/PaymentManager";
-import PaymentDetail from "../views/components/PaymentManager/PaymentDetail";
+import ProductTypeManager from "../views/components/Dashboard/ProductType/ProductTypeManager";
+import ProductTypeDetail from "../views/components/Dashboard/ProductType/ProductTypeDetail";
+import RoleManager from "../views/components/Dashboard/RoleManager/RoleManager";
+import RoleDetail from "../views/components/Dashboard/RoleManager/RoleDetail";
+import PaymentManager from "../views/components/Dashboard/PaymentManager/PaymentManager";
+import PaymentDetail from "../views/components/Dashboard/PaymentManager/PaymentDetail";
 
 
 const useRoutes = () => {

@@ -10,15 +10,18 @@ import { Provider } from "react-redux";
 import { store } from "./services/redux/stores";
 import { NotificationContainer } from "react-notifications";
 import { ToastContainer } from "react-toastify";
+import { LoadingProvider } from "@utils/loading/loadingContext";
+import {ToastProvider} from "@utils/toastContext"; 
+
 const App = () => {
   const navigate = useNavigate();
   const { routes } = useRoutes();
   const { token } = useUser();
   const [ready, setReady] = useState(false); // set after
-    const renderRoute = (routes) => (
-      <Routes>
-        {routes.map((route) =>
-          "children" in route ? (
+  const renderRoute = (routes) => (
+    <Routes>
+      {routes.map((route) =>
+        "children" in route ? (
           <Route key={route.key} {...route}>
             {renderRoute(route.children)}
           </Route>
@@ -45,17 +48,20 @@ const App = () => {
   );
 
   useEffect(() => {
-  	token ? setReady(true) : setReady(false);
+    token ? setReady(true) : setReady(false);
   }, [])
   return (
     <>
-      <Provider store={store}>
-        <ScrollToTop />
-        {renderRoute(routes)}
-        <ScrollToTopButton />
-      </Provider>
-        <ToastContainer position="bottom-right" autoClose={3000}/>
-      
+      <LoadingProvider>
+        <ToastProvider>
+          <Provider store={store}>
+            <ScrollToTop />
+            {renderRoute(routes)}
+            <ScrollToTopButton />
+          </Provider>
+          <ToastContainer position="top-right" autoClose={3000} />
+        </ToastProvider>
+      </LoadingProvider>
     </>
   );
 };

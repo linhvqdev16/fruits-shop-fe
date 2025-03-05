@@ -41,7 +41,6 @@ const Login = () => {
       userName: formik.values["username"],
       password: formik.values["password"],
     });
-    debugger;
     if (!data.success) {
       toast.error(data.message);
     } else {

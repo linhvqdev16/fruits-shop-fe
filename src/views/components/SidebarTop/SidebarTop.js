@@ -13,7 +13,7 @@ const SidebarTop = (data) => {
   return (
     <>
       <header class="app-header">
-        <nav class="navbar navbar-expand-lg navbar-light">
+        <nav class="navbar navbar-expand-md" style={{height: "30px"}}>
           <ul class="navbar">
             <li class="nav-item d-block d-xl-none">
               <a
@@ -25,9 +25,8 @@ const SidebarTop = (data) => {
               </a>
             </li>
           </ul>
-          <div class="navbar-collapse px-0" id="navbarNav">
+          <div class="navbar-collapse" id="navbarNav">
             <ul class="navbar-nav flex-row ms-auto align-items-center">
-              
             <li class="nav-item">
               <a class="nav-link nav-icon-hover" href="javascript:void(0)">
                <IconBellRinging stroke={2} size={35}/>

@@ -1,26 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Dropdown, Menu, Select, Table } from 'antd';
+import { Button, Select, Dropdown, Table, Menu } from 'antd';
 import { toast } from 'react-toastify';
 import { Pagination } from 'antd';
-import useCategory from '@api/useCategory';
-import AddBranch from './AddBranch';
-import { Col, Form, Input, Modal, Row } from "antd";
+import useType from '@api/useType';
+import ProductTypeAdd from './ProductTypeAdd';
+import { Col, Form, Input, Row } from "antd";
 import { DownOutlined } from '@ant-design/icons';
-import { Option } from 'antd/es/mentions';
 
-function BranchManager() {
-    const { getList } = useCategory()
+function ProductTypeManager() {
+    const { getList } = useType()
+    const { Option } = Select;
 
-    const [branch, setBranch] = useState([])
+    const [types, setType] = useState([])
     const [loading, setLoading] = useState(false);
-
     const [total, setTotal] = useState();
+
     const [tableParams, setTableParams] = useState({
         pagination: {
             pageIndex: 1,
             pageSize: 10,
-            keySearch: "",
-            status: -1
+            keySearch: '',
+            status: null
         },
     });
 
@@ -29,15 +29,35 @@ function BranchManager() {
         if (!success || data.status == 'Error') {
             toast.error('Có lỗi xảy ra')
         } else {
-            setBranch(data.data)
+            setType(data.data)
             setLoading(false);
-            setTotal(data.totalCount)
+            setTotal(data.data.totalCount)
         }
     }
 
     useEffect(() => {
         fetchData()
-    }, [JSON.stringify(tableParams), loading]);
+    }, [JSON.stringify(tableParams), loading])
+
+    const handleChangeName = (e) => {
+        setTableParams((prevParms) => ({
+            ...prevParms,
+            pagination: {
+                ...prevParms.pagination,
+                keySearch: e.target.value
+            }
+        }));
+    }
+
+    const handleChangeSelect = (value) => {
+        setTableParams((prevParms) => ({
+            ...prevParms,
+            pagination: {
+                ...prevParms.pagination,
+                status: value
+            }
+        }));
+    };
 
     const handleTableChange = (pagination, filters, sorter) => {
         setTableParams({
@@ -46,9 +66,10 @@ function BranchManager() {
             ...sorter,
         });
         if (pagination.pageSize !== tableParams.pagination?.pageSize) {
-            setBranch([]);
+            setType([]);
         }
     };
+
     const onShowSizeChange = (current, pageSize) => {
         setTableParams({
             pagination: {
@@ -57,32 +78,44 @@ function BranchManager() {
             }
         })
     };
+
+    const menu = (record) => (
+        <Menu>
+            <Menu.Item onClick={() => handleMenuClick('Edit', record)}>Edit</Menu.Item>
+            <Menu.Item onClick={() => handleMenuClick('Delete', record)}>Delete</Menu.Item>
+        </Menu>
+    );
+
+    const handleMenuClick = (action, record) => {
+        console.log(`${action} action on row`, record);
+    };
+
     const columns = [
         {
             title: 'STT',
             dataIndex: 'orderNumber',
             key: 'orderNumber',
-            render: (_, __, index) => <a style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{index + 1}</a>,
+            render: (_, __, index) => <a style={{ fontSize: "14px", color: "black", fontWeight: "500", textAlign: 'center' }}>{index + 1}</a>,
         },
         {
             title: 'Code',
             dataIndex: 'code',
             key: 'code',
-            render: (text) => <a style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{text}</a>,
+            render: (text) => <a style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{text}</a>,
         },
 
         {
             title: 'Tên',
             dataIndex: 'name',
             key: 'name',
-            render: (_, record) => <a style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{record.name}</a>
+            render: (text) => <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{text}</p>
         },
 
         {
             title: 'Mô tả',
             dataIndex: 'description',
             key: 'description',
-            render: (text) => <p style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{text}</p>
+            render: (text) => <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{text}</p>
         },
         {
             title: 'Trạng thái',
@@ -109,52 +142,21 @@ function BranchManager() {
             ),
         },
     ];
-
-    const handleChangeName = (e) => {
-        setTableParams((prevParms) => ({
-            ...prevParms,
-            pagination: {
-                ...prevParms.pagination,
-                keySearch: e.target.value
-            }
-        }));
-    }
-
-    const handleChangeSelect = (value) => {
-        setTableParams((prevParms) => ({
-            ...prevParms,
-            pagination: {
-                ...prevParms.pagination,
-                status: value
-            }
-        }));
-    };
-
-    const menu = (record) => (
-        <Menu>
-            <Menu.Item onClick={() => handleMenuClick('Edit', record)}>Edit</Menu.Item>
-            <Menu.Item onClick={() => handleMenuClick('Delete', record)}>Delete</Menu.Item>
-        </Menu>
-    );
-
-    const handleMenuClick = (action, record) => {
-        console.log(`${action} action on row`, record);
-    };
-
     return (
         <>
             <Row gutter={[16, 16]}>
                 <Col span={8}>
                     <Form.Item
                         label="Key search"
-                        name="productName"
-                        rules={[{ required: false, message: "Please input product name!" }]}><Input placeholder="Enter code, name category" onChange={(e) => handleChangeName(e)} />
+                        name="keySearch"
+                        rules={[{ required: false, message: "Please input product name!" }]}>
+                        <Input placeholder="Enter code, name category" onChange={(e) => handleChangeName(e)} />
                     </Form.Item>
                 </Col>
                 <Col span={8}>
                     <Form.Item
                         label="Trạng thái"
-                        name="originId"
+                        name="status"
                     >
                         <Select
                             value={tableParams.pagination.status}
@@ -164,19 +166,19 @@ function BranchManager() {
                                 width: '100%',
                             }}
                         >
-                            <Option value={-1}>Tất cả</Option>
-                            <Option value={1}>Hoạt động</Option>
-                            <Option value={2}>Không hoạt động</Option>
+                            <Option value="-1">Tất cả</Option>
+                            <Option value="1">Hoạt động</Option>
+                            <Option value="2">Không hoạt động</Option>
                         </Select>
-
                     </Form.Item>
                 </Col>
                 <Col span={8} style={{ textAlign: 'right' }}>
-                    <AddBranch fechtList={fetchData}/>
+                    <ProductTypeAdd fetchData={fetchData} />
                 </Col>
             </Row>
             <Table
-                dataSource={branch} columns={columns}
+                dataSource={types}
+                columns={columns}
                 pagination={false}
                 loading={loading}
                 onChange={handleTableChange}
@@ -192,4 +194,4 @@ function BranchManager() {
     );
 }
 
-export default BranchManager;
+export default ProductTypeManager;

@@ -24,8 +24,6 @@ function ProfileUser() {
             toast.error(err)
         }
     }
-
-
     useEffect(() => {
         fetchDataUser();
     }, [])
