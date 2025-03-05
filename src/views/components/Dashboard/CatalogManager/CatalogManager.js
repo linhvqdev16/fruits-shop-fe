@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { Button, Dropdown, Menu, Select, Table } from 'antd';
 import { toast } from 'react-toastify';
 import { Pagination } from 'antd';
-import useCategory from '@api/useCategory';
-import AddBranch from './AddBranch';
+import useCatalog from '@api/useCatalog';
 import { Col, Form, Input, Modal, Row } from "antd";
 import { DownOutlined } from '@ant-design/icons';
 import { Option } from 'antd/es/mentions';
+import CatalogAddOrChange from './CatalogAddOrChange'
 
-function BranchManager() {
-    const { getList } = useCategory()
+function CatalogManager() {
+    const { getList } = useCatalog()
 
     const [branch, setBranch] = useState([])
     const [loading, setLoading] = useState(false);
@@ -76,12 +76,6 @@ function BranchManager() {
             dataIndex: 'name',
             key: 'name',
             render: (_, record) => <a style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{record.name}</a>
-        },
-        {
-            title: 'Danh mục',
-            dataIndex: 'catalogName',
-            key: 'catalogName',
-            render: (_, record) => <a style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{record.catalogName}</a>
         },
 
         {
@@ -178,7 +172,7 @@ function BranchManager() {
                     </Form.Item>
                 </Col>
                 <Col span={8} style={{ textAlign: 'right' }}>
-                    <AddBranch fechtList={fetchData}/>
+                    <CatalogAddOrChange fechtList={fetchData}/>
                 </Col>
             </Row>
             <Table
@@ -198,4 +192,4 @@ function BranchManager() {
     );
 }
 
-export default BranchManager;
+export default CatalogManager;

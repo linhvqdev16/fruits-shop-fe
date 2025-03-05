@@ -1,8 +1,9 @@
 import useRequest from './useRequest'
-const useCategory = () => {
-	const { createPostRequest, createPutRequest, createGetRequest, createDeleteRequest, cancel } = useRequest('types')
+const useCatalog = () => {
+    
+	const { createPostRequest, createGetRequest, createDeleteRequest, cancel } = useRequest('catalog')
 	const getList = (params) => createGetRequest({
-		endpoint: '/get-list-type',
+		endpoint: '/get-list',
 		params: params
 	})
     const getItemById = (id) => createGetRequest({
@@ -11,15 +12,19 @@ const useCategory = () => {
 	})
     const generateCode = () => createGetRequest({
 		endpoint: '/generate-code',
+		params: null
 	})
+	
 	const deleteItem = (id) => createDeleteRequest({
 		endpoint: '/delete',
 		params: {id: id}
 	})
+
 	const addOrChange = (params) => createPostRequest({
 		endpoint: '/add-or-change',
 		data: params
 	})
+	
 	return {
 		getList, 
         getItemById, 
@@ -29,4 +34,4 @@ const useCategory = () => {
 	}
 }
 
-export default useCategory
+export default useCatalog

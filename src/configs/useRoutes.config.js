@@ -31,6 +31,7 @@ import RoleManager from "../views/components/Dashboard/RoleManager/RoleManager";
 import RoleDetail from "../views/components/Dashboard/RoleManager/RoleDetail";
 import PaymentManager from "../views/components/Dashboard/PaymentManager/PaymentManager";
 import PaymentDetail from "../views/components/Dashboard/PaymentManager/PaymentDetail";
+import CatalogManager from "@views/components/Dashboard/CatalogManager/CatalogManager"
 
 
 const useRoutes = () => {
@@ -208,6 +209,15 @@ const useRoutes = () => {
         < DetailBranch />
       </Layout>,
 
+    },
+    // catalog
+    {
+      key: "/dashboard/catalog",
+      label: "Catalog",
+      path: "/dashboard/catalog",
+      element: <Layout>
+        <CatalogManager />
+      </Layout>,
     },
 
     // product type

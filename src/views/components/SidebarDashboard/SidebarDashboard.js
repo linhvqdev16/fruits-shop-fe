@@ -72,6 +72,11 @@ const SidebarDashboard = () => {
                     onClick={() => handleMenuClick('type')}
                     className={isActiveMenu('type') ? 'selected-item' : ''}
                     active={isActiveMenu('type')}> Danh sách gói </MenuItem>
+                    <MenuItem
+                    component={<Link to={'/dashboard/catalog'} className="sidebar-link" aria-expanded="false" ></Link>}
+                    onClick={() => handleMenuClick('catalog')}
+                    className={isActiveMenu('catalog') ? 'selected-item' : ''}
+                    active={isActiveMenu('catalog')}> Danh mục </MenuItem>
                 </SubMenu>
                 <SubMenu label="Quản lý tài khoản" icon={<IconDeviceDesktopCog stroke={2}/>}>
                   <MenuItem

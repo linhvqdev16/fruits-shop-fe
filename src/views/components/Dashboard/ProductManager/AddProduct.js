@@ -19,7 +19,7 @@ const getBase64 = (file) =>
 
 const AddProduct = () => {
 
-  const { generateCode } = useProduct();
+  const { generateCode, addOrChange } = useProduct();
 
   const [modal2Open, setModal2Open] = useState(false);
   const [form] = Form.useForm();
@@ -41,12 +41,12 @@ const AddProduct = () => {
   const fetchGenerateCode = async () => {
     const { success, data } = await generateCode();
     if (data != null && success) {
-      form.setFieldsValue({code: data.data});
+      form.setFieldsValue({ code: data.data });
     }
   }
 
   const fetchCategory = async () => {
-    const { success, data } = await getList({pageIndex: 1, pageSize: 20});
+    const { success, data } = await getList({ pageIndex: 1, pageSize: 20 });
     if (data != null && success) {
       var dataCategory = data.data.map((item) => {
         return {
@@ -60,7 +60,7 @@ const AddProduct = () => {
 
 
   const fetchTypes = async () => {
-    const { success, data } = await getListType({pageIndex: 1, pageSize: 20});
+    const { success, data } = await getListType({ pageIndex: 1, pageSize: 20 });
     if (data != null && success) {
       var dataOrigin = data.data.map((item) => {
         return {
@@ -72,7 +72,7 @@ const AddProduct = () => {
     }
   }
 
- 
+
   const showModel = () => {
     setModal2Open(true);
     fetchCategory();
@@ -90,6 +90,7 @@ const AddProduct = () => {
     setPreviewOpen(true);
   };
   const handleChangeFile = ({ fileList: newFileList }) => {
+    debugger;
     newFileList.forEach(items => items.status = 'done')
     setFileList(newFileList);
   };
@@ -118,18 +119,22 @@ const AddProduct = () => {
   const onFinish = async (values) => {
     try {
       const formData = new FormData()
-      formData.append('branchId', values.branchId);
-      formData.append('originId', values.originId);
-      formData.append('productName', values.productName);
-      formData.append('ProdcutPrice', values.productPrice);
-      formData.append('ProductQuanlity', values.productQuantity);
-      formData.append('productDescription', values.productDescription);
-      formData.append('productMaterial', values.productMaterial);
-      formData.append('productType', values.productType);
-      fileList.forEach((file, index) => {
-        formData.append(`ListFileImg`, file.originFileObj);
+      debugger;
+      var product = {
+        typeId: values.typeId,
+        categoryId: values.categoryId,
+        name: values.name,
+        price: values.price,
+        stock: values.stock,
+        description: values.description,
+        code: values.code
+      }
+      formData.append("productModel", JSON.stringify(product));
+      fileList.forEach((file) => {
+        debugger;
+        formData.append(`files`, file.originFileObj);
       });
-      const { success, data } = await createProduct(formData, { "Content-Type": "multipart/form-data" });
+      const { success, data } = await addOrChange(formData, { "Content-Type": "multipart/form-data" });
       if (data.status != 'Error' && success) {
         setModal2Open(false);
         toast.success(data.message)
@@ -137,7 +142,7 @@ const AddProduct = () => {
         toast.error(data.message)
       }
     } catch (error) {
-      toast.error("loi")
+      toast.error(error)
     }
   };
 
@@ -147,14 +152,6 @@ const AddProduct = () => {
   const handleChange = (value) => {
     console.log(`Selected: ${value}`);
   };
-
-  const normFile = (e) => {
-    if (Array.isArray(e)) {
-      return e;
-    }
-    return e?.fileList;
-  };
-
   return (
     <div>
       <Button
@@ -186,16 +183,16 @@ const AddProduct = () => {
           layout="vertical"
 
         >
-          <Row gutter={[16, 16]}>
+          <Row >
 
-          <Col span={12}>
+            <Col span={12}>
               <Form.Item
                 label="Mã sản phẩm"
                 name="code"
                 rules={[{ required: true, message: "Please input product code!" }]}
 
               >
-                <Input placeholder="Product Name" readOnly={true}/>
+                <Input placeholder="Product Name" readOnly={true} />
 
               </Form.Item>
             </Col>
@@ -203,12 +200,10 @@ const AddProduct = () => {
             <Col span={12}>
               <Form.Item
                 label="Tên sách"
-                name="productName"
+                name="name"
                 rules={[{ required: true, message: "Please input product name!" }]}
-
               >
                 <Input placeholder="Product Name" />
-
               </Form.Item>
             </Col>
 
@@ -235,7 +230,7 @@ const AddProduct = () => {
             <Col span={12}>
               <Form.Item
                 label="Loại sách"
-                name="type"
+                name="typeId"
                 rules={[{ required: true, message: "Please input Origin" }]}>
                 <Select
                   placeholder="Please select"
@@ -248,10 +243,77 @@ const AddProduct = () => {
               </Form.Item>
             </Col>
 
+
+            <Col span={12}>
+              <Form.Item
+                label="Tác giả"
+                name="author"
+                rules={[{ required: true, message: "Please input product price!" }]}
+              >
+                <Input placeholder="Price" type="text" />
+              </Form.Item>
+            </Col>
+
+            <Col span={12}>
+              <Form.Item
+                label="Nhà xuất bản"
+                name="authorPublish"
+                rules={[
+                  { required: true, message: "Please input product quantity!" },
+                ]}
+              >
+                <Input placeholder="Quantity" type="text" />
+              </Form.Item>
+            </Col>
+
+            <Col span={12}>
+              <Form.Item
+                label="Series"
+                name="series"
+                rules={[{ required: true, message: "Please input product price!" }]}
+              >
+                <Input placeholder="Price" type="text" />
+              </Form.Item>
+            </Col>
+
+            <Col span={12}>
+              <Form.Item
+                label="Nhà phát hành"
+                name="authorPublish"
+                rules={[
+                  { required: true, message: "Please input product quantity!" },
+                ]}
+              >
+                <Input placeholder="Quantity" type="text" />
+              </Form.Item>
+            </Col>
+
+            <Col span={12}>
+              <Form.Item
+                label="Ngày xuất bản"
+                name="datePublish"
+                rules={[{ required: true, message: "Please input product price!" }]}
+              >
+                <Input placeholder="Price" type="text" />
+              </Form.Item>
+            </Col>
+
+            <Col span={12}>
+              <Form.Item
+                label="Ngày phát hành"
+                name="datePublic"
+                rules={[
+                  { required: true, message: "Please input product quantity!" },
+                ]}
+              >
+                <Input placeholder="Quantity" type="text" />
+              </Form.Item>
+            </Col>
+
             <Col span={12}>
               <Form.Item
                 label="Giá sản phẩm"
-                name="productPrice"
+                name="price"
                 rules={[{ required: true, message: "Please input product price!" }]}
               >
                 <Input placeholder="Price" type="text" />
@@ -261,7 +323,7 @@ const AddProduct = () => {
             <Col span={12}>
               <Form.Item
                 label="Số lượng"
-                name="productQuantity"
+                name="stock"
                 rules={[
                   { required: true, message: "Please input product quantity!" },
                 ]}
@@ -273,11 +335,11 @@ const AddProduct = () => {
             <Col span={24}>
               <Form.Item
                 label="Mô tả"
-                name="productDescription"
+                name="description"
                 rules={[
                   { required: false, message: "Please input product description!" },
                 ]}  >
-                <Input.TextArea placeholder="Description"/>
+                <Input.TextArea placeholder="Description" />
               </Form.Item>
             </Col>
 

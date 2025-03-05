@@ -10,9 +10,10 @@ const useType = () => {
 		endpoint: '/detail',
 		params: {id: id}
 	})
-	const addOrChange  = (data) => createPostRequest({
+	const addOrChange  = (data, headers) => createPostRequest({
 		endpoint: '/add-or-change',
-		data: data
+		data: data,
+		headers: headers
 	})
 	const deleteProduct = (params) => createDeleteRequest({
 		endpoint: '/delete',
