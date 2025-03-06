@@ -72,51 +72,51 @@ function OrderManager() {
         {
             title: 'STT',
             render: (data) => {
-                return (<p style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{`${data.orderNumber}`}</p>)
+                return (<p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{`${data.orderNumber}`}</p>)
             }
         },
         {
             title: 'Order code',
             render: (data) => {
-                return (<p style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{`${data.orderCode}`}</p>)
+                return (<p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{`${data.orderCode}`}</p>)
             }
         },
         {
             title: 'Customer name',
             render: (data) => {
-                return (<p style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{`${data.customerName}`}</p>)
+                return (<p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{`${data.customerName}`}</p>)
             }
         },
         {
             title: 'Phone number',
             render: (data) => {
-                return (<p style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{`${data.phoneNumber}`}</p>)
+                return (<p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{`${data.phoneNumber}`}</p>)
             }
         },
         {
             title: 'Address',
             dataIndex: 'address',
             key: 'addressDetail',
-            render: (_, record) => <p style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{record.addressDetail}</p>
+            render: (_, record) => <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{record.addressDetail}</p>
         },
         {
             title: 'Employee name',
             dataIndex: 'employeeName',
             key: 'employeeName',
-            render: (_, record) => <p style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{record.employeeName}</p>
+            render: (_, record) => <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{record.employeeName}</p>
         },
         {
             title: 'Order status',
             dataIndex: 'orderStatus',
             key: 'orderStatus',
-            render: (_, record) => <p style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{record.orderStatus}</p>
+            render: (_, record) => <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{record.orderStatus}</p>
         },
         {
             title: 'Price',
             dataIndex: 'totalPrice',
             key: 'totalPrice',
             render: (_, data) => {
-                return (<p style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{formatCurrencyVND(data.totalPrice)}</p>)
+                return (<p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{formatCurrencyVND(data.totalPrice)}</p>)
             }
         },
         {

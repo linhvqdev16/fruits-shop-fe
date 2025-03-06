@@ -62,27 +62,27 @@ function CatalogManager() {
             title: 'STT',
             dataIndex: 'orderNumber',
             key: 'orderNumber',
-            render: (_, __, index) => <a style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{index + 1}</a>,
+            render: (_, __, index) => <a style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{index + 1}</a>,
         },
         {
             title: 'Code',
             dataIndex: 'code',
             key: 'code',
-            render: (text) => <a style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{text}</a>,
+            render: (text) => <a style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{text}</a>,
         },
 
         {
             title: 'Tên',
             dataIndex: 'name',
             key: 'name',
-            render: (_, record) => <a style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{record.name}</a>
+            render: (_, record) => <a style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{record.name}</a>
         },
 
         {
             title: 'Mô tả',
             dataIndex: 'description',
             key: 'description',
-            render: (text) => <p style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{text}</p>
+            render: (text) => <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{text}</p>
         },
         {
             title: 'Trạng thái',

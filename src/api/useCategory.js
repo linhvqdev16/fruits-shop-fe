@@ -2,7 +2,7 @@ import useRequest from './useRequest'
 const useCategory = () => {
     
 	const { createPostRequest, createPutRequest, createGetRequest, createDeleteRequest, cancel } = useRequest('category')
-	const getList = (params) => createGetRequest({
+	const getListCategory = (params) => createGetRequest({
 		endpoint: '/get-category-list',
 		params: params
 	})
@@ -26,7 +26,7 @@ const useCategory = () => {
 	})
 	
 	return {
-		getList, 
+		getListCategory, 
         getItemById, 
         generateCode, 
         deleteItem, 

@@ -7,7 +7,6 @@ import useCategory from "@api/useCategory";
 import useType from "@api/useType";
 import useProduct from "@api/useProduct";
 import { toast } from "react-toastify";
-import { useForm } from "antd/es/form/Form";
 
 const getBase64 = (file) =>
   new Promise((resolve, reject) => {
@@ -17,7 +16,7 @@ const getBase64 = (file) =>
     reader.onerror = (error) => reject(error);
   });
 
-const AddProduct = () => {
+const AddProduct = ({fetchData, modelItem, textButton, isStyle}) => {
 
   const { generateCode, addOrChange } = useProduct();
 
@@ -28,7 +27,7 @@ const AddProduct = () => {
   const [previewImage, setPreviewImage] = useState('');
 
 
-  const { getList } = useCategory()
+  const { getListCategory } = useCategory()
   const { getListType } = useType()
   const [category, setCategory] = useState([])
   const [types, setType] = useState([])
@@ -46,7 +45,7 @@ const AddProduct = () => {
   }
 
   const fetchCategory = async () => {
-    const { success, data } = await getList({ pageIndex: 1, pageSize: 20 });
+    const { success, data } = await getListCategory({ pageIndex: 1, pageSize: 20 });
     if (data != null && success) {
       var dataCategory = data.data.map((item) => {
         return {
@@ -137,7 +136,8 @@ const AddProduct = () => {
       const { success, data } = await addOrChange(formData, { "Content-Type": "multipart/form-data" });
       if (data.status != 'Error' && success) {
         setModal2Open(false);
-        toast.success(data.message)
+        toast.success(data.message); 
+        fetchData();
       } else {
         toast.error(data.message)
       }
@@ -154,17 +154,17 @@ const AddProduct = () => {
   };
   return (
     <div>
-      <Button
-        type="primary"
-        value="large"
-        style={{
+       <Button
+        type= {isStyle ? "primary" : "button"}
+        value="small"
+        style={ isStyle ? {
           alignItems: "center",
           background: "#1fbf39",
           marginBottom: "20px",
-        }}
+        } : null}
         onClick={() => showModel()}
       >
-        <PlusSquareOutlined /> Thêm
+        {isStyle &&  <PlusSquareOutlined />} {textButton}
       </Button>
 
       <Modal
@@ -183,17 +183,15 @@ const AddProduct = () => {
           layout="vertical"
 
         >
-          <Row >
+          <Row gutter={[5,5]} >
 
             <Col span={12}>
               <Form.Item
                 label="Mã sản phẩm"
                 name="code"
                 rules={[{ required: true, message: "Please input product code!" }]}
-
               >
-                <Input placeholder="Product Name" readOnly={true} />
-
+                <Input placeholder="" readOnly={true} />
               </Form.Item>
             </Col>
 
@@ -203,7 +201,7 @@ const AddProduct = () => {
                 name="name"
                 rules={[{ required: true, message: "Please input product name!" }]}
               >
-                <Input placeholder="Product Name" />
+                <Input placeholder="" />
               </Form.Item>
             </Col>
 
@@ -215,7 +213,7 @@ const AddProduct = () => {
                 rules={[{ required: true, message: "Please input category!" }]}
               >
                 <Select
-                  placeholder="Please select"
+                  placeholder=""
                   onChange={handleChange}
                   style={{
                     width: '100%'
@@ -233,7 +231,7 @@ const AddProduct = () => {
                 name="typeId"
                 rules={[{ required: true, message: "Please input Origin" }]}>
                 <Select
-                  placeholder="Please select"
+                  placeholder=""
                   onChange={handleChange}
                   style={{
                     width: '100%',
@@ -250,7 +248,7 @@ const AddProduct = () => {
                 name="author"
                 rules={[{ required: true, message: "Please input product price!" }]}
               >
-                <Input placeholder="Price" type="text" />
+                <Input placeholder="" type="text" />
               </Form.Item>
             </Col>
 
@@ -262,7 +260,7 @@ const AddProduct = () => {
                   { required: true, message: "Please input product quantity!" },
                 ]}
               >
-                <Input placeholder="Quantity" type="text" />
+                <Input placeholder="" type="text" />
               </Form.Item>
             </Col>
 
@@ -272,19 +270,19 @@ const AddProduct = () => {
                 name="series"
                 rules={[{ required: true, message: "Please input product price!" }]}
               >
-                <Input placeholder="Price" type="text" />
+                <Input placeholder="" type="text" />
               </Form.Item>
             </Col>
 
             <Col span={12}>
               <Form.Item
                 label="Nhà phát hành"
-                name="authorPublish"
+                name="authorPublic"
                 rules={[
                   { required: true, message: "Please input product quantity!" },
                 ]}
               >
-                <Input placeholder="Quantity" type="text" />
+                <Input placeholder="" type="text" />
               </Form.Item>
             </Col>
 
@@ -294,7 +292,7 @@ const AddProduct = () => {
                 name="datePublish"
                 rules={[{ required: true, message: "Please input product price!" }]}
               >
-                <Input placeholder="Price" type="text" />
+                <Input placeholder="" type="date" />
               </Form.Item>
             </Col>
 
@@ -306,7 +304,7 @@ const AddProduct = () => {
                   { required: true, message: "Please input product quantity!" },
                 ]}
               >
-                <Input placeholder="Quantity" type="text" />
+                <Input placeholder="" type="date" />
               </Form.Item>
             </Col>
 

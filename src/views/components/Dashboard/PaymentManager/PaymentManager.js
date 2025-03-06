@@ -67,26 +67,26 @@ function PaymentManager() {
             title: 'STT',
             dataIndex: 'orderNumber',
             key: 'orderNumber',
-            render: (text) => <a style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{text}</a>,
+            render: (text) => <a style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{text}</a>,
         },
         {
             title: 'Code',
             dataIndex: 'code',
             key: 'code',
-            render: (text) => <a style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{text}</a>,
+            render: (text) => <a style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{text}</a>,
         },
 
         {
             title: 'Tên',
             dataIndex: 'name',
             key: 'name',
-            render: (_, record) => <p style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{record.countProduct}</p>
+            render: (_, record) => <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{record.countProduct}</p>
         },
         {
             title: 'Trạng thái',
             dataIndex: 'status',
             key: 'status',
-            render: (text) => <p style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{new Date(text).toLocaleDateString('en-GB')}</p>
+            render: (text) => <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{new Date(text).toLocaleDateString('en-GB')}</p>
         },
         {
 

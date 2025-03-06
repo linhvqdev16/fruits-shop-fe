@@ -3,7 +3,7 @@ import useRequest from './useRequest'
 const useType = () => {
 	const { createPostRequest, createPutRequest, createGetRequest, createDeleteRequest, cancel } = useRequest('product')
 	const getList = (params) => createGetRequest({
-		endpoint: '/get-list-type',
+		endpoint: '/get-list-product',
 		params: params
 	})
     const getById = (id) => createGetRequest({

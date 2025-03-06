@@ -9,7 +9,7 @@ import { DownOutlined } from '@ant-design/icons';
 import { Option } from 'antd/es/mentions';
 
 function BranchManager() {
-    const { getList } = useCategory()
+    const { getListCategory } = useCategory()
 
     const [branch, setBranch] = useState([])
     const [loading, setLoading] = useState(false);
@@ -25,7 +25,7 @@ function BranchManager() {
     });
 
     const fetchData = async () => {
-        const { success, data } = await getList(tableParams.pagination);
+        const { success, data } = await getListCategory(tableParams.pagination);
         if (!success || data.status == 'Error') {
             toast.error('Có lỗi xảy ra')
         } else {
@@ -62,33 +62,33 @@ function BranchManager() {
             title: 'STT',
             dataIndex: 'orderNumber',
             key: 'orderNumber',
-            render: (_, __, index) => <a style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{index + 1}</a>,
+            render: (_, __, index) => <a style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{index + 1}</a>,
         },
         {
             title: 'Code',
             dataIndex: 'code',
             key: 'code',
-            render: (text) => <a style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{text}</a>,
+            render: (text) => <a style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{text}</a>,
         },
 
         {
             title: 'Tên',
             dataIndex: 'name',
             key: 'name',
-            render: (_, record) => <a style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{record.name}</a>
+            render: (_, record) => <a style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{record.name}</a>
         },
         {
             title: 'Danh mục',
             dataIndex: 'catalogName',
             key: 'catalogName',
-            render: (_, record) => <a style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{record.catalogName}</a>
+            render: (_, record) => <a style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{record.catalogName}</a>
         },
 
         {
             title: 'Mô tả',
             dataIndex: 'description',
             key: 'description',
-            render: (text) => <p style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{text}</p>
+            render: (text) => <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{text}</p>
         },
         {
             title: 'Trạng thái',

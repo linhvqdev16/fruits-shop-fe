@@ -34,91 +34,108 @@ const SidebarDashboard = () => {
             </div>
           </div>
           <nav class="sidebar-nav" data-simplebar="">
-            <Sidebar>
-              <Menu>
+            <Sidebar style={{position: "fixed", height: "100vh"}}>
+              <Menu style={{
+                height: "calc(100vh - 100px)", 
+                overflowY: "auto"
+              }}>
                 <MenuItem
                   component={<Link to={'/dashboard'} className="sidebar-link" aria-expanded="false" ></Link>}
                   onClick={() => handleMenuClick('dashboard')}
                   className={isActiveMenu('dashboard') ? 'selected-item' : ''}
                   active={isActiveMenu('dashboard')}
-                  icon={<IconLayoutDashboard stroke={2}/>}
+                  style={{fontSize: "15px", fontWeight: "bold"}}
                   > Trang chủ </MenuItem>
-                <MenuItem   icon={<IconBookUpload stroke={2}/>}> Bán hàng tại quầy </MenuItem>
-                <SubMenu label="Thống kê" icon={<IconDeviceDesktopCog stroke={2}/>}>
+              {/*icon={<IconBookUpload stroke={2}/>}*/}
+                <MenuItem  style={{fontSize: "15px", fontWeight: "bold"}}> Bán hàng tại quầy </MenuItem>
+                <SubMenu label="Thống kê"  style={{fontSize: "15px", fontWeight: "bold"}} >
                 <MenuItem
                     component={<Link to={'/dashboard/product'} className="sidebar-link" aria-expanded="false" ></Link>}
                     onClick={() => handleMenuClick('product')}
                     className={isActiveMenu('product') ? 'selected-item' : ''}
+                    style={{fontSize: "15px"}}
                     active={isActiveMenu('product')}> Đơn hàng </MenuItem>
                      <MenuItem
                     component={<Link to={'/dashboard/product'} className="sidebar-link" aria-expanded="false" ></Link>}
                     onClick={() => handleMenuClick('product')}
                     className={isActiveMenu('product') ? 'selected-item' : ''}
+                    style={{fontSize: "15px"}}
                     active={isActiveMenu('product')}> Đánh giá sản phẩm </MenuItem>
                 </SubMenu>
-                <SubMenu label="Quản lý sản phẩm" icon={<IconDeviceDesktopCog stroke={2}/>}>
+                <SubMenu label="Quản lý sản phẩm" style={{fontSize: "15px", fontWeight: "bold"}} >
                   <MenuItem
                     component={<Link to={'/dashboard/product'} className="sidebar-link" aria-expanded="false" ></Link>}
                     onClick={() => handleMenuClick('product')}
                     className={isActiveMenu('product') ? 'selected-item' : ''}
+                    style={{fontSize: "15px"}}
                     active={isActiveMenu('product')}> Danh sách sản phẩm </MenuItem>
                   <MenuItem
                     component={<Link to={'/dashboard/branch'} className="sidebar-link" aria-expanded="false" ></Link>}
                     onClick={() => handleMenuClick('branch')}
                     className={isActiveMenu('branch') ? 'selected-item' : ''}
+                    style={{fontSize: "15px"}}
                     active={isActiveMenu('branch')}> Danh sách loại </MenuItem>
                    <MenuItem
                     component={<Link to={'/dashboard/type'} className="sidebar-link" aria-expanded="false" ></Link>}
                     onClick={() => handleMenuClick('type')}
                     className={isActiveMenu('type') ? 'selected-item' : ''}
+                    style={{fontSize: "15px"}}
                     active={isActiveMenu('type')}> Danh sách gói </MenuItem>
                     <MenuItem
                     component={<Link to={'/dashboard/catalog'} className="sidebar-link" aria-expanded="false" ></Link>}
                     onClick={() => handleMenuClick('catalog')}
                     className={isActiveMenu('catalog') ? 'selected-item' : ''}
-                    active={isActiveMenu('catalog')}> Danh mục </MenuItem>
+                    active={isActiveMenu('catalog')}
+                    style={{fontSize: "15px"}}> Danh mục </MenuItem>
                 </SubMenu>
-                <SubMenu label="Quản lý tài khoản" icon={<IconDeviceDesktopCog stroke={2}/>}>
+                <SubMenu label="Quản lý tài khoản" style={{fontSize: "15px", fontWeight: "bold"}} >
                   <MenuItem
                     component={<Link to={'/dashboard/accounts'} className="sidebar-link" aria-expanded="false" ></Link>}
                     onClick={() => handleMenuClick('accounts')}
                     className={isActiveMenu('accounts') ? 'selected-item' : ''}
+                    style={{fontSize: "15px"}}
                     active={isActiveMenu('accounts')}> Khách hàng </MenuItem>
                   <MenuItem
                     component={<Link to={'/dashboard/accounts'} className="sidebar-link" aria-expanded="false" ></Link>}
                     onClick={() => handleMenuClick('accounts')}
                     className={isActiveMenu('accounts') ? 'selected-item' : ''}
+                    style={{fontSize: "15px"}}
                     active={isActiveMenu('dashboard')}> Nhân viên </MenuItem>
                 </SubMenu>
-                <SubMenu label="Quản lý khuyến mại" icon={<IconDeviceDesktopCog stroke={2}/>}>
+                <SubMenu label="Quản lý khuyến mại" style={{fontSize: "15px", fontWeight: "bold"}} >
                   <MenuItem
                     component={<Link to={'/dashboard/product'} className="sidebar-link" aria-expanded="false" ></Link>}
                     onClick={() => handleMenuClick('product')}
                     className={isActiveMenu('product') ? 'selected-item' : ''}
+                    style={{fontSize: "15px"}}
                     active={isActiveMenu('product')}> Coupon </MenuItem>
                   <MenuItem
                     component={<Link to={'/dashboard/product'} className="sidebar-link" aria-expanded="false" ></Link>}
                     onClick={() => handleMenuClick('product')}
                     className={isActiveMenu('product') ? 'selected-item' : ''}
+                    style={{fontSize: "15px"}}
                     active={isActiveMenu('product')}> Discount </MenuItem>
                 </SubMenu>
-                <SubMenu label="Quản lý đơn hàng" icon={<IconDeviceDesktopCog stroke={2}/>}>
+                <SubMenu label="Quản lý đơn hàng" style={{fontSize: "15px", fontWeight: "bold"}} >
                   <MenuItem
                     component={<Link to={'/dashboard/order'} className="sidebar-link" aria-expanded="false" ></Link>}
                     onClick={() => handleMenuClick('order')}
                     className={isActiveMenu('order') ? 'selected-item' : ''}
+                    style={{fontSize: "15px"}}
                     active={isActiveMenu('order')}> Đơn hàng </MenuItem>
                   <MenuItem
                     component={<Link to={'/dashboard/order'} className="sidebar-link" aria-expanded="false" ></Link>}
                     onClick={() => handleMenuClick('order')}
                     className={isActiveMenu('order') ? 'selected-item' : ''}
+                    style={{fontSize: "15px"}}
                     active={isActiveMenu('order')}> Danh sách hoàn đơn </MenuItem>
                 </SubMenu>
-                <SubMenu label="Quản lý cấu hình" icon={<IconDeviceDesktopCog stroke={2}/>}>
+                <SubMenu label="Quản lý cấu hình" style={{fontSize: "15px", fontWeight: "bold"}} >
                   <MenuItem
                     component={<Link to={'/dashboard/order'} className="sidebar-link" aria-expanded="false" ></Link>}
                     onClick={() => handleMenuClick('order')}
                     className={isActiveMenu('order') ? 'selected-item' : ''}
+                    style={{fontSize: "15px"}}
                     active={isActiveMenu('order')}> Phân quyền </MenuItem>
                   <MenuItem
                     component={<Link to={'/dashboard/order'} className="sidebar-link" aria-expanded="false" ></Link>}
@@ -129,6 +146,7 @@ const SidebarDashboard = () => {
                     component={<Link to={'/dashboard/order'} className="sidebar-link" aria-expanded="false" ></Link>}
                     onClick={() => handleMenuClick('order')}
                     className={isActiveMenu('order') ? 'selected-item' : ''}
+                    style={{fontSize: "15px"}}
                     active={isActiveMenu('order')}> Vận chuyển </MenuItem>
                 </SubMenu>
                 <MenuItem
@@ -136,7 +154,7 @@ const SidebarDashboard = () => {
                   onClick={() => handleMenuClick('dashboard')}
                   className={isActiveMenu('dashboard') ? 'selected-item' : ''}
                   active={isActiveMenu('dashboard')}
-                  icon={<IconLogout2 stroke={2} />}
+                  style={{fontSize: "15px", fontWeight: "bold"}}
                   > Đăng xuất </MenuItem>
               </Menu>
             </Sidebar>

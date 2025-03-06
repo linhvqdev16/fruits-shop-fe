@@ -97,30 +97,30 @@ const UserAddOrChange = () => {
             title: 'STT',
             dataIndex: 'number',
             key: 'number',
-            render: (text) => <a style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{text}</a>,
+            render: (text) => <a style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{text}</a>,
         },
         {
             title: 'Tên sản phẩm',
             dataIndex: 'name',
             key: 'name',
-            render: (text) => <a style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{text}</a>,
+            render: (text) => <a style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{text}</a>,
         },
         {
             title: 'Mã sản phẩm',
             dataIndex: 'code',
             key: 'code',
-            render: (text) => <a style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{text}</a>,
+            render: (text) => <a style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{text}</a>,
         },
         {
             title: 'Giá sản phẩm',
             dataIndex: 'price',
-            render: (text) => <p style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{formatCurrencyVND(text)}</p>,
+            render: (text) => <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{formatCurrencyVND(text)}</p>,
         },
         {
             title: 'Số lượng',
             dataIndex: 'stock',
             key: 'stock',
-            render: (_, record) => <p style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{record.productQuanlity + record.productSold >= 0 ? (record.productQuanlity + record.productSold) : 0}</p>,
+            render: (_, record) => <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{record.productQuanlity + record.productSold >= 0 ? (record.productQuanlity + record.productSold) : 0}</p>,
 
         },
         {

@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { useToast } from "@utils/toastContext";
 
 
-const ProductTypeAdd = ({fetchData, modelItem}) => {
+const ProductTypeAdd = ({fetchData, modelItem, textButton, isStyle}) => {
 
   const [modal2Open, setModal2Open] = useState(false);
   const [form] = Form.useForm()
@@ -29,7 +29,8 @@ const ProductTypeAdd = ({fetchData, modelItem}) => {
         name: values.name, 
         description: values.description, 
         status: 1, 
-        isDeleted: 0
+        isDeleted: 0, 
+        id: modelItem ? modelItem.id : null
       }
       const { success, data } = await addOrChange(model)
       if (data.status != 'Error' && success) {
@@ -47,29 +48,30 @@ const ProductTypeAdd = ({fetchData, modelItem}) => {
   const showModel = () => {
     if(modelItem){
       form.setFieldsValue({ code: modelItem.code, name: modelItem.name, description: modelItem.description });
+    }else{
+      fetchGenerateCode();
     }
     setModal2Open(true); 
-    fetchGenerateCode();
   }
 
   return (<>
     <div>
       <Button
-        type="primary"
-        value="large"
-        style={{
+        type= {isStyle ? "primary" : "button"}
+        value="small"
+        style={ isStyle ? {
           alignItems: "center",
           background: "#1fbf39",
           marginBottom: "20px",
-        }}
+        } : null}
         onClick={() => showModel()}
       >
-        <PlusSquareOutlined /> Thêm mới
+        {isStyle &&  <PlusSquareOutlined />} {textButton}
       </Button>
 
       <Modal
         width={'50%'}
-        title="Thêm mới kiểu sản phẩm"
+        title= {isStyle ?  "Thêm mới kiểu sản phẩm" : "Cập nhật thông tin"}
         centered
         visible={modal2Open}
         onCancel={() => setModal2Open(false)}

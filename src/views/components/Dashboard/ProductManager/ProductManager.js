@@ -1,25 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Select, Space, Table, Tag } from 'antd';
+import { Button, Select, Dropdown, Table, Menu } from 'antd';
 import useProduct from '@api/useProduct';
 import { toast } from 'react-toastify';
 import { Pagination } from 'antd';
-import Delete from './DeleteProduct';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleInfo, faPenToSquare } from '@fortawesome/free-solid-svg-icons';
-import { Link, Navigate } from 'react-router-dom';
-import { render } from '@testing-library/react';
 import AddProduct from './AddProduct';
-import { Col, Form, Input, Modal, Row, DatePicker } from "antd";
+import { Col, Form, Input, Row } from "antd";
+import { DownOutlined } from '@ant-design/icons';
+import { Option } from 'antd/es/mentions';
+import useCategory from '@api/useCategory';
+import useType from '@api/useType';
 
 function ProductManager() {
     function formatCurrencyVND(amount) {
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
     }
 
-    const { getAll } = useProduct()
+    const { getList } = useProduct(); 
+    const {getListType} = useType(); 
+    const { getListCategory } = useCategory();
 
     const [product, setProduct] = useState([])
-
     const [loading, setLoading] = useState(false);
 
     const [total, setTotal] = useState();
@@ -29,19 +29,51 @@ function ProductManager() {
             pageSize: 10,
         },
     });
+    const [category, setCategory] = useState([]); 
+    const [types, setType] = useState([]);
+
     const fetchData = async () => {
-        const { success, data } = await getAll(tableParams.pagination);
+        const { success, data } = await getList(tableParams.pagination);
         if (!success || data.status == 'Error') {
             toast.error('Có lỗi xảy ra')
         } else {
-            setProduct(data.data.items)
+            setProduct(data.data)
             setLoading(false);
-            setTotal(data.data.totalCount)
+            setTotal(data.totalCount)
         }
-    }
-    // useEffect(() => {
-    //     fetchData()
-    // }, [JSON.stringify(tableParams), loading])
+    };
+
+    const fetchCategory = async () => {
+        const { success, data } = await getListCategory({ pageIndex: 1, pageSize: 20 });
+        if (data != null && success) {
+          var dataResults = data.data.map((item) => {
+            return {
+              value: item.id,
+              label: item.name
+            }
+          });
+          setCategory(dataResults)
+        }
+      };
+
+      const fetchType = async () => {
+        const { success, data } = await getListType({ pageIndex: 1, pageSize: 20 });
+        if (data != null && success) {
+          var dataResults = data.data.map((item) => {
+            return {
+              value: item.id,
+              label: item.name
+            }
+          });
+          setType(dataResults)
+        }
+      };
+
+    useEffect(() => {
+        fetchData();
+        fetchCategory(); 
+        fetchType();
+    }, [JSON.stringify(tableParams), loading])
 
 
     const handleTableChange = (pagination, filters, sorter) => {
@@ -62,66 +94,84 @@ function ProductManager() {
             }
         })
     };
+
+    const menu = (record) => (
+        <Menu>
+            <Menu.Item>
+                <AddProduct fetchData={fetchData} modelItem={record} textButton={"Edit"} isStyle={false} />
+            </Menu.Item>
+            <Menu.Item>
+                <Button
+                    type="button"
+                    value="small"
+                    onClick={null}
+      >
+                Delete
+            </Button>
+        </Menu.Item>
+        </Menu >
+    );
+
     const columns = [
         {
             title: 'STT',
             dataIndex: 'number',
             key: 'number',
-            render: (text) => <a style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{text}</a>,
+            render: (_, __, index) => <a style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{index + 1}</a>,
+        },
+        {
+            title: 'Hình ảnh',
+            dataIndex: 'code',
+            key: 'images',
+            render: (_, record) => <img src={Array.isArray(record.images) ?  record.images[0] : "href"} style={{width: "65px", height: "auto", borderRadius: "10px"}} />,
         },
         {
             title: 'Tên sản phẩm',
             dataIndex: 'name',
             key: 'name',
-            render: (text) => <a style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{text}</a>,
+            render: (text) => <a style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{text}</a>,
         },
         {
             title: 'Mã sản phẩm',
             dataIndex: 'code',
             key: 'code',
-            render: (text) => <a style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{text}</a>,
-        },
-        {
-            title: 'Hình ảnh',
-            dataIndex: 'code',
-            key: 'code',
-            render: (text) => <a style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{text}</a>,
+            render: (text) => <a style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{text}</a>,
         },
         {
             title: 'Giá sản phẩm',
             dataIndex: 'price',
-            render: (text) => <p style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{formatCurrencyVND(text)}</p>,
+            render: (text) => <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{formatCurrencyVND(text)}</p>,
         },
         {
             title: 'Số lượng',
             dataIndex: 'stock',
             key: 'stock',
-            render: (_, record) => <p style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{record.productQuanlity + record.productSold >= 0 ? (record.productQuanlity + record.productSold) : 0}</p>,
+            render: (_, record) => <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{record.stock}</p>,
 
         },
         {
             title: 'Loại sản phẩm',
             dataIndex: 'categoryName',
             key: 'categoryName',
-            render: (_, record) => <p style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{record.branchName}</p>
+            render: (_, record) => <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{record.categoryName}</p>
         },
         {
             title: 'Kiểu sản phẩm',
             dataIndex: 'typeName',
             key: 'typeName',
-            render: (_, record) => <p style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{record.branchName}</p>
+            render: (_, record) => <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{record.typeName}</p>
         },
         {
             title: 'Mô tả',
             dataIndex: 'description',
             key: 'description',
-            render: (_, record) => <p style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{record.productSold}</p>
+            render: (_, record) => <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{record.description}</p>
         },
         {
             title: 'Số lượng đã bán',
             dataIndex: 'soldQuantity',
             key: 'soldQuantity',
-            render: (_, record) => <p style={{ fontSize: "16px", color: "black", fontWeight: "500" }}>{record.productQuanlity}</p>,
+            render: (_, record) => <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{record.soldQuantity ? record.soldQuantity : 0}</p>,
 
         },
         {
@@ -129,21 +179,11 @@ function ProductManager() {
             title: 'Action',
             key: 'action',
             render: (_, record) => (
-                <Space>
-                    <Delete id={record.id} state={loading} action={setLoading} />
-                    <Link to={record.id}>
-                        <Button type='primary' title='Detail Product'>
-                            <FontAwesomeIcon icon={faCircleInfo} />
-                        </Button>
-                    </Link>
-                    <Link to={`/dashboard/product/edit/${record.id}`}>
-                        <Button title='Edit Product' style={{
-                            backgroundColor: 'brown'
-                        }}>
-                            <FontAwesomeIcon icon={faPenToSquare} style={{ color: "white" }} />
-                        </Button>
-                    </Link>
-                </Space>
+                <Dropdown overlay={menu(record)} trigger={['click']}>
+                    <Button>
+                        Actions <DownOutlined />
+                    </Button>
+                </Dropdown>
             ),
         },
     ];
@@ -153,19 +193,19 @@ function ProductManager() {
                 <Col span={16}>
                     <Form.Item
                         label="Key search"
-                        name="productName"
+                        name="keySearch"
                         rules={[{ required: false, message: "Please input product name!" }]}><Input placeholder="Enter code, name category" />
                     </Form.Item>
                 </Col>
                 <Col span={8} style={{ textAlign: 'right' }}>
-                    <AddProduct />
+                <AddProduct fetchData={fetchData} modelItem={null} textButton={"Thêm mới"} isStyle={true} />
                 </Col>
             </Row>
             <Row gutter={[16, 16]}>
             <Col span={8}>
                     <Form.Item
                         label="Loại sản phẩm"
-                        name="originId"
+                        name="categoryId"
                     >
                         <Select
                             placeholder="Please select"
@@ -173,7 +213,7 @@ function ProductManager() {
                             style={{
                                 width: '100%',
                             }}
-                            options={origin}
+                            options={category}
                         />
 
                     </Form.Item>
@@ -181,7 +221,7 @@ function ProductManager() {
                 <Col span={8}>
                     <Form.Item
                         label="Gói bán SP"
-                        name="originId"
+                        name="typeId"
                     >
                         <Select
                             placeholder="Please select"
@@ -189,7 +229,7 @@ function ProductManager() {
                             style={{
                                 width: '100%',
                             }}
-                            options={origin}
+                            options={types}
                         />
 
                     </Form.Item>
@@ -197,7 +237,7 @@ function ProductManager() {
                 <Col span={8}>
                     <Form.Item
                         label="Trạng thái"
-                        name="originId"
+                        name="status"
                     >
                         <Select
                             placeholder="Please select"
@@ -205,8 +245,12 @@ function ProductManager() {
                             style={{
                                 width: '100%',
                             }}
-                            options={origin}
-                        />
+                           
+                        >
+                            <Option value={-1}>Tất cả</Option>
+                            <Option value={1}>Hoạt động</Option>
+                            <Option value={2}>Không hoạt động</Option>
+                        </Select>
 
                     </Form.Item>
                 </Col>

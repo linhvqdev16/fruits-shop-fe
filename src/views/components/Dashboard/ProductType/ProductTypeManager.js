@@ -8,7 +8,7 @@ import { Col, Form, Input, Row } from "antd";
 import { DownOutlined } from '@ant-design/icons';
 
 function ProductTypeManager() {
-    const { getList } = useType()
+    const { getListType } = useType()
     const { Option } = Select;
 
     const [types, setType] = useState([])
@@ -26,7 +26,7 @@ function ProductTypeManager() {
     });
 
     const fetchData = async () => {
-        const { success, data } = await getList(tableParams.pagination);
+        const { success, data } = await getListType(tableParams.pagination);
         if (!success || data.status == 'Error') {
             toast.error('Có lỗi xảy ra')
         } else {
@@ -82,18 +82,21 @@ function ProductTypeManager() {
 
     const menu = (record) => (
         <Menu>
-            <Menu.Item onClick={() => handleMenuClick('Edit', record)}>Edit</Menu.Item>
-            <Menu.Item onClick={() => handleMenuClick('Delete', record)}>Delete</Menu.Item>
-        </Menu>
-    );
+            <Menu.Item>
 
-    const handleMenuClick = (action, record) => {
-         if(action === 'Edit'){
-            debugger;
-            setSelectedItem(record);
-         }
-    };
-    
+                <ProductTypeAdd fetchData={fetchData} modelItem={record} textButton={"Edit"} isStyle={false} />
+            </Menu.Item>
+            <Menu.Item>
+                <Button
+                    type="button"
+                    value="small"
+                    onClick={null}
+      >
+                Delete
+            </Button>
+        </Menu.Item>
+        </Menu >
+    );
 
     const columns = [
         {
@@ -178,7 +181,7 @@ function ProductTypeManager() {
                     </Form.Item>
                 </Col>
                 <Col span={8} style={{ textAlign: 'right' }}>
-                    <ProductTypeAdd fetchData={fetchData} modelItem={null}/>
+                    <ProductTypeAdd isOpen={true} fetchData={fetchData} modelItem={null} textButton={"Thêm mới"} isStyle={true} />
                 </Col>
             </Row>
             <Table
@@ -188,7 +191,7 @@ function ProductTypeManager() {
                 loading={loading}
                 onChange={handleTableChange}
             />
-            {(<ProductTypeAdd fetchData={fetchData} modelItem={selectedItem} />)}
+            {selectedItem && (<ProductTypeAdd fetchData={fetchData} modelItem={selectedItem} />)}
             <Pagination
                 showSizeChanger
                 onChange={onShowSizeChange}
