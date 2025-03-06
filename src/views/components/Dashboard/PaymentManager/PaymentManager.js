@@ -1,48 +1,47 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Select, Space, Table, Tag } from 'antd';
+import { Button, Menu, Select, Dropdown, Table, Form, Input,    Row, Col } from 'antd';
 import { toast } from 'react-toastify';
 import { Pagination } from 'antd';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleInfo, faPenToSquare } from '@fortawesome/free-solid-svg-icons';
-import { Link, Navigate } from 'react-router-dom';
-import useBranch from '@api/useBranch';
 import PaymentAdd from './PaymentAdd';
-import PaymentDelete from './PaymentDelete';
-import PaymentEdit from './PaymentEdit';
+import usePayment from '@api/usePayment';
+import DownOutlined from '@ant-design/icons';
 
 function PaymentManager() {
-    const { getBranch } = useBranch()
-
-    const [branch, setBranch] = useState([])
-
+    const { getListPayment } = usePayment()
+    const [payments, setPayments] = useState([])
     const [loading, setLoading] = useState(false);
-
     const [searchName, setSearchName] = useState('')
-
     const [total, setTotal] = useState();
     const [tableParams, setTableParams] = useState({
         pagination: {
             pageIndex: 1,
             pageSize: 10,
+            keySearch: ''
         },
     });
 
     const fetchData = async () => {
-        const { success, data } = await getBranch(tableParams.pagination);
+        const { success, data } = await getListPayment(tableParams.pagination);
         if (!success || data.status == 'Error') {
             toast.error('Có lỗi xảy ra')
         } else {
-            setBranch(data.data.items)
+            setPayments(data.data)
             setLoading(false);
             setTotal(data.data.totalCount)
         }
     }
-    // useEffect(() => {
-    //     fetchData()
-    // }, [JSON.stringify(tableParams), loading, searchName])
+    useEffect(() => {
+        fetchData()
+    }, [JSON.stringify(tableParams), loading, searchName])
 
     const handleChangeName = (e) => {
-        setSearchName(e.target.value)
+        setTableParams((prevPrams) => ({
+            ...prevPrams,
+            pagination: {
+                ...prevPrams.pagination,
+                keySearch: e.target.value
+            }
+        }));
     }
     const handleTableChange = (pagination, filters, sorter) => {
         setTableParams({
@@ -51,7 +50,7 @@ function PaymentManager() {
             ...sorter,
         });
         if (pagination.pageSize !== tableParams.pagination?.pageSize) {
-            setBranch([]);
+            setPayments([]);
         }
     };
     const onShowSizeChange = (current, pageSize) => {
@@ -62,12 +61,13 @@ function PaymentManager() {
             }
         })
     };
+
     const columns = [
         {
             title: 'STT',
             dataIndex: 'orderNumber',
             key: 'orderNumber',
-            render: (text) => <a style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{text}</a>,
+            render: (_, __, index) => <a style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{index + 1}</a>,
         },
         {
             title: 'Code',
@@ -80,37 +80,67 @@ function PaymentManager() {
             title: 'Tên',
             dataIndex: 'name',
             key: 'name',
-            render: (_, record) => <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{record.countProduct}</p>
+            render: (_, record) => <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{record.name}</p>
         },
         {
             title: 'Trạng thái',
             dataIndex: 'status',
             key: 'status',
-            render: (text) => <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{new Date(text).toLocaleDateString('en-GB')}</p>
+            render: (value) => {
+                if (value == 1) {
+                    return <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>Hoạt động</p>
+                } else {
+                    return <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>Không hoạt động</p>
+                }
+            }
         },
         {
 
             title: 'Action',
             key: 'action',
             render: (_, record) => (
-                <Space>
-                    <PaymentDelete id={record.id} state={loading} action={setLoading} />
-                    <Link to={record.id}>
-                        <Button type='primary' title='Detail Branch'>
-                            <FontAwesomeIcon icon={faCircleInfo} />
-                        </Button>
-                    </Link>
-                    <PaymentEdit id={record.id} state={loading} action={setLoading} />
-                </Space>
+                <Dropdown overlay={menu(record)} trigger={['click']}>
+                    <Button>
+                        Actions <DownOutlined />
+                    </Button>
+                </Dropdown>
             ),
         },
     ];
+
+    const menu = (record) => (
+        <Menu>
+            <Menu.Item>
+                <PaymentAdd fetchData={fetchData} modelItem={record} textButton={"Edit"} isStyle={false} />
+            </Menu.Item>
+            <Menu.Item>
+                <Button
+                    type="button"
+                    value="small"
+                    onClick={null}
+                >
+                    Delete
+                </Button>
+            </Menu.Item>
+        </Menu >
+    );
     return (
         <>
-
-            <PaymentAdd />
+            <Row gutter={[12, 12]}>
+                <Col span={16}>
+                <Form.Item
+                        label="Key search"
+                        name="keySearch"
+                        rules={[{ required: false, message: "Please input product name!" }]}>
+                        <Input placeholder="Enter code, name category" onChange={(e) => handleChangeName(e)} />
+                    </Form.Item>
+                </Col>
+                <Col span={8} style={{ textAlign: 'right' }}>
+                    <PaymentAdd fetchData={fetchData} modelItem={null} textButton={"Thêm mới"} isStyle={true} />
+                </Col>
+            </Row>
             <Table
-                dataSource={branch} columns={columns}
+                dataSource={payments} columns={columns}
                 pagination={false}
                 loading={loading}
                 onChange={handleTableChange}

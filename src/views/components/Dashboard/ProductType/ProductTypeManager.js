@@ -38,7 +38,7 @@ function ProductTypeManager() {
 
     useEffect(() => {
         fetchData()
-    }, [JSON.stringify(tableParams), loading])
+    }, [JSON.stringify(tableParams), loading]);
 
     const handleChangeName = (e) => {
         setTableParams((prevParms) => ({

@@ -21,8 +21,8 @@ import ProductManager from "@views/components/Dashboard/ProductManager/ProductMa
 import BranchManager from "@views/components/Dashboard/BranchManager/BranchManager";
 import DetailBranch from "@views/components/Dashboard/BranchManager/DetailBranch";
 import EditBranch from "@views/components/Dashboard/BranchManager/EditBranch";
-import OrderManager from "@views/components/OrderManager/OrderManager";
-import DetailOrder from "@views/components/OrderManager/DetailOrder";
+import OrderManager from "@views/components/Dashboard/OrderManager/OrderManager";
+import DetailOrder from "@views/components/Dashboard/OrderManager/DetailOrder";
 import ManagerUser from "../views/components/ManagerUser/ManagerUser";
 import DetailUser from "../views/components/ManagerUser/DetailUser";
 import ProductTypeManager from "../views/components/Dashboard/ProductType/ProductTypeManager";
@@ -32,6 +32,8 @@ import RoleDetail from "../views/components/Dashboard/RoleManager/RoleDetail";
 import PaymentManager from "../views/components/Dashboard/PaymentManager/PaymentManager";
 import PaymentDetail from "../views/components/Dashboard/PaymentManager/PaymentDetail";
 import CatalogManager from "@views/components/Dashboard/CatalogManager/CatalogManager"
+import DiscountManager from "../views/components/Dashboard/DiscountManager/DiscountManager";
+import CouponManager from "../views/components/Dashboard/CouponManager/CouponManager";
 
 
 const useRoutes = () => {
@@ -338,6 +340,24 @@ const useRoutes = () => {
       path: "/dashboard/accounts/:userId",
       element: <Layout>
         <DetailUser />
+      </Layout>
+    },
+    // discount
+    {
+      key: "/dashboard/discount",
+      label: "Discount",
+      path: "/dashboard/discount",
+      element: <Layout>
+        <DiscountManager />
+      </Layout>
+    },
+    // coupon
+    {
+      key: "/dashboard/coupon",
+      label: "Coupon",
+      path: "/dashboard/coupon",
+      element: <Layout>
+        <CouponManager />
       </Layout>
     }
   ];

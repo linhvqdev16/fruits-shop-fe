@@ -1,25 +1,32 @@
 import { PlusSquareOutlined } from "@ant-design/icons";
-import useBranch from "@api/useBranch";
+import useRole from "@api/useRole";
 import { Button, Col, Form, Input, Modal, Row, Select, message } from "antd";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-function RoleAdd() {
+import { useToast } from "@utils/toastContext";
+
+const  RoleAdd  = ({fetchData, modelItem, textButton, isStyle}) =>{
 
     const [modal2Open, setModal2Open] = useState(false);
-    const [form] = Form.useForm()
-    const {createBranch} = useBranch()
+    const [form] = Form.useForm();
+    const { addOrChange} = useRole(); 
 
     const onFinish = async (values) => {
         try {
-            const branch = {
-              BranchName: values.BranchName
+            const mode = {
+              code: values.code, 
+              name: values.name,
+              id: modelItem != null ? modelItem.id : null, 
+              status: 1, 
+              isDeleted: 0
             }
-           const {success,data}  = await createBranch(branch, { "Content-Type": "multipart/form-data"})
+           const {success,data}  = await addOrChange(mode)
             console.log(success,data);
            
             if (data.status != 'Error' && success) {
                 setModal2Open(false);
-                toast.success(data.message)
+                toast.success(data.message);
+                fetchData();
             } else {
                 toast.error(data.message)
             }
@@ -28,25 +35,27 @@ function RoleAdd() {
         }
       };
 
+      const onFinishFailed = () => {}
 
-      const onFinishFailed = () => {
-        
+      const showModel = () => {
+        if(modelItem){
+          form.setFieldsValue({ code: modelItem.code, name: modelItem.name, description: modelItem.description });
+        }
+        setModal2Open(true); 
       }
     return ( <>  <div>
         <Button
-          type="primary"
-          value="large"
-          style={{
-            marginTop: "40px",
-            display: "flex",
-            alignItems: "center",
-            background: "#1fbf39",
-            marginBottom: "20px",
-          }}
-          onClick={() => setModal2Open(true)}
-        >
-          <PlusSquareOutlined /> Thêm mới
-        </Button>
+                type= {isStyle ? "primary" : "button"}
+                value="small"
+                style={ isStyle ? {
+                  alignItems: "center",
+                  background: "#1fbf39",
+                  marginBottom: "20px",
+                } : null}
+                onClick={() => showModel()}
+              >
+                {isStyle &&  <PlusSquareOutlined />} {textButton}
+              </Button>
   
         <Modal
           width={'50%'}
@@ -70,7 +79,7 @@ function RoleAdd() {
                   name="code"
                   rules={[{ required: true, message: "Please input category code!" }]}
                 >
-                  <Input placeholder="Type code auto generate" readOnly="true" />
+                  <Input placeholder="Type code auto generate" readOnly={modelItem ? true : false}/>
                 </Form.Item>
               </Col>      
             </Row>
