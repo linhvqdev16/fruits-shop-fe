@@ -1,15 +1,15 @@
 import { PlusSquareOutlined } from "@ant-design/icons";
-import { Button, Col, Form, Input, Modal, Row, Select, Table, Pagination, Space, Checkbox } from "antd";
+import { Button, Col, Form, Input, Modal, Row, Select, Table, Pagination, DatePicker, Checkbox } from "antd";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import useCoupon from "@api/useCoupons";
+import useDiscount from "@api/useDiscount";
 import { Option } from 'antd/es/mentions';
 import TextArea from "antd/es/input/TextArea";
 import useProduct from "@api/useProduct";
 import useCategory from "@api/useCategory"
 const DiscountAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
 
-  const { generateCode, addOrChange } = useCoupon();
+  const { generateCode, addOrChange } = useDiscount();
   const { getListCategory } = useCategory()
   const [modal2Open, setModal2Open] = useState(false);
   const [form] = Form.useForm();
@@ -21,11 +21,14 @@ const DiscountAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
   const [category, setCategory] = useState([])
   const [allSelected, setAllSelected] = useState(false); 
   const [productIdSelected, setProductIdSelected] = useState([]);
+  const {RangePicker} = DatePicker;
+  const [dates, setDates] = useState([]);
 
   const [tableParams, setTableParams] = useState({
     pagination: {
       pageIndex: 1,
       pageSize: 10,
+      keySearch: ''
     },
   });
   const fetchGenerateCode = async () => {
@@ -71,28 +74,37 @@ const DiscountAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
       fetchGenerateCode();
     }
     setModal2Open(true);
-    fetchProduct();
     setTypeProductDiscount(1);
     fetchCategory();
   }
+  useEffect (() => {
+     if(typeProductDiscount === 3){
+       fetchProduct(); 
+     }
+  }, [tableParams, typeProductDiscount]); 
   const onFinish = async (values) => {
+
+    debugger; 
+    var date = dates; 
+
+    
     try {
       var objectModel = {
         name: values.name,
         price: values.price,
         description: values.description,
-        type: values.type,
-        minValue: values.minValue,
-        maxValue: values.maxValue,
-        dateStart: values.dateStart,
-        dateEnd: values.dateEnd,
+        type: values.typeId,
+        startDate: dates[0].format('YYYY-MM-DD'),
+        endDate:  dates[1].format('YYYY-MM-DD'),
         quantity: values.quantity,
-        couponAmount: values.couponAmount,
+        moneyDiscount: values.couponAmount,
         status: 1,
-        isDelete: 0,
+        isDeleted: 0,
         id: modelItem ? modelItem.id : null,
-        code: values.code
+        code: values.code, 
+        percent: values.couponAmount
       }
+      debugger;
       const { success, data } = await addOrChange(objectModel);
       if (data.status != 'Error' && success) {
         setModal2Open(false);
@@ -111,13 +123,37 @@ const DiscountAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
   const handleChange = (value) => {
     console.log(`Selected: ${value}`);
   };
+  
+  const handleSelectedAll = (event) => {
+    if(event.target.checked){
+      setProductIdSelected(product.map(({id}) => id)); 
+    }else{
+      setProductIdSelected([]); 
+    }
+ };
+ const handleChangeSelected = (event, id) => {
+  if(event.target.checked){
+    setProductIdSelected([...productIdSelected].push(id)); 
+  }else{
+    setProductIdSelected([...productIdSelected].filter((e) => e != id)); 
+  }
+ }
+ const handleChangeSearchNameProd = (e) => {
+    setTableParams((prevPrams) => ({
+       ...prevPrams, 
+       pagination : {
+          ...prevPrams.pagination,
+          keySearch: e.target.value
+       }
+    }));
+ }
   const columns = [
     {
-      title: (<Checkbox></Checkbox>),
+      title: (<Checkbox onClick={(e) => handleSelectedAll(e)}></Checkbox>),
       dataIndex: 'number',
       key: 'number',
       render: (_,record) => {
-         return <Checkbox value={true}></Checkbox>
+         return <Checkbox checked={productIdSelected && productIdSelected.includes(record.id) }></Checkbox>
       },
     },
     {
@@ -141,7 +177,7 @@ const DiscountAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
       title: 'Số lượng',
       dataIndex: 'stock',
       key: 'stock',
-      render: (_, record) => <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{record.productQuanlity + record.productSold >= 0 ? (record.productQuanlity + record.productSold) : 0}</p>,
+      render: (_, record) => <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{record.stock}</p>,
 
     } 
   ];
@@ -150,6 +186,10 @@ const DiscountAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
   }
   const handeSelectTypeDiscountProd = (e) => {
     setTypeProductDiscount(e);
+  }
+  const handeRangerPicker = (e) => {
+    debugger;
+    setDates(e);
   }
   return (
     <div>
@@ -234,41 +274,28 @@ const DiscountAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
 
             <Col span={12}>
               <Form.Item
-                label="Ngày bắt đầu"
+                label="Thời gian"
                 name="dateStart"
                 rules={[{ required: true, message: "Please input start date!" }]}
               >
-                <Input placeholder="" type="date" />
+                  <RangePicker
+                           value={dates}
+                           onChange={(e) => handeRangerPicker(e)}
+                           format="YYYY-MM-DD" // Format the date as YYYY-MM-DD
+                           placeholder={['Start Date', 'End Date']}
+                           style={{ width: '100%' }}/>
               </Form.Item>
             </Col>
-            <Col span={12}>
-              <Form.Item
-                label="Ngày kết thúc"
-                name="dateEnd"
-                rules={[
-                  { required: true, message: "Please input end date!" },
-                ]}
-              >
-                <Input placeholder="" type="date" />
-              </Form.Item>
-            </Col>
+            
 
-            <Col span={12}>
-              <Form.Item
-                label="Số lượng"
-                name="quantity"
-                rules={[{ required: true, message: "Please input quantity!" }]}
-              >
-                <Input placeholder="" type="number" />
-              </Form.Item>
-            </Col>
+           
 
             <Col span={12}>
               <Form.Item
                 label="Mô tả"
                 name="description"
               >
-                <TextArea rows={5} placeholder="" type="text" />
+                <TextArea rows={3} placeholder="" type="text" />
               </Form.Item>
             </Col>
           </Row>
@@ -350,7 +377,8 @@ const DiscountAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
               <Col span={24}>
                 <Form.Item
                   name="searchProduct"
-                  rules={[{ required: false, message: "" }]}><Input placeholder="Enter code, product name.." />
+                  rules={[{ required: false, message: "" }]}>
+                    <Input placeholder="Enter code, product name.." onChange={(e) => handleChangeSearchNameProd(e)} />
                 </Form.Item>
               </Col>
             </Row>

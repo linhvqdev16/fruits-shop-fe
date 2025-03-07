@@ -34,6 +34,7 @@ import PaymentDetail from "../views/components/Dashboard/PaymentManager/PaymentD
 import CatalogManager from "@views/components/Dashboard/CatalogManager/CatalogManager"
 import DiscountManager from "../views/components/Dashboard/DiscountManager/DiscountManager";
 import CouponManager from "../views/components/Dashboard/CouponManager/CouponManager";
+import EmployeeManager from "@views/components/Dashboard/EmployeeManager/EmployeeManager";
 
 
 const useRoutes = () => {
@@ -334,14 +335,6 @@ const useRoutes = () => {
         <ManagerUser />
       </Layout>
     },
-    {
-      key: "/dashboard/accounts/:userId",
-      label: "Accounts",
-      path: "/dashboard/accounts/:userId",
-      element: <Layout>
-        <DetailUser />
-      </Layout>
-    },
     // discount
     {
       key: "/dashboard/discount",
@@ -359,7 +352,16 @@ const useRoutes = () => {
       element: <Layout>
         <CouponManager />
       </Layout>
-    }
+    },
+    // employee
+    {
+      key: "/dashboard/employee",
+      label: "Employee",
+      path: "/dashboard/employee",
+      element: <Layout>
+        <EmployeeManager />
+      </Layout>
+    },
   ];
 
   return {

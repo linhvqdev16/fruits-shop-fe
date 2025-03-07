@@ -1,36 +1,41 @@
 import { Link } from "react-router-dom"
-import DetailOrder from "./DetailOrder"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faCircleInfo } from "@fortawesome/free-solid-svg-icons"
 import useOrder from '@api/useOrder';
-import React, { useEffect, useState } from 'react';
+import useAuth from '@api/useAuth';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { Pagination, Table, Space, Button } from 'antd';
-
-import OrderAddOrChange from './OrderAddOrChange';
+import EmployeeAddOrChange from './EmployeeAddOrChange'
 
 function formatCurrencyVND(amount) {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
   } 
 
 function EmployeeManager() {
-    const {getAll} = useOrder()
+
+    const [user, setUsers] = useState([]);
+    const {getUser} = useAuth();
+
     const [orders, setOrder] = useState([])
     const [loading, setLoading] = useState(false)
-    const [total,setTotal] = useState()
+    const [total,setTotal] = useState(0)
     const [tableParams, setTableParams] = useState({
         pagination: {
             pageIndex: 1,
             pageSize: 10
         }
     })
+    
+
     const fetchData = async () => {
-        const {success,data} = await getAll(tableParams.pagination);
+        const {success,data} = await getUser(tableParams.pagination);
         console.log(data);
         if(success && data.status != 'Error') {
-            setOrder(data.data.items)
+            setUsers(data.data)
             setLoading(false)
-            setTotal(data.data.totalCount)
+            setTotal(data.data.length)
+            toast.success(data.message)
         }else {
             toast.error(data.message)
         }
@@ -46,7 +51,7 @@ function EmployeeManager() {
             ...sorter,
           });
           if (pagination.pageSize !== tableParams.pagination?.pageSize) {
-            setOrder([]);
+            setUsers([]);
           }
     }
 
@@ -61,79 +66,65 @@ function EmployeeManager() {
     const columns = [
         {
             title: 'STT',
-            render: (data) => {
-                return (<p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{`${data.orderNumber}`}</p>)
-            }
+            dataIndex: 'orderNumber',
+            key: 'orderNumber',
+            render: (_, record) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{record.orderNumber}</p>
         },
         {
-            title: 'Order code',
-            render: (data) => {
-                return (<p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{`${data.orderCode}`}</p>)
-            }
+            title: 'User code',
+            dataIndex: 'code',
+            key: 'code',
+            render: (_, record) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{record.code}</p>
         },
         {
-            title: 'Customer name',
-            render: (data) => {
-                return (<p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{`${data.customerName}`}</p>)
-            }
+            title: 'Full name',
+            dataIndex: 'fullName',
+            key: 'fullName',
+            render: (_, record) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{record.fullName}</p>
         },
         {
-            title: 'Phone number',
-            render: (data) => {
-                return (<p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{`${data.phoneNumber}`}</p>)
-            }
+            title: 'PhoneNumber',
+            dataIndex: 'phoneNumber',
+            key: 'phoneNumber',
+            render: (_, record) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{record.phoneNumber}</p>
         },
         {
-            title: 'Address',
-            dataIndex: 'address',
-            key: 'addressDetail',
-            render: (_, record) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{record.addressDetail}</p>
+            title: 'Email',
+            dataIndex: 'email',
+            key: 'email',
+            render: (_, record) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{record.email}</p>
         },
         {
-            title: 'Employee name',
-            dataIndex: 'employeeName',
-            key: 'employeeName',
-            render: (_, record) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{record.employeeName}</p>
+            title: 'Date birth',
+            dataIndex: 'dateBirth',
+            key: 'dateBirth',
+            render: (_, record) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{record.dateBirth}</p>
         },
         {
-            title: 'Order status',
-            dataIndex: 'orderStatus',
-            key: 'orderStatus',
-            render: (_, record) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{record.orderStatus}</p>
+            title: 'UserName',
+            dataIndex: 'userName',
+            key: 'userName',
+            render: (_, record) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{record.userName}</p>
         },
-        // {
-        //     title: 'Order stage',
-        //     dataIndex: 'orderStage',
-        //     key: 'orderStage',
-        //     render: (_, record) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{record.orderStage}</p>
-        // },
-        // {
-        //     title: 'Order type',
-        //     dataIndex: 'orderTypeName',
-        //     key: 'orderTypeName',
-        //     render: (_, record) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{record.orderTypeName}</p>
-        // },
-        // {
-        //     title: 'Delivery type',
-        //     dataIndex: 'deliveryName',
-        //     key: 'deliveryName',
-        //     render: (_, record) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{record.deliveryName}</p>
-        // },
         {
-            title: 'Price',
-            dataIndex: 'totalPrice',
-            key: 'totalPrice',
-            render: (_,data) => {
-                return (<p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{formatCurrencyVND(data.totalPrice)}</p>)
-            }
+            title: 'Gender',
+            dataIndex: 'gender',
+            key: 'gender',
+            render: (_, record) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{record.gender}</p>
         },
+           {
+            title: 'RoleCode',
+            dataIndex: 'roleCode',
+            key: 'roleCode',
+            render: (_, record) => <p style={{fontSize:"16px", color:"black", fontWeight:"500"}}>{record.roleCode}</p>
+        },  
         {
             title: 'Action',
             key: 'action',
             render: (_, record) => (
                 <Space>
-                    <Link to={record.id}>
-                        <Button type='primary' title='Detail Order'>
+                    <Link to={record.userId}>
+                        <Button type='primary' title='Detail Account'>
                             <FontAwesomeIcon icon={faCircleInfo} />
                         </Button>
                     </Link>
@@ -144,22 +135,25 @@ function EmployeeManager() {
         
     ]
     return (
+
         <>
-        <OrderAddOrChange/>
+        <EmployeeAddOrChange/>
          <Table 
-                dataSource={orders}   
+                dataSource={user}   
                 columns={columns}
                 pagination={false}
                 loading={loading}
                 onChange={handleTableChange}
         />
+
         <Pagination showSizeChanger
                 onChange={onShowSizeChange} 
                 style={{textAlign: 'center',marginTop: '1.5rem'}} 
                 defaultCurrent={tableParams.pagination.pageIndex} 
                 total={total}  />
         </>
+       
     )
 } 
 
-export default EmployeeManager
+export default EmployeeManager;

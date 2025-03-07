@@ -1,5 +1,5 @@
 import { PlusSquareOutlined } from "@ant-design/icons";
-import { Button, Col, Form, Input, Modal, Row, Select, Space, Table } from "antd";
+import { Button, Col, Form, Input, Modal, Row, Select, Space, DatePicker } from "antd";
 import React, { useEffect, useState } from "react";
 import useProduct from "@api/useProduct";
 import { toast } from "react-toastify";
@@ -346,7 +346,7 @@ const UserAddOrChange = () => {
                                 label="Ngày sinh"
                                 name="birthDate"
                             >
-                                <Input placeholder="" type="date" />
+                               <DatePicker onChange={null} style={{width: '100%'}}/>
                             </Form.Item>
                         </Col>
                         <Col span={12}>

@@ -96,11 +96,11 @@ const SidebarDashboard = () => {
                     style={{fontSize: "15px"}}
                     active={isActiveMenu('accounts')}> Khách hàng </MenuItem>
                   <MenuItem
-                    component={<Link to={'/dashboard/accounts'} className="sidebar-link" aria-expanded="false" ></Link>}
-                    onClick={() => handleMenuClick('accounts')}
-                    className={isActiveMenu('accounts') ? 'selected-item' : ''}
+                    component={<Link to={'/dashboard/employee'} className="sidebar-link" aria-expanded="false" ></Link>}
+                    onClick={() => handleMenuClick('employee')}
+                    className={isActiveMenu('employee') ? 'selected-item' : ''}
                     style={{fontSize: "15px"}}
-                    active={isActiveMenu('dashboard')}> Nhân viên </MenuItem>
+                    active={isActiveMenu('employee')}> Nhân viên </MenuItem>
                 </SubMenu>
                 <SubMenu label="Quản lý khuyến mại" style={{fontSize: "15px", fontWeight: "bold"}} >
                   <MenuItem
