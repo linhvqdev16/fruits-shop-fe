@@ -1,7 +1,7 @@
 import useTranslate from '@lang'
 import { useNavigate } from 'react-router-dom'
 import { message, notification } from 'antd'
-
+import { toast } from "react-toastify";
 import { HTTP_STATUS } from '@configs/app.config'
 
 const {
@@ -25,7 +25,7 @@ const useHandleError = () => {
 
 			switch(status) {
 			case BAD_REQUEST:
-				message.warning(t(data.message).toUpperFirst())
+				toast.warning(t(data.message).toUpperFirst())
 				break
 			case UNAUTHORIZED:
 				notification.info({
@@ -36,23 +36,23 @@ const useHandleError = () => {
 				navigate('/login')
 				break
 			case NOT_FOUND:
-				message.error(t('url not found').toUpperFirst())
+				toast.error(t('url not found').toUpperFirst())
 				break
 			case METHOD_NOT_ALLOWED:
-				message.error(t('method not allowed').toUpperFirst())
+				toast.error(t('method not allowed').toUpperFirst())
 				break
 			case TOO_MANY_REQUEST:
-				message.error(t('too many request').toUpperFirst())
+				toast.error(t('too many request').toUpperFirst())
 				break
 			case SERVER_ERROR:
-				notification.error({
+				toast.error({
 					message: t('server error').toUpperFirst(),
 					description: data.message,
 					placement: 'bottomRight'
 				})
 				break
 			default:
-				message.error(`${t('error').toUpperFirst()}: ${status}`)
+				toast.error(`${t('error').toUpperFirst()}: ${status}`)
 				break
 			}
 
@@ -64,12 +64,12 @@ const useHandleError = () => {
 			console.log({request})
 			if(_hasError) {
 				if(_sent) {
-					message.error(t('server not respond').toUpperFirst())
+					toast.error(t('server not respond').toUpperFirst())
 				} else {
-					message.error(t('network error').toUpperFirst())
+					toast.error(t('network error').toUpperFirst())
 				}
 			} else {
-				message.error('request error unknown')
+				toast.error('request error unknown')
 			
 			}
 		} else {
