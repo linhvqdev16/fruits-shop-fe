@@ -103,27 +103,27 @@ function ProductTypeManager() {
             title: 'STT',
             dataIndex: 'orderNumber',
             key: 'orderNumber',
-            render: (_, __, index) => <a style={{ fontSize: "14px", color: "black", fontWeight: "500", textAlign: 'center' }}>{index + 1}</a>,
+            render: (_, __, index) => <a style={{ fontSize: "13px", color: "black", fontWeight: "300", textAlign: 'center' }}>{index + 1}</a>,
         },
         {
             title: 'Code',
             dataIndex: 'code',
             key: 'code',
-            render: (text) => <a style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{text}</a>,
+            render: (text) => <a style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{text}</a>,
         },
 
         {
             title: 'Tên',
             dataIndex: 'name',
             key: 'name',
-            render: (text) => <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{text}</p>
+            render: (text) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{text}</p>
         },
 
         {
             title: 'Mô tả',
             dataIndex: 'description',
             key: 'description',
-            render: (text) => <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{text}</p>
+            render: (text) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{text}</p>
         },
         {
             title: 'Trạng thái',
@@ -131,9 +131,9 @@ function ProductTypeManager() {
             key: 'status',
             render: (value) => {
                 if (value == 1) {
-                    return <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>Hoạt động</p>
+                    return <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>Hoạt động</p>
                 } else {
-                    return <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>Không hoạt động</p>
+                    return <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>Không hoạt động</p>
                 }
             }
         },

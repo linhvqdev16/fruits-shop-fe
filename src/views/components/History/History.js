@@ -23,7 +23,6 @@ function History() {
     
 
     const fetchData = async () => {
-        debugger
         const {success,data} = await getAll({
             ...tableParams.pagination,
             UserId: jwtDecode(token).user_id

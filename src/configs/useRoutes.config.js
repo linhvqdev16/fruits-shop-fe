@@ -35,6 +35,8 @@ import CatalogManager from "@views/components/Dashboard/CatalogManager/CatalogMa
 import DiscountManager from "../views/components/Dashboard/DiscountManager/DiscountManager";
 import CouponManager from "../views/components/Dashboard/CouponManager/CouponManager";
 import EmployeeManager from "@views/components/Dashboard/EmployeeManager/EmployeeManager";
+import RollbackOrderManager from "@views/components/Dashboard/RollbackOrderManager/RollbackOrderManager";
+import DeliveryManager from "@views/components/Dashboard/DeliveryManager/DeliveryManager";
 
 
 const useRoutes = () => {
@@ -360,6 +362,24 @@ const useRoutes = () => {
       path: "/dashboard/employee",
       element: <Layout>
         <EmployeeManager />
+      </Layout>
+    },
+    // rollback-order
+    {
+      key: "/dashboard/rollback-order",
+      label: "Employee",
+      path: "/dashboard/rollback-order",
+      element: <Layout>
+        <RollbackOrderManager />
+      </Layout>
+    },
+    // delivery
+    {
+      key: "/dashboard/delivery",
+      label: "Employee",
+      path: "/dashboard/delivery",
+      element: <Layout>
+        <DeliveryManager />
       </Layout>
     },
   ];

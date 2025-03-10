@@ -77,28 +77,28 @@ function CouponManager() {
             title: 'STT',
             dataIndex: 'number',
             key: 'number',
-            render: (_, __, index) => <a style={{ fontSize: "12px", color: "black", fontWeight: "500" }}>{index + 1}</a>,
+            render: (_, __, index) => <a style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{index + 1}</a>,
         },
         {
             title: 'Mã khuyến mại',
             dataIndex: 'code',
             key: 'code',
-            render: (text) => <a style={{ fontSize: "12px", color: "black", fontWeight: "500" }}>{text}</a>,
+            render: (text) => <a style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{text}</a>,
         },
         {
             title: 'Tên khuyến mại',
             dataIndex: 'name',
             key: 'name',
-            render: (text) => <a style={{ fontSize: "12px", color: "black", fontWeight: "500" }}>{text}</a>,
+            render: (text) => <a style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{text}</a>,
         },
         {
             title: 'Kiểu khuyến mại',
             dataIndex: 'type',
             render: (value) => {
                 if (value === 1) {
-                    return <p style={{ fontSize: "12px", color: "black", fontWeight: "500" }}>Chiết khấu phần trăm đơn hàng </p>
+                    return <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>Chiết khấu phần trăm đơn hàng </p>
                 } else {
-                    return <p style={{ fontSize: "12px", color: "black", fontWeight: "500" }}>Chiết khấu giá trị đơn hàng </p>
+                    return <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>Chiết khấu giá trị đơn hàng </p>
                 }
             }
         },
@@ -106,26 +106,26 @@ function CouponManager() {
             title: 'Số lượng',
             dataIndex: 'quantity',
             key: 'quantity',
-            render: (_, record) => <p style={{ fontSize: "12px", color: "black", fontWeight: "500" }}>{record.quantity}</p>,
+            render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{record.quantity}</p>,
 
         },
         {
             title: 'Số lượng đã sử dụng',
             dataIndex: 'quantityUsed',
             key: 'quantityUsed',
-            render: (_, record) => <p style={{ fontSize: "12px", color: "black", fontWeight: "500" }}>{record.quantityUsed}</p>
+            render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{record.quantityUsed}</p>
         },
         {
             title: 'Thời gian bắt đầu',
             dataIndex: 'dateStart',
             key: 'dateStart',
-            render: (_, record) => <p style={{ fontSize: "12px", color: "black", fontWeight: "500" }}>{format(record.dateStart, 'dd-MM-yyyy')}</p>
+            render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{format(record.dateStart, 'dd-MM-yyyy')}</p>
         },
         {
             title: 'Thời gian kết thúc',
             dataIndex: 'dateEnd',
             key: 'dateEnd',
-            render: (_, record) => <p style={{ fontSize: "12px", color: "black", fontWeight: "500" }}>{format(record.dateEnd, 'dd-MM-yyyy')}</p>
+            render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{format(record.dateEnd, 'dd-MM-yyyy')}</p>
         },
         {
             title: 'Trạng thái',
@@ -133,9 +133,9 @@ function CouponManager() {
             key: 'status',
             render: (value) => {
                 if (value === 1) {
-                    return <p style={{ fontSize: "12px", color: "black", fontWeight: "500" }}>Hoạt động</p>
+                    return <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>Hoạt động</p>
                 } else {
-                    return <p style={{ fontSize: "12px", color: "black", fontWeight: "500" }}>Không hoạt động</p>
+                    return <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>Không hoạt động</p>
                 }
 
             }

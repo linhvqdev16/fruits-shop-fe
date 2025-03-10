@@ -84,7 +84,7 @@ const DiscountAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
   }, [tableParams, typeProductDiscount]); 
   const onFinish = async (values) => {
 
-    debugger; 
+     
     var date = dates; 
 
     
@@ -104,7 +104,7 @@ const DiscountAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
         code: values.code, 
         percent: values.couponAmount
       }
-      debugger;
+      
       const { success, data } = await addOrChange(objectModel);
       if (data.status != 'Error' && success) {
         setModal2Open(false);
@@ -160,24 +160,24 @@ const DiscountAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
       title: 'Tên sản phẩm',
       dataIndex: 'name',
       key: 'name',
-      render: (text) => <a style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{text}</a>,
+      render: (text) => <a style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{text}</a>,
     },
     {
       title: 'Mã sản phẩm',
       dataIndex: 'code',
       key: 'code',
-      render: (text) => <a style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{text}</a>,
+      render: (text) => <a style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{text}</a>,
     },
     {
       title: 'Giá sản phẩm',
       dataIndex: 'price',
-      render: (text) => <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{formatCurrencyVND(text)}</p>,
+      render: (text) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{formatCurrencyVND(text)}</p>,
     },
     {
       title: 'Số lượng',
       dataIndex: 'stock',
       key: 'stock',
-      render: (_, record) => <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{record.stock}</p>,
+      render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{record.stock}</p>,
 
     } 
   ];
@@ -188,7 +188,7 @@ const DiscountAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
     setTypeProductDiscount(e);
   }
   const handeRangerPicker = (e) => {
-    debugger;
+    
     setDates(e);
   }
   return (

@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom"
-import DetailOrder from "./DetailOrder"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faCircleInfo } from "@fortawesome/free-solid-svg-icons"
 import useOrder from '@api/useOrder';
@@ -8,13 +7,11 @@ import { toast } from 'react-toastify';
 import { Pagination, Table, Space, Button } from 'antd';
 import { Col, Form, Input, Modal, Row, Select, DatePicker } from "antd";
 
-import OrderAddOrChange from './OrderAddOrChange';
-
 function formatCurrencyVND(amount) {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
 }
 
-function OrderManager() {
+function RollbackOrderManager() {
 
     const { RangePicker } = DatePicker;
 
@@ -138,18 +135,13 @@ function OrderManager() {
     return (
         <>
             <Row gutter={[16, 16]}>
-                <Col span={16}>
+                <Col span={6}>
                     <Form.Item
                         label="Key search"
                         name="productName"
                         rules={[{ required: false, message: "Please input product name!" }]}><Input placeholder="Enter code, name order..." />
                     </Form.Item>
                 </Col>
-                <Col span={8} style={{textAlign: 'right'}}>
-                    <OrderAddOrChange />
-                </Col>
-            </Row>
-            <Row gutter={[16, 16]}>
                 <Col span={6}>
                     <Form.Item
                         label="Khách hàng"
@@ -179,25 +171,9 @@ function OrderManager() {
                         rules={[{ required: false, message: "Please input product name!" }]}><Input placeholder="Enter code, phone number, name employee..." />
                     </Form.Item>
                 </Col>
-                <Col span={6}>
-                    <Form.Item
-                        label="Trạng thái"
-                        name="originId"
-                    >
-                        <Select
-                            placeholder="Please select"
-                            onChange={null}
-                            style={{
-                                width: '100%',
-                            }}
-                            options={origin}
-                        />
-
-                    </Form.Item>
-                </Col>
             </Row>
             <Row gutter={[16, 16]}>
-                <Col span={12}>
+                <Col span={10}>
                     <Form.Item
                         label="Giá trị đơn hàng"
                         name="productName"
@@ -211,7 +187,7 @@ function OrderManager() {
                         </Row>
                     </Form.Item>
                 </Col>
-                <Col span={12}>
+                <Col span={8}>
                     <Form.Item
                         label="Thời gian"
                         name="productName"
@@ -225,6 +201,22 @@ function OrderManager() {
                         />
                     </Form.Item>
                 </Col>
+                 <Col span={6}>
+                                    <Form.Item
+                                        label="Trạng thái"
+                                        name="originId"
+                                    >
+                                        <Select
+                                            placeholder="Please select"
+                                            onChange={null}
+                                            style={{
+                                                width: '100%',
+                                            }}
+                                            options={origin}
+                                        />
+                
+                                    </Form.Item>
+                                </Col>
             </Row>
             <Table
                 dataSource={orders}
@@ -242,4 +234,4 @@ function OrderManager() {
     )
 }
 
-export default OrderManager
+export default RollbackOrderManager

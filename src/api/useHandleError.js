@@ -69,7 +69,7 @@ const useHandleError = () => {
 					toast.error(t('network error').toUpperFirst())
 				}
 			} else {
-				toast.error('request error unknown')
+				// toast.error('request error unknown')
 			
 			}
 		} else {

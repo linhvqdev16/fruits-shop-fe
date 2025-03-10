@@ -12,7 +12,6 @@ const Register = () => {
   const { register } = useAuth();
   const handleRegister = async () => {
     try {
-      debugger
       const { success, data } = await register(formik.values);
       if (!success || data.status == "Error") {
         toast.error(data.message);

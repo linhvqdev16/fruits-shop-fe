@@ -89,7 +89,7 @@ const AddProduct = ({fetchData, modelItem, textButton, isStyle}) => {
     setPreviewOpen(true);
   };
   const handleChangeFile = ({ fileList: newFileList }) => {
-    debugger;
+    
     newFileList.forEach(items => items.status = 'done')
     setFileList(newFileList);
   };
@@ -118,7 +118,7 @@ const AddProduct = ({fetchData, modelItem, textButton, isStyle}) => {
   const onFinish = async (values) => {
     try {
       const formData = new FormData()
-      debugger;
+      
       var product = {
         typeId: values.typeId,
         categoryId: values.categoryId,
@@ -130,7 +130,6 @@ const AddProduct = ({fetchData, modelItem, textButton, isStyle}) => {
       }
       formData.append("productModel", JSON.stringify(product));
       fileList.forEach((file) => {
-        debugger;
         formData.append(`files`, file.originFileObj);
       });
       const { success, data } = await addOrChange(formData, { "Content-Type": "multipart/form-data" });

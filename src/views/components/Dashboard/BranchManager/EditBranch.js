@@ -24,7 +24,6 @@ function EditBranch({id,state,action}) {
     const onFinish = async (values) => {
       const {success,data} = await editBranch(values,{id: branch.id});
       if(success && data.status != 'Error') {
-        debugger
         toast.success(data.message);
         action(!state)
       } else {

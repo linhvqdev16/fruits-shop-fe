@@ -1,43 +1,64 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Dropdown, Menu, Select, Table } from 'antd';
+import { Button, Select, Dropdown, Table, Menu } from 'antd';
 import { toast } from 'react-toastify';
 import { Pagination } from 'antd';
-import useCatalog from '@api/useCatalog';
-import { Col, Form, Input, Modal, Row } from "antd";
+import useType from '@api/useType';
+import ProductTypeAdd from './DeliveryAddOrChange';
+import { Col, Form, Input, Row } from "antd";
 import { DownOutlined } from '@ant-design/icons';
-import { Option } from 'antd/es/mentions';
-import CatalogAddOrChange from './CatalogAddOrChange'
 
-function CatalogManager() {
-    const { getList } = useCatalog()
+function DeliveryManager() {
+    const { getListType } = useType()
+    const { Option } = Select;
 
-    const [branch, setBranch] = useState([])
+    const [types, setType] = useState([])
     const [loading, setLoading] = useState(false);
-
     const [total, setTotal] = useState();
+    const [selectedItem, setSelectedItem] = useState();
+
     const [tableParams, setTableParams] = useState({
         pagination: {
             pageIndex: 1,
             pageSize: 10,
-            keySearch: "",
-            status: -1
+            keySearch: '',
+            status: null
         },
     });
 
     const fetchData = async () => {
-        const { success, data } = await getList(tableParams.pagination);
+        const { success, data } = await getListType(tableParams.pagination);
         if (!success || data.status == 'Error') {
             toast.error('Có lỗi xảy ra')
         } else {
-            setBranch(data.data)
+            setType(data.data)
             setLoading(false);
-            setTotal(data.totalCount)
+            setTotal(data.data.totalCount)
         }
     }
 
     useEffect(() => {
         fetchData()
     }, [JSON.stringify(tableParams), loading]);
+
+    const handleChangeName = (e) => {
+        setTableParams((prevParms) => ({
+            ...prevParms,
+            pagination: {
+                ...prevParms.pagination,
+                keySearch: e.target.value
+            }
+        }));
+    }
+
+    const handleChangeSelect = (value) => {
+        setTableParams((prevParms) => ({
+            ...prevParms,
+            pagination: {
+                ...prevParms.pagination,
+                status: value
+            }
+        }));
+    };
 
     const handleTableChange = (pagination, filters, sorter) => {
         setTableParams({
@@ -46,9 +67,10 @@ function CatalogManager() {
             ...sorter,
         });
         if (pagination.pageSize !== tableParams.pagination?.pageSize) {
-            setBranch([]);
+            setType([]);
         }
     };
+
     const onShowSizeChange = (current, pageSize) => {
         setTableParams({
             pagination: {
@@ -57,12 +79,31 @@ function CatalogManager() {
             }
         })
     };
+
+    const menu = (record) => (
+        <Menu>
+            <Menu.Item>
+
+                <ProductTypeAdd fetchData={fetchData} modelItem={record} textButton={"Edit"} isStyle={false} />
+            </Menu.Item>
+            <Menu.Item>
+                <Button
+                    type="button"
+                    value="small"
+                    onClick={null}
+      >
+                Delete
+            </Button>
+        </Menu.Item>
+        </Menu >
+    );
+
     const columns = [
         {
             title: 'STT',
             dataIndex: 'orderNumber',
             key: 'orderNumber',
-            render: (_, __, index) => <a style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{index + 1}</a>,
+            render: (_, __, index) => <a style={{ fontSize: "13px", color: "black", fontWeight: "300", textAlign: 'center' }}>{index + 1}</a>,
         },
         {
             title: 'Code',
@@ -75,7 +116,7 @@ function CatalogManager() {
             title: 'Tên',
             dataIndex: 'name',
             key: 'name',
-            render: (_, record) => <a style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{record.name}</a>
+            render: (text) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{text}</p>
         },
 
         {
@@ -109,52 +150,21 @@ function CatalogManager() {
             ),
         },
     ];
-
-    const handleChangeName = (e) => {
-        setTableParams((prevParms) => ({
-            ...prevParms,
-            pagination: {
-                ...prevParms.pagination,
-                keySearch: e.target.value
-            }
-        }));
-    }
-
-    const handleChangeSelect = (value) => {
-        setTableParams((prevParms) => ({
-            ...prevParms,
-            pagination: {
-                ...prevParms.pagination,
-                status: value
-            }
-        }));
-    };
-
-    const menu = (record) => (
-        <Menu>
-            <Menu.Item onClick={() => handleMenuClick('Edit', record)}>Edit</Menu.Item>
-            <Menu.Item onClick={() => handleMenuClick('Delete', record)}>Delete</Menu.Item>
-        </Menu>
-    );
-
-    const handleMenuClick = (action, record) => {
-        console.log(`${action} action on row`, record);
-    };
-
     return (
         <>
             <Row gutter={[16, 16]}>
                 <Col span={8}>
                     <Form.Item
                         label="Key search"
-                        name="productName"
-                        rules={[{ required: false, message: "Please input product name!" }]}><Input placeholder="Enter code, name category" onChange={(e) => handleChangeName(e)} />
+                        name="keySearch"
+                        rules={[{ required: false, message: "Please input product name!" }]}>
+                        <Input placeholder="Enter code, name category" onChange={(e) => handleChangeName(e)} />
                     </Form.Item>
                 </Col>
                 <Col span={8}>
                     <Form.Item
                         label="Trạng thái"
-                        name="originId"
+                        name="status"
                     >
                         <Select
                             value={tableParams.pagination.status}
@@ -164,23 +174,24 @@ function CatalogManager() {
                                 width: '100%',
                             }}
                         >
-                            <Option value={-1}>Tất cả</Option>
-                            <Option value={1}>Hoạt động</Option>
-                            <Option value={2}>Không hoạt động</Option>
+                            <Option value="-1">Tất cả</Option>
+                            <Option value="1">Hoạt động</Option>
+                            <Option value="2">Không hoạt động</Option>
                         </Select>
-
                     </Form.Item>
                 </Col>
                 <Col span={8} style={{ textAlign: 'right' }}>
-                    <CatalogAddOrChange fechtList={fetchData}/>
+                    <ProductTypeAdd isOpen={true} fetchData={fetchData} modelItem={null} textButton={"Thêm mới"} isStyle={true} />
                 </Col>
             </Row>
             <Table
-                dataSource={branch} columns={columns}
+                dataSource={types}
+                columns={columns}
                 pagination={false}
                 loading={loading}
                 onChange={handleTableChange}
             />
+            {selectedItem && (<ProductTypeAdd fetchData={fetchData} modelItem={selectedItem} />)}
             <Pagination
                 showSizeChanger
                 onChange={onShowSizeChange}
@@ -192,4 +203,4 @@ function CatalogManager() {
     );
 }
 
-export default CatalogManager;
+export default DeliveryManager;

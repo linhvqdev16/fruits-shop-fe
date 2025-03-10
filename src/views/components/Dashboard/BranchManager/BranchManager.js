@@ -62,33 +62,33 @@ function BranchManager() {
             title: 'STT',
             dataIndex: 'orderNumber',
             key: 'orderNumber',
-            render: (_, __, index) => <a style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{index + 1}</a>,
+            render: (_, __, index) => <a style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{index + 1}</a>,
         },
         {
             title: 'Code',
             dataIndex: 'code',
             key: 'code',
-            render: (text) => <a style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{text}</a>,
+            render: (text) => <a style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{text}</a>,
         },
 
         {
             title: 'Tên',
             dataIndex: 'name',
             key: 'name',
-            render: (_, record) => <a style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{record.name}</a>
+            render: (_, record) => <a style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{record.name}</a>
         },
         {
             title: 'Danh mục',
             dataIndex: 'catalogName',
             key: 'catalogName',
-            render: (_, record) => <a style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{record.catalogName}</a>
+            render: (_, record) => <a style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{record.catalogName}</a>
         },
 
         {
             title: 'Mô tả',
             dataIndex: 'description',
             key: 'description',
-            render: (text) => <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{text}</p>
+            render: (text) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{text}</p>
         },
         {
             title: 'Trạng thái',
@@ -96,9 +96,9 @@ function BranchManager() {
             key: 'status',
             render: (value) => {
                 if (value == 1) {
-                    return <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>Hoạt động</p>
+                    return <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>Hoạt động</p>
                 } else {
-                    return <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>Không hoạt động</p>
+                    return <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>Không hoạt động</p>
                 }
             }
         },

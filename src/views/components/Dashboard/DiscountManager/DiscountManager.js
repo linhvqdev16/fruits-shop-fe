@@ -161,7 +161,7 @@ function DiscountManager() {
                 </Col>
             </Row>
             <Row gutter={[16, 16]}>
-                <Col span={8}>
+                <Col span={16}>
                     <Form.Item
                         label="Thời gian"
                         name="minValue"

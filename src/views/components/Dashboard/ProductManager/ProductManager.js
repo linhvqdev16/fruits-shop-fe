@@ -117,7 +117,7 @@ function ProductManager() {
             title: 'STT',
             dataIndex: 'number',
             key: 'number',
-            render: (_, __, index) => <a style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{index + 1}</a>,
+            render: (_, __, index) => <a style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{index + 1}</a>,
         },
         {
             title: 'Hình ảnh',
@@ -129,49 +129,49 @@ function ProductManager() {
             title: 'Tên sản phẩm',
             dataIndex: 'name',
             key: 'name',
-            render: (text) => <a style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{text}</a>,
+            render: (text) => <a style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{text}</a>,
         },
         {
             title: 'Mã sản phẩm',
             dataIndex: 'code',
             key: 'code',
-            render: (text) => <a style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{text}</a>,
+            render: (text) => <a style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{text}</a>,
         },
         {
             title: 'Giá sản phẩm',
             dataIndex: 'price',
-            render: (text) => <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{formatCurrencyVND(text)}</p>,
+            render: (text) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{formatCurrencyVND(text)}</p>,
         },
         {
             title: 'Số lượng',
             dataIndex: 'stock',
             key: 'stock',
-            render: (_, record) => <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{record.stock}</p>,
+            render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{record.stock}</p>,
 
         },
         {
             title: 'Loại sản phẩm',
             dataIndex: 'categoryName',
             key: 'categoryName',
-            render: (_, record) => <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{record.categoryName}</p>
+            render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{record.categoryName}</p>
         },
         {
             title: 'Kiểu sản phẩm',
             dataIndex: 'typeName',
             key: 'typeName',
-            render: (_, record) => <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{record.typeName}</p>
+            render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{record.typeName}</p>
         },
         {
             title: 'Mô tả',
             dataIndex: 'description',
             key: 'description',
-            render: (_, record) => <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{record.description}</p>
+            render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{record.description}</p>
         },
         {
             title: 'Số lượng đã bán',
             dataIndex: 'soldQuantity',
             key: 'soldQuantity',
-            render: (_, record) => <p style={{ fontSize: "14px", color: "black", fontWeight: "500" }}>{record.soldQuantity ? record.soldQuantity : 0}</p>,
+            render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{record.soldQuantity ? record.soldQuantity : 0}</p>,
 
         },
         {
