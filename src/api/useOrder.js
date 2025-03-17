@@ -1,7 +1,7 @@
 import useRequest from './useRequest'
 
 const useOrder = () => {
-    const { createPostRequest, createGetRequest, createPutRequest, cancel } = useRequest('Orders')
+    const { createPostRequest, createGetRequest, createPutRequest, cancel } = useRequest('order')
 
     const getAll = (data) => createPostRequest({
 		endpoint: '/getall',
@@ -20,11 +20,16 @@ const useOrder = () => {
 		params: params,
 		data: data
 	})
+	const generateCode = () => createGetRequest({
+		endpoint: '/generate-code', 
+		params: null
+	})
 	return {
 		getAll,
 		create,
 		getDetail,
-		edit
+		edit,
+		generateCode
 	}
 } 
 export default useOrder

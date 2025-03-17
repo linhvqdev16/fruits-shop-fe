@@ -1,13 +1,14 @@
 import { PlusSquareOutlined, CloseCircleOutlined } from "@ant-design/icons";
-import { Button, Col, Form, Input, Modal, Row, Select, Space, Table, message } from "antd";
+import { Button, Col, Form, Input, Modal, Row, Select, Space, Table, AutoComplete } from "antd";
 import React, { useEffect, useState } from "react";
 import useProduct from "@api/useProduct";
 import { toast } from "react-toastify";
-import { Pagination } from 'antd';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleInfo, faPenToSquare } from '@fortawesome/free-solid-svg-icons';
-import { Link } from 'react-router-dom';
+import useUser from "@api/useUser";
 import { EyeClosed, Trash2, CircleX, Eye } from "lucide-react";
+import ProductPopUp from "./ProductPopUp";
+import PaymentPage from "./PaymentPages";
+import UserAddOrChange from "@views/components/ManagerUser/UserAddOrChange";
+
 const getBase64 = (file) =>
     new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -45,8 +46,8 @@ const Tab = ({ label, activeTab, setActiveTab, closeTab }) => {
             <CircleX size={25} onClick={(e) => {
                 e.stopPropagation(); // Prevent tab switching on close button click
                 closeTab(label);
-            }} 
-              color={activeTab === label ? '#fff' : '#000'}
+            }}
+                color={activeTab === label ? '#fff' : '#000'}
             />
         </div>
     );
@@ -56,27 +57,31 @@ const Tab = ({ label, activeTab, setActiveTab, closeTab }) => {
 const OrderCounter = () => {
     const [form] = Form.useForm();
     const { createProduct } = useProduct();
-    const { getAll } = useProduct()
-
-    const [product, setProduct] = useState([])
-
     const [loading, setLoading] = useState(false);
-
-    const [tabs, setTabs] = useState([{ id: 'Tab 1', active: true }]);
-    const [activeTab, setActiveTab] = useState('Tab 1');
-
-    const [total, setTotal] = useState();
+    const [tabs, setTabs] = useState([{ id: 'Đơn hàng 1', active: true, user: null, products: [] }]);
+    const [activeTab, setActiveTab] = useState('Đơn hàng 1');
+    const [query, setQuery] = useState("");
+    const [user, setUsers] = useState([]);
+    const [option, setOptions] = useState([]);
+    const { getListUser } = useUser();
     const [tableParams, setTableParams] = useState({
         pagination: {
             pageIndex: 1,
             pageSize: 10,
-        },
-    });
-
+            keySearch: '',
+            roleId: 5,
+            status: null
+        }
+    })
+    const handleProductSelected = (products, index) => {
+        const modelTabs = [...tabs];
+        modelTabs[index] = { ...modelTabs[index], products: products };
+        setTabs(modelTabs);
+    }
     const addTab = () => {
         if (tabs.length < 5) {
-            const newTabId = `Tab ${tabs.length + 1}`;
-            setTabs([...tabs, { id: newTabId, active: false }]);
+            const newTabId = `Đơn hàng ${tabs.length + 1}`;
+            setTabs([...tabs, { id: newTabId, active: false, user: null, products: [] }]);
             setActiveTab(newTabId);
         } else {
             toast.error("Only can create 5 order in one time!");
@@ -88,7 +93,7 @@ const OrderCounter = () => {
         const newTabs = tabs.filter((tab) => tab.id !== tabId);
         setTabs(newTabs);
         if (activeTab === tabId && newTabs.length > 0) {
-            setActiveTab(newTabs[0].id);
+            setActiveTab(newTabs[newTabs.length - 1].id);
         }
     };
 
@@ -123,36 +128,73 @@ const OrderCounter = () => {
     function formatCurrencyVND(amount) {
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
     }
-    const normFile = (e) => {
-        if (Array.isArray(e)) {
-            return e;
+
+    const fetchData = async () => {
+        const { success, data } = await getListUser(tableParams.pagination);
+        console.log(data);
+        if (success && data.status != 'Error') {
+            setUsers(data.data);
+            setLoading(false)
+            toast.success(data.message);
+            const model = data.data.map((e) => {
+                return {
+                    value: e.id,
+                    label: e.code + " - " + e.phoneNumber + " - " + e.fullName,
+                    key: e.id,
+                    fullName: e.fullName
+                }
+            });
+            setOptions(model);
+        } else {
+            toast.error(data.message)
         }
-        return e?.fileList;
-    };
-    const handleTableChange = (pagination, filters, sorter) => {
-        setTableParams({
-            pagination,
-            filters,
-            ...sorter,
-        });
-        if (pagination.pageSize !== tableParams.pagination?.pageSize) {
-            setProduct([]);
-        }
-    };
-    const onShowSizeChange = (current, pageSize) => {
-        setTableParams({
+    }
+    const onSearchByKey = (e) => {
+        setQuery(e);
+        setTableParams((prevPrams) => ({
+            ...prevPrams,
             pagination: {
-                pageIndex: current,
-                pageSize: pageSize
+                ...prevPrams.pagination,
+                keySearch: e
             }
-        })
+        }))
+    }
+    useEffect(() => {
+        if (tableParams.pagination && tableParams.pagination.keySearch.length > 0) {
+            fetchData();
+        }
+    }, [JSON.stringify(tableParams), loading])
+    const handleInputQuantity = (index, value) => {
+        const tabIndex = tabs.findIndex((e) => e.id === activeTab);
+        const modelTabs = [...tabs];
+        const models = [...modelTabs[tabIndex].products];
+        models[index] = { ...models[index], quantity: parseInt(value) };
+        modelTabs[tabIndex] = { ...modelTabs[tabIndex], products: models }
+        setTabs(modelTabs);
+    }
+    const handleRemoveProd = (index) => {
+        const tabIndex = tabs.findIndex((e) => e.id === activeTab);
+        const modelTabs = [...tabs];
+        const models = [...modelTabs[tabIndex].products];
+        models.splice(index, 1);
+        modelTabs[tabIndex] = { ...modelTabs[tabIndex], products: models }
+        setTabs(modelTabs);
+    }
+    const handleSelect = (value, option, index) => {
+        const tabIndex = tabs.findIndex((e) => e.id === activeTab);
+        var userInfo = user.find((e) => e.id === value);
+        const modelTabs = [...tabs];
+        modelTabs[tabIndex] = {...modelTabs[tabIndex], user: userInfo };
+        setTabs(modelTabs);
+        form.setFieldsValue({ customerName: userInfo.fullName, phoneNumber: userInfo.phoneNumber, addressDetail: userInfo.address && userInfo.address.length > 0 && userInfo.address[0].fullInfo });
+        setQuery(option.fullName);
     };
     const columns = [
         {
-            title: 'STT',
-            dataIndex: 'number',
-            key: 'number',
-            render: (text) => <a style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{text}</a>,
+            title: 'Hình ảnh',
+            dataIndex: 'code',
+            key: 'images',
+            render: (_, record) => <img src={record.image} style={{ width: "65px", height: "auto", borderRadius: "10px" }} />,
         },
         {
             title: 'Tên sản phẩm',
@@ -175,28 +217,22 @@ const OrderCounter = () => {
             title: 'Số lượng',
             dataIndex: 'stock',
             key: 'stock',
-            render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{record.productQuanlity + record.productSold >= 0 ? (record.productQuanlity + record.productSold) : 0}</p>,
+            width: 150,
+            render: (_, record, index) => {
+                return <Input style={{ textAlign: 'center' }} type="number" value={record.quantity}
+                    onChange={(e) => handleInputQuantity(index, e.target.value)}
+                >
+                </Input>
+            },
 
         },
         {
 
             title: 'Action',
             key: 'action',
-            render: (_, record) => (
-                <Space>
-                    {/* <Delete id={record.id} state={loading} action={setLoading} /> */}
-                    <Link to={record.id}>
-                        <Button type='primary' title='Detail Product'>
-                            <FontAwesomeIcon icon={faCircleInfo} />
-                        </Button>
-                    </Link>
-                    <Link to={`/dashboard/product/edit/${record.id}`}>
-                        <Button title='Edit Product' style={{
-                            backgroundColor: 'brown'
-                        }}>
-                            <FontAwesomeIcon icon={faPenToSquare} style={{ color: "white" }} />
-                        </Button>
-                    </Link>
+            render: (_, record, index) => (
+                <Space style={{ textAlign: 'center' }}>
+                    <Trash2 style={{ color: "gray" }} onClick={(e) => handleRemoveProd(index)} />
                 </Space>
             ),
         },
@@ -234,7 +270,7 @@ const OrderCounter = () => {
             </div>
 
             {tabs.map(
-                (tab) =>
+                (tab, index) =>
                     activeTab === tab.id && (
 
                         <Form
@@ -252,18 +288,28 @@ const OrderCounter = () => {
                             </Row>
                             <br />
                             <Row gutter={[16, 16]}>
-                                <Col span={24}>
-                                    <Form.Item
-                                        name="productName"
-                                        rules={[{ required: false, message: "Please input product name!" }]}><Input placeholder="Enter code, phone number, name customer..." />
-                                    </Form.Item>
+                                <Col span={18}>
+                                    <AutoComplete
+                                        options={option}
+                                        onSearch={onSearchByKey}
+                                        onSelect={handleSelect}
+                                        value={query}
+                                        onChange={setQuery}
+                                        style={{ width: '100%' }}
+                                    >
+                                        <Input placeholder="Enter code, phone number, name customer..." />
+                                    </AutoComplete>
+
+                                </Col>
+                                <Col span={6} style={{ textAlign: 'right' }}>
+                                    <UserAddOrChange fetchData={null} modelItem={null} textButton={"Thêm mới"} isStyle={true} />
                                 </Col>
                             </Row>
                             <Row gutter={[16, 16]}>
                                 <Col span={12}>
                                     <Form.Item
                                         label="Họ tên khách hàng"
-                                        name="productPrice"
+                                        name="customerName"
                                     >
                                         <Input placeholder="" type="text" />
                                     </Form.Item>
@@ -272,7 +318,7 @@ const OrderCounter = () => {
                                 <Col span={12}>
                                     <Form.Item
                                         label="Số điện thoại khách hàng"
-                                        name="productQuantity"
+                                        name="phoneNumber"
                                     >
                                         <Input placeholder="" type="text" />
                                     </Form.Item>
@@ -283,23 +329,23 @@ const OrderCounter = () => {
                                 <Col span={12}>
                                     <Form.Item
                                         label="Địa chỉ khách hàng"
-                                        name="productPrice"
+                                        name="addressDetail"
                                     >
                                         <Input placeholder="" type="text" />
                                     </Form.Item>
                                 </Col>
 
-                                <Col span={12}>
+                                {/* <Col span={12}>
                                     <Form.Item
                                         label="Mã khuyến mại"
                                         name="productPrice"
                                     >
                                         <Input placeholder="" type="text" />
                                     </Form.Item>
-                                </Col>
+                                </Col> */}
                             </Row>
 
-                            <Row gutter={[16, 16]}>
+                            {/* <Row gutter={[16, 16]}>
                                 <Col span={12}>
                                     <Form.Item
                                         label="Hình thức thanh toán"
@@ -335,15 +381,18 @@ const OrderCounter = () => {
 
                                     </Form.Item>
                                 </Col>
-                            </Row>
+                            </Row> */}
 
                             <br />
                             <Row gutter={[16, 16]}>
                                 <Col span={16}>
                                     <span class="hide-menu" style={{ fontSize: "13px", color: "black", fontWeight: "bold" }}>Thông tin sản phẩm</span>
                                 </Col>
+                                <Col span={8} style={{ textAlign: 'right' }}>
+                                    <ProductPopUp handleProductSelected={handleProductSelected} modelProduct={tab.products} tabIndex={index} />
+                                </Col>
                             </Row>
-                            <br />
+                            {/* <br />
                             <Row gutter={[16, 16]}>
                                 <Col span={24}>
                                     <Form.Item
@@ -351,27 +400,25 @@ const OrderCounter = () => {
                                         rules={[{ required: false, message: "" }]}><Input placeholder="Enter code, product name.." />
                                     </Form.Item>
                                 </Col>
-                            </Row>
+                            </Row> */}
 
                             <Table
-                                dataSource={product} columns={columns}
+                                dataSource={tab.products} columns={columns}
                                 pagination={false}
                                 loading={false}
                                 onChange={null}
                             />
-                            <Pagination
+                            {/* <Pagination
                                 showSizeChanger
                                 onChange={onShowSizeChange}
                                 style={{ textAlign: 'center', marginTop: '24px' }}
                                 defaultCurrent={tableParams.pagination.pageIndex}
                                 total={total}
-                            />
+                            /> */}
 
-                            <Form.Item>
-                                <Button type="primary" htmlType="submit" >
-                                    Thêm
-                                </Button>
-                            </Form.Item>
+                            <Col span={6} style={{ textAlign: 'left' }}>
+                                <PaymentPage callback={null} userInfo={tab.user} producs={tab.products} />
+                            </Col>
                         </Form>
                     )
             )}

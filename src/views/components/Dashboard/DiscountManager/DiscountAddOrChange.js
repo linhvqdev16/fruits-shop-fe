@@ -19,9 +19,9 @@ const DiscountAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
   const [loading, setLoading] = useState(false);
   const [typeProductDiscount, setTypeProductDiscount] = useState(null);
   const [category, setCategory] = useState([])
-  const [allSelected, setAllSelected] = useState(false); 
+  const [allSelected, setAllSelected] = useState(false);
   const [productIdSelected, setProductIdSelected] = useState([]);
-  const {RangePicker} = DatePicker;
+  const { RangePicker } = DatePicker;
   const [dates, setDates] = useState([]);
 
   const [tableParams, setTableParams] = useState({
@@ -77,17 +77,17 @@ const DiscountAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
     setTypeProductDiscount(1);
     fetchCategory();
   }
-  useEffect (() => {
-     if(typeProductDiscount === 3){
-       fetchProduct(); 
-     }
-  }, [tableParams, typeProductDiscount]); 
+  useEffect(() => {
+    if (typeProductDiscount === 3) {
+      fetchProduct();
+    }
+  }, [tableParams, typeProductDiscount]);
   const onFinish = async (values) => {
 
-     
-    var date = dates; 
 
-    
+    var date = dates;
+
+
     try {
       var objectModel = {
         name: values.name,
@@ -95,16 +95,16 @@ const DiscountAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
         description: values.description,
         type: values.typeId,
         startDate: dates[0].format('YYYY-MM-DD'),
-        endDate:  dates[1].format('YYYY-MM-DD'),
+        endDate: dates[1].format('YYYY-MM-DD'),
         quantity: values.quantity,
         moneyDiscount: values.couponAmount,
         status: 1,
         isDeleted: 0,
         id: modelItem ? modelItem.id : null,
-        code: values.code, 
+        code: values.code,
         percent: values.couponAmount
       }
-      
+
       const { success, data } = await addOrChange(objectModel);
       if (data.status != 'Error' && success) {
         setModal2Open(false);
@@ -123,37 +123,37 @@ const DiscountAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
   const handleChange = (value) => {
     console.log(`Selected: ${value}`);
   };
-  
+
   const handleSelectedAll = (event) => {
-    if(event.target.checked){
-      setProductIdSelected(product.map(({id}) => id)); 
-    }else{
-      setProductIdSelected([]); 
+    if (event.target.checked) {
+      setProductIdSelected(product.map(({ id }) => id));
+    } else {
+      setProductIdSelected([]);
     }
- };
- const handleChangeSelected = (event, id) => {
-  if(event.target.checked){
-    setProductIdSelected([...productIdSelected].push(id)); 
-  }else{
-    setProductIdSelected([...productIdSelected].filter((e) => e != id)); 
+  };
+  const handleChangeSelected = (event, id) => {
+    if (event.target.checked) {
+      setProductIdSelected([...productIdSelected].push(id));
+    } else {
+      setProductIdSelected([...productIdSelected].filter((e) => e != id));
+    }
   }
- }
- const handleChangeSearchNameProd = (e) => {
+  const handleChangeSearchNameProd = (e) => {
     setTableParams((prevPrams) => ({
-       ...prevPrams, 
-       pagination : {
-          ...prevPrams.pagination,
-          keySearch: e.target.value
-       }
+      ...prevPrams,
+      pagination: {
+        ...prevPrams.pagination,
+        keySearch: e.target.value
+      }
     }));
- }
+  }
   const columns = [
     {
       title: (<Checkbox onClick={(e) => handleSelectedAll(e)}></Checkbox>),
       dataIndex: 'number',
       key: 'number',
-      render: (_,record) => {
-         return <Checkbox checked={productIdSelected && productIdSelected.includes(record.id) }></Checkbox>
+      render: (_, record) => {
+        return <Checkbox checked={productIdSelected && productIdSelected.includes(record.id)}></Checkbox>
       },
     },
     {
@@ -179,7 +179,7 @@ const DiscountAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
       key: 'stock',
       render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{record.stock}</p>,
 
-    } 
+    }
   ];
   function formatCurrencyVND(amount) {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
@@ -188,7 +188,7 @@ const DiscountAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
     setTypeProductDiscount(e);
   }
   const handeRangerPicker = (e) => {
-    
+
     setDates(e);
   }
   return (
@@ -278,17 +278,17 @@ const DiscountAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
                 name="dateStart"
                 rules={[{ required: true, message: "Please input start date!" }]}
               >
-                  <RangePicker
-                           value={dates}
-                           onChange={(e) => handeRangerPicker(e)}
-                           format="YYYY-MM-DD" // Format the date as YYYY-MM-DD
-                           placeholder={['Start Date', 'End Date']}
-                           style={{ width: '100%' }}/>
+                <RangePicker
+                  value={dates}
+                  onChange={(e) => handeRangerPicker(e)}
+                  format="YYYY-MM-DD" // Format the date as YYYY-MM-DD
+                  placeholder={['Start Date', 'End Date']}
+                  style={{ width: '100%' }} />
               </Form.Item>
             </Col>
-            
 
-           
+
+
 
             <Col span={12}>
               <Form.Item
@@ -378,7 +378,7 @@ const DiscountAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
                 <Form.Item
                   name="searchProduct"
                   rules={[{ required: false, message: "" }]}>
-                    <Input placeholder="Enter code, product name.." onChange={(e) => handleChangeSearchNameProd(e)} />
+                  <Input placeholder="Enter code, product name.." onChange={(e) => handleChangeSearchNameProd(e)} />
                 </Form.Item>
               </Col>
             </Row>
