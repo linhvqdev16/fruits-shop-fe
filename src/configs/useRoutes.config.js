@@ -37,6 +37,7 @@ import CouponManager from "../views/components/Dashboard/CouponManager/CouponMan
 import EmployeeManager from "@views/components/Dashboard/EmployeeManager/EmployeeManager";
 import RollbackOrderManager from "@views/components/Dashboard/RollbackOrderManager/RollbackOrderManager";
 import DeliveryManager from "@views/components/Dashboard/DeliveryManager/DeliveryManager";
+import OrderCounter from './../views/components/Dashboard/OrderManager/OrderCounter';
 
 
 const useRoutes = () => {
@@ -380,6 +381,15 @@ const useRoutes = () => {
       path: "/dashboard/delivery",
       element: <Layout>
         <DeliveryManager />
+      </Layout>
+    },
+    // Order
+    {
+      key: "/dashboard/order-counter",
+      label: "OrderCounter",
+      path: "/dashboard/order-counter",
+      element: <Layout>
+        <OrderCounter />
       </Layout>
     },
   ];
