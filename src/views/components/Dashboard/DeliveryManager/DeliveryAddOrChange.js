@@ -1,5 +1,5 @@
 import { PlusSquareOutlined } from "@ant-design/icons";
-import useType from "@api/useType";
+import useDelivery from "@api/useDelivery";
 import { Button, Col, Form, Input, Modal, Row, Select, message } from "antd";
 import React, { useEffect, useState } from "react";
 import { useToast } from "@utils/toastContext";
@@ -10,7 +10,7 @@ const DeliveryAddOrChange = ({fetchData, modelItem, textButton, isStyle}) => {
   const [modal2Open, setModal2Open] = useState(false);
   const [form] = Form.useForm()
 
-  const { addOrChange, generateCode } = useType()
+  const { addOrChange, generateCode } = useDelivery()
   const { toastMsg } = useToast();
 
   const fetchGenerateCode = async () => {
@@ -30,7 +30,9 @@ const DeliveryAddOrChange = ({fetchData, modelItem, textButton, isStyle}) => {
         description: values.description, 
         status: 1, 
         isDeleted: 0, 
-        id: modelItem ? modelItem.id : null
+        id: modelItem ? modelItem.id : null, 
+        fee: values.fee, 
+        description: values.description
       }
       const { success, data } = await addOrChange(model)
       if (data.status != 'Error' && success) {
@@ -47,7 +49,7 @@ const DeliveryAddOrChange = ({fetchData, modelItem, textButton, isStyle}) => {
 
   const showModel = () => {
     if(modelItem){
-      form.setFieldsValue({ code: modelItem.code, name: modelItem.name, description: modelItem.description });
+      form.setFieldsValue({ code: modelItem.code, name: modelItem.name, description: modelItem.description, fee: modelItem.fee });
     }else{
       fetchGenerateCode();
     }
@@ -71,7 +73,7 @@ const DeliveryAddOrChange = ({fetchData, modelItem, textButton, isStyle}) => {
 
       <Modal
         width={'50%'}
-        title= {isStyle ?  "Thêm mới kiểu sản phẩm" : "Cập nhật thông tin"}
+        title= {isStyle ?  "Thêm mới" : "Cập nhật thông tin"}
         centered
         visible={modal2Open}
         onCancel={() => setModal2Open(false)}
@@ -89,9 +91,9 @@ const DeliveryAddOrChange = ({fetchData, modelItem, textButton, isStyle}) => {
               <Form.Item
                 label="Code"
                 name="code"
-                rules={[{ required: true, message: "Please input category code!" }]}
+                rules={[{ required: true, message: "" }]}
               >
-                <Input placeholder="Type code auto generate" readOnly={true} />
+                <Input placeholder="Delivery code auto generate" readOnly={true} />
               </Form.Item>
             </Col>
           </Row>
@@ -99,9 +101,9 @@ const DeliveryAddOrChange = ({fetchData, modelItem, textButton, isStyle}) => {
           <Row gutter={[16, 16]}>
             <Col span={16}>
               <Form.Item
-                label="Kiểu sản phẩm"
+                label="Tên phương thức vận chuyển"
                 name="name"
-                rules={[{ required: true, message: "Please input type name!" }]}
+                rules={[{ required: true, message: "" }]}
               >
                 <Input placeholder="Please input type name"/>
               </Form.Item>
@@ -116,6 +118,18 @@ const DeliveryAddOrChange = ({fetchData, modelItem, textButton, isStyle}) => {
                 rules={[{ required: true, message: "Please input type description!" }]}
               >
                 <Input placeholder="Please input type description" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={[16, 16]}>
+            <Col span={16}>
+              <Form.Item
+                label="Cước"
+                name="fee"
+                rules={[{ required: true, message: "Please input type description!" }]}
+              >
+                <Input type="number" placeholder="Please input type description" />
               </Form.Item>
             </Col>
           </Row>

@@ -73,7 +73,7 @@ const CouponAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
         name: values.name,
         price: values.price,
         description: values.description,
-        type: values.type,
+        type: values.typeId,
         minValue: values.minValue,
         maxValue: values.maxValue,
         dateStart: values.dateStart,

@@ -90,6 +90,7 @@ const OrderCounter = () => {
 
     // Function to handle closing a tab
     const closeTab = (tabId) => {
+        debugger;
         const newTabs = tabs.filter((tab) => tab.id !== tabId);
         setTabs(newTabs);
         if (activeTab === tabId && newTabs.length > 0) {
@@ -184,7 +185,7 @@ const OrderCounter = () => {
         const tabIndex = tabs.findIndex((e) => e.id === activeTab);
         var userInfo = user.find((e) => e.id === value);
         const modelTabs = [...tabs];
-        modelTabs[tabIndex] = {...modelTabs[tabIndex], user: userInfo };
+        modelTabs[tabIndex] = { ...modelTabs[tabIndex], user: userInfo };
         setTabs(modelTabs);
         form.setFieldsValue({ customerName: userInfo.fullName, phoneNumber: userInfo.phoneNumber, addressDetail: userInfo.address && userInfo.address.length > 0 && userInfo.address[0].fullInfo });
         setQuery(option.fullName);
@@ -416,8 +417,9 @@ const OrderCounter = () => {
                                 total={total}
                             /> */}
 
-                            <Col span={6} style={{ textAlign: 'left' }}>
-                                <PaymentPage callback={null} userInfo={tab.user} producs={tab.products} />
+                            <br />
+                             <Col span={6} style={{ textAlign: 'left' }}>
+                                <PaymentPage callback={closeTab} userInfo={tab.user} producs={tab.products} tabId={tab.id} />
                             </Col>
                         </Form>
                     )

@@ -2,39 +2,59 @@ import React, { useEffect, useState } from 'react';
 import { Button, Select, Dropdown, Table, Menu } from 'antd';
 import { toast } from 'react-toastify';
 import { Pagination } from 'antd';
-import useType from '@api/useType';
-import ProductTypeAdd from './DeliveryAddOrChange';
+import useDelivery from '@api/useDelivery';
+import DeliveryAddOrChange from './DeliveryAddOrChange';
 import { Col, Form, Input, Row } from "antd";
 import { DownOutlined } from '@ant-design/icons';
+import CommonPopup from './../Common/CommonPopup';
 
 function DeliveryManager() {
-    const { getListType } = useType()
+    const { getListDelivery, changeStatusDelivery } = useDelivery()
     const { Option } = Select;
 
-    const [types, setType] = useState([])
+    const [delivery, setDelivery] = useState([])
     const [loading, setLoading] = useState(false);
     const [total, setTotal] = useState();
     const [selectedItem, setSelectedItem] = useState();
-
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [idChangeStatus, setIdChangeStatus] = useState();
     const [tableParams, setTableParams] = useState({
         pagination: {
             pageIndex: 1,
             pageSize: 10,
-            keySearch: '',
-            status: null
+            keySearch: ''
         },
     });
 
     const fetchData = async () => {
-        const { success, data } = await getListType(tableParams.pagination);
+        const { success, data } = await getListDelivery(tableParams.pagination);
         if (!success || data.status == 'Error') {
             toast.error('Có lỗi xảy ra')
         } else {
-            setType(data.data)
+            setDelivery(data.data)
             setLoading(false);
             setTotal(data.data.totalCount)
         }
     }
+
+
+    const changeStatus = async (id) => {
+        const { success, data } = await changeStatusDelivery(id);
+        if (!success || data.status == 'Error') {
+            toast.error('Có lỗi xảy ra')
+        } else {
+        fetchData();
+        }
+    }
+
+    const handleOk = () => {
+        changeStatus(idChangeStatus); 
+        setIsModalVisible(false);
+    };
+
+    const handleCancel = () => {
+        setIsModalVisible(false);
+    };
 
     useEffect(() => {
         fetchData()
@@ -67,7 +87,7 @@ function DeliveryManager() {
             ...sorter,
         });
         if (pagination.pageSize !== tableParams.pagination?.pageSize) {
-            setType([]);
+            setDelivery([]);
         }
     };
 
@@ -80,21 +100,26 @@ function DeliveryManager() {
         })
     };
 
+    const showModal = (id) => {
+        setIdChangeStatus(id);
+        setIsModalVisible(true);
+      };
+
     const menu = (record) => (
         <Menu>
             <Menu.Item>
 
-                <ProductTypeAdd fetchData={fetchData} modelItem={record} textButton={"Edit"} isStyle={false} />
+                <DeliveryAddOrChange fetchData={fetchData} modelItem={record} textButton={"Edit"} isStyle={false} />
             </Menu.Item>
             <Menu.Item>
                 <Button
                     type="button"
                     value="small"
-                    onClick={null}
-      >
-                Delete
-            </Button>
-        </Menu.Item>
+                    onClick={(e) => showModal(record.id)}
+                >
+                    Delete
+                </Button>
+            </Menu.Item>
         </Menu >
     );
 
@@ -117,6 +142,14 @@ function DeliveryManager() {
             dataIndex: 'name',
             key: 'name',
             render: (text) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{text}</p>
+        },
+
+
+        {
+            title: 'Phí vận chuyển',
+            dataIndex: 'fee',
+            key: 'fee',
+            render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{record.fee}</p>
         },
 
         {
@@ -152,6 +185,13 @@ function DeliveryManager() {
     ];
     return (
         <>
+            <CommonPopup
+                visible={isModalVisible}
+                title="Xác nhận"
+                content={<p>Bạn chắc chắn cập nhật trạng thái bản ghi này?</p>}  // You can replace this with any content
+                onClose={handleCancel}
+                onOk={handleOk}
+            />
             <Row gutter={[16, 16]}>
                 <Col span={8}>
                     <Form.Item
@@ -161,37 +201,18 @@ function DeliveryManager() {
                         <Input placeholder="Enter code, name category" onChange={(e) => handleChangeName(e)} />
                     </Form.Item>
                 </Col>
-                <Col span={8}>
-                    <Form.Item
-                        label="Trạng thái"
-                        name="status"
-                    >
-                        <Select
-                            value={tableParams.pagination.status}
-                            placeholder="Please select"
-                            onChange={handleChangeSelect}
-                            style={{
-                                width: '100%',
-                            }}
-                        >
-                            <Option value="-1">Tất cả</Option>
-                            <Option value="1">Hoạt động</Option>
-                            <Option value="2">Không hoạt động</Option>
-                        </Select>
-                    </Form.Item>
-                </Col>
                 <Col span={8} style={{ textAlign: 'right' }}>
-                    <ProductTypeAdd isOpen={true} fetchData={fetchData} modelItem={null} textButton={"Thêm mới"} isStyle={true} />
+                    <DeliveryAddOrChange isOpen={true} fetchData={fetchData} modelItem={null} textButton={"Thêm mới"} isStyle={true} />
                 </Col>
             </Row>
             <Table
-                dataSource={types}
+                dataSource={delivery}
                 columns={columns}
                 pagination={false}
                 loading={loading}
                 onChange={handleTableChange}
             />
-            {selectedItem && (<ProductTypeAdd fetchData={fetchData} modelItem={selectedItem} />)}
+            {selectedItem && (<DeliveryAddOrChange fetchData={fetchData} modelItem={selectedItem} />)}
             <Pagination
                 showSizeChanger
                 onChange={onShowSizeChange}

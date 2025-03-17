@@ -22,12 +22,17 @@ const useCoupon = () => {
 		endpoint: '/generate-code', 
 		params: null
 	})
+	const getCouponCode = (params) => createGetRequest({
+		endpoint: '/get-coupon-code', 
+		params: params
+	})
 	return {
 		generateCode, 
 		deleteProduct, 
 		addOrChange, 
 		getById, 
-		getListCoupon
+		getListCoupon,
+		getCouponCode
 	}
 }
 

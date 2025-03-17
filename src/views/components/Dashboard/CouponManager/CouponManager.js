@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Select, Dropdown, Table, Menu } from 'antd';
+import { Button, Select, Dropdown, Table, Menu,DatePicker } from 'antd';
 import { toast } from 'react-toastify';
 import { Pagination } from 'antd';
 import CouponAddOrChange from './CouponAddOrChange';
@@ -25,6 +25,8 @@ function CouponManager() {
             status: null
         },
     });
+    const { RangePicker } = DatePicker;
+        const [dates, setDates] = useState([]);
     const fetchData = async () => {
         const { success, data } = await getListCoupon(tableParams.pagination);
         if (!success || data.status === 'Error') {
@@ -186,21 +188,18 @@ function CouponManager() {
                 </Col>
             </Row>
             <Row gutter={[16, 16]}>
-                <Col span={8}>
+            <Col span={16}>
                     <Form.Item
-                        label="Ngày bắt đầu"
+                        label="Thời gian"
                         name="minValue"
                     >
-                        <Input placeholder="" type='date' />
-
-                    </Form.Item>
-                </Col>
-                <Col span={8}>
-                    <Form.Item
-                        label="Ngày kết thúc"
-                        name="typeId"
-                    >
-                        <Input placeholder="" type='date' />
+                       <RangePicker
+                            value={dates}
+                            onChange={null}
+                            format="YYYY-MM-DD" // Format the date as YYYY-MM-DD
+                            placeholder={['Start Date', 'End Date']}
+                            style={{ width: '100%' }}
+                        />
 
                     </Form.Item>
                 </Col>

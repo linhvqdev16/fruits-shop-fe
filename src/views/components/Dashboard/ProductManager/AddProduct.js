@@ -1,5 +1,5 @@
 import { PlusSquareOutlined } from "@ant-design/icons";
-import { Button, Col, Form, Input, Modal, Row, Select, message } from "antd";
+import { Button, Col, Form, Input, Modal, Row, Select, DatePicker } from "antd";
 import React, { useEffect, useState } from "react";
 import { PlusOutlined } from '@ant-design/icons';
 import { Image, Upload } from 'antd';
@@ -31,6 +31,8 @@ const AddProduct = ({fetchData, modelItem, textButton, isStyle}) => {
   const { getListType } = useType()
   const [category, setCategory] = useState([])
   const [types, setType] = useState([])
+  const [datePublish, setDatePublish] = useState();
+  const [datePublic, setDatePublic] = useState();
 
 
   const handleRemove = () => {
@@ -151,6 +153,12 @@ const AddProduct = ({fetchData, modelItem, textButton, isStyle}) => {
   const handleChange = (value) => {
     console.log(`Selected: ${value}`);
   };
+  const handleSetDatePublish= date => {
+    setDatePublish(date.format());
+}
+const handleSetDatePublic = date => {
+  setDatePublic(date.format());
+}
   return (
     <div>
        <Button
@@ -289,9 +297,8 @@ const AddProduct = ({fetchData, modelItem, textButton, isStyle}) => {
               <Form.Item
                 label="Ngày xuất bản"
                 name="datePublish"
-                rules={[{ required: true, message: "Please input product price!" }]}
               >
-                <Input placeholder="" type="date" />
+                <DatePicker onChange={handleSetDatePublish} style={{ width: '100%' }}  />
               </Form.Item>
             </Col>
 
@@ -303,7 +310,7 @@ const AddProduct = ({fetchData, modelItem, textButton, isStyle}) => {
                   { required: true, message: "Please input product quantity!" },
                 ]}
               >
-                <Input placeholder="" type="date" />
+              <DatePicker onChange={handleSetDatePublic} style={{ width: '100%' }}  />
               </Form.Item>
             </Col>
 

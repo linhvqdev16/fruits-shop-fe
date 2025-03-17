@@ -19,7 +19,7 @@ function OrderManager() {
     const { RangePicker } = DatePicker;
 
     const [dates, setDates] = useState([]);
-    const { getAll } = useOrder()
+    const { getListOrder } = useOrder()
     const [orders, setOrder] = useState([])
     const [loading, setLoading] = useState(false)
     const [total, setTotal] = useState()
@@ -35,19 +35,19 @@ function OrderManager() {
     };
 
     const fetchData = async () => {
-        const { success, data } = await getAll(tableParams.pagination);
+        const { success, data } = await getListOrder(tableParams.pagination);
         console.log(data);
         if (success && data.status != 'Error') {
-            setOrder(data.data.items)
+            setOrder(data.data)
             setLoading(false)
-            setTotal(data.data.totalCount)
+            setTotal(data.totalCount)
         } else {
             toast.error(data.message)
         }
     }
-    // useEffect(() => {
-    //     fetchData()    
-    // }, [JSON.stringify(tableParams), loading])
+    useEffect(() => {
+        fetchData()    
+    }, [JSON.stringify(tableParams), loading])
 
     const handleTableChange = (pagination, filters, sorter) => {
         setTableParams({
@@ -71,8 +71,8 @@ function OrderManager() {
     const columns = [
         {
             title: 'STT',
-            render: (data) => {
-                return (<p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{`${data.orderNumber}`}</p>)
+            render: (_, __, index) => {
+                return (<p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{index + 1}</p>)
             }
         },
         {
@@ -109,7 +109,32 @@ function OrderManager() {
             title: 'Order status',
             dataIndex: 'orderStatus',
             key: 'orderStatus',
-            render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{record.orderStatus}</p>
+            render: (_, record) => {
+                if(record.orderStatus === 1){
+                    return <p style={{ fontSize: "13px", color: "red", fontWeight: "300" }}>Đã hủy</p>; 
+                }
+                if(record.orderStatus === 2){
+                    return <p style={{ fontSize: "13px", color: "yellow", fontWeight: "300" }}>Chờ xác nhận</p>; 
+                }
+                if(record.orderStatus === 3){
+                    return <p style={{ fontSize: "13px", color: "yellowgreen", fontWeight: "300" }}>Xác  nhận</p>; 
+                }
+                if(record.orderStatus === 4){
+                    return <p style={{ fontSize: "13px", color: "orange", fontWeight: "300" }}>Chờ vận chuyển</p>; 
+                }
+                if(record.orderStatus === 5){
+                    return <p style={{ fontSize: "13px", color: "blueviolet", fontWeight: "300" }}>Đang vận chuyển</p>; 
+                }
+                if(record.orderStatus === 6){
+                    return <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>Đã giao hàng</p>; 
+                }
+                if(record.orderStatus === 7){
+                    return <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>Đã thanh toán</p>; 
+                }
+                if(record.orderStatus === 8){
+                    return <p style={{ fontSize: "13px", color: "green", fontWeight: "300" }}>Hoàn thành</p>; 
+                }
+            }
         },
         {
             title: 'Price',
@@ -145,9 +170,9 @@ function OrderManager() {
                         rules={[{ required: false, message: "Please input product name!" }]}><Input placeholder="Enter code, name order..." />
                     </Form.Item>
                 </Col>
-                <Col span={8} style={{textAlign: 'right'}}>
+                {/* <Col span={8} style={{textAlign: 'right'}}>
                     <OrderAddOrChange />
-                </Col>
+                </Col> */}
             </Row>
             <Row gutter={[16, 16]}>
                 <Col span={6}>
