@@ -106,8 +106,28 @@ const OrderDetail = () => {
         if (!success || data.status == 'Error') {
             toast.error('Có lỗi xảy ra')
         } else {
-            modelTabs[index] = { ...modelTabs[index], products: data.data.product };
+            const modelTabs = [...tabs];
+            modelTabs[0] = { ...modelTabs[0], products: data.data.orderDetailModels  };
+            const sum = data.data.orderDetailModels.reduce((accumulator, currentItem) => accumulator + (currentItem.price * currentItem.quantity), 0);
+            form.setFieldsValue({addressDetail: data.data.addressModel.fullInfo, customerName: data.data.userModel.fullName, email: data.data.userModel.email, phoneNumber: data.data.userModel.phoneNumber});
+            setCouponModel(data.data.couponModel);
+            setPaymentId(data.data.paymentModel.id);
+            setDeleveryId(data.data.deliveryModel.id);
             setTabs(modelTabs);
+            setTotalPrice(sum);
+            setFeeDelivery(data.data.deliveryModel && data.data.deliveryModel.fee);
+            setFeeDelivery(data.data.deliveryModel && data.data.deliveryModel.fee);
+            if (data.data.couponModel !== undefined && data.data.couponModel !== null) {
+                if (data.data.couponModel.minValue <= sum && data.data.couponModel.maxValue >= sum) {
+                    var discountNumber = 0;
+                    if (data.data.couponModel.type === 1) {
+                        discountNumber = (sum * data.data.couponModel.couponAmount / 100);
+                    } else {
+                        discountNumber = data.data.couponModel.couponAmount;
+                    }
+                    setDiscount(discountNumber);
+                }
+            }
         }
     }
 
@@ -561,7 +581,7 @@ const OrderDetail = () => {
 
                                             {
                                                 userModel === null && <>
-                                                    <Col span={8}>
+                                                    {/* <Col span={8}>
                                                         <Form.Item
                                                             label="Tỉnh/Thành phố"
                                                             name="provinceId"
@@ -629,7 +649,7 @@ const OrderDetail = () => {
                                                             </Select>
 
                                                         </Form.Item>
-                                                    </Col>
+                                                    </Col> */}
                                                 </>
                                             }
 
@@ -658,9 +678,9 @@ const OrderDetail = () => {
                                                 </Col>
                                                 <Col span={10}>
                                                     <Input placeholder="" value={couponModel && couponModel.code} type="text" onBlur={handleChange} readOnly={true} /></Col>
-                                                <Col span={8} style={{ textAlign: 'right' }}>
+                                                {/* <Col span={8} style={{ textAlign: 'right' }}>
                                                     <VoucherPopup handlePopupSelected={handleSelectCounpon} model={couponModel} />
-                                                </Col>
+                                                </Col> */}
                                             </Row>
                                         </Col>
                                         <br />
@@ -672,6 +692,7 @@ const OrderDetail = () => {
                                                 <Col span={18}>
 
                                                     <Select
+                                                        value={paymentId}
                                                         placeholder="Please select"
                                                         onChange={handlePaymentId}
                                                         style={{
@@ -689,6 +710,7 @@ const OrderDetail = () => {
                                                 </Col>
                                                 <Col span={18}>
                                                     <Select
+                                                        value={deleveryId}
                                                         placeholder="Please select"
                                                         onChange={(e) => handleSelectDelivery(e)}
                                                         style={{
