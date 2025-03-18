@@ -1,5 +1,5 @@
 import { PlusSquareOutlined } from "@ant-design/icons";
-import { Button, Col, Form, Input, Modal, Row, Select, message } from "antd";
+import { Button, Col, Form, Input, Modal, Row, Select, DatePicker } from "antd";
 import React, { useEffect, useState } from "react";
 import useCategory from "@api/useCategory";
 import useType from "@api/useType";
@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import useCoupon from "@api/useCoupons";
 import { Option } from 'antd/es/mentions';
 import TextArea from "antd/es/input/TextArea";
+import { format } from 'date-fns';
 
 const CouponAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
 
@@ -20,6 +21,9 @@ const CouponAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
   const { getListType } = useType()
   const [category, setCategory] = useState([])
   const [types, setType] = useState([])
+
+  const [startDate, setStartDate] = useState();
+  const [endDate, setEndDate] = useState();
 
   const fetchGenerateCode = async () => {
     const { success, data } = await generateCode();
@@ -53,18 +57,27 @@ const CouponAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
       setType(dataOrigin)
     }
   }
+  const handleSetEndDate = date => {
+    setEndDate(date.format());
+  }
+
+  const handleSetStartDate = date => {
+    setStartDate(date.format());
+  }
 
 
   const showModel = () => {
-    
-    if(modelItem){
-      form.setFieldsValue({code: modelItem.code, name: modelItem.name, description: modelItem.description });
-    }else{
-    fetchGenerateCode();
-    }
-    setModal2Open(true);
     fetchCategory();
     fetchTypes();
+    debugger;
+    if (modelItem) {
+      form.setFieldsValue({ code: modelItem.code, name: modelItem.name, description: modelItem.description, typeId: modelItem.type, couponAmount: modelItem.couponAmount, minValue: modelItem.minValue, maxValue: modelItem.maxValue, quantity: modelItem.quantity});
+      setStartDate(new Date(modelItem.dateStart));
+      setEndDate(new Date(modelItem.dateEnd));
+    } else {
+      fetchGenerateCode();
+    }
+    setModal2Open(true);
   }
 
   const onFinish = async (values) => {
@@ -77,12 +90,12 @@ const CouponAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
         minValue: values.minValue,
         maxValue: values.maxValue,
         dateStart: values.dateStart,
-        dateEnd: values.dateEnd ,
+        dateEnd: values.dateEnd,
         quantity: values.quantity,
-        couponAmount: values.couponAmount, 
-        status: 1, 
-        isDelete: 0, 
-        id: modelItem ? modelItem.id : null, 
+        couponAmount: values.couponAmount,
+        status: 1,
+        isDelete: 0,
+        id: modelItem ? modelItem.id : null,
         code: values.code
       }
       const { success, data } = await addOrChange(objectModel);
@@ -215,7 +228,7 @@ const CouponAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
                 name="dateStart"
                 rules={[{ required: true, message: "Please input start date!" }]}
               >
-                <Input placeholder="" type="date" />
+                <DatePicker onChange={handleSetStartDate} placeholder={startDate && format(startDate, "dd-MM-yyyy")} style={{ width: '100%' }} />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -226,7 +239,7 @@ const CouponAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
                   { required: true, message: "Please input end date!" },
                 ]}
               >
-                <Input placeholder="" type="date" />
+                <DatePicker onChange={handleSetEndDate} placeholder={endDate && format(endDate, "dd-MM-yyyy")} style={{ width: '100%' }} />
               </Form.Item>
             </Col>
 

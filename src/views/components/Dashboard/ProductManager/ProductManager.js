@@ -10,13 +10,15 @@ import { Option } from 'antd/es/mentions';
 import useCategory from '@api/useCategory';
 import useType from '@api/useType';
 
+import CommonPopup from './../Common/CommonPopup';
+
 function ProductManager() {
     function formatCurrencyVND(amount) {
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
     }
 
-    const { getList } = useProduct(); 
-    const {getListType} = useType(); 
+    const { getList, changeStatus } = useProduct();
+    const { getListType } = useType();
     const { getListCategory } = useCategory();
 
     const [product, setProduct] = useState([])
@@ -27,9 +29,10 @@ function ProductManager() {
         pagination: {
             pageIndex: 1,
             pageSize: 10,
+            status: 1
         },
     });
-    const [category, setCategory] = useState([]); 
+    const [category, setCategory] = useState([]);
     const [types, setType] = useState([]);
 
     const fetchData = async () => {
@@ -46,32 +49,32 @@ function ProductManager() {
     const fetchCategory = async () => {
         const { success, data } = await getListCategory({ pageIndex: 1, pageSize: 20 });
         if (data != null && success) {
-          var dataResults = data.data.map((item) => {
-            return {
-              value: item.id,
-              label: item.name
-            }
-          });
-          setCategory(dataResults)
+            var dataResults = data.data.map((item) => {
+                return {
+                    value: item.id,
+                    label: item.name
+                }
+            });
+            setCategory(dataResults)
         }
-      };
+    };
 
-      const fetchType = async () => {
+    const fetchType = async () => {
         const { success, data } = await getListType({ pageIndex: 1, pageSize: 20 });
         if (data != null && success) {
-          var dataResults = data.data.map((item) => {
-            return {
-              value: item.id,
-              label: item.name
-            }
-          });
-          setType(dataResults)
+            var dataResults = data.data.map((item) => {
+                return {
+                    value: item.id,
+                    label: item.name
+                }
+            });
+            setType(dataResults)
         }
-      };
+    };
 
     useEffect(() => {
         fetchData();
-        fetchCategory(); 
+        fetchCategory();
         fetchType();
     }, [JSON.stringify(tableParams), loading])
 
@@ -104,14 +107,37 @@ function ProductManager() {
                 <Button
                     type="button"
                     value="small"
-                    onClick={null}
-      >
-                Delete
-            </Button>
-        </Menu.Item>
+                    onClick={(e) => showModal(record.id)}
+                >
+                    Delete
+                </Button>
+            </Menu.Item>
         </Menu >
     );
+    const [idChangeStatus, setIdChangeStatus] = useState();
+    const [isModalVisible, setIsModalVisible] = useState(false);
 
+    const handleChangeStatus = async (id) => {
+        const { success, data } = await changeStatus(id);
+        if (!success || data.status == 'Error') {
+            toast.error('Có lỗi xảy ra')
+        } else {
+            fetchData();
+        }
+    }
+    const handleOk = () => {
+        handleChangeStatus(idChangeStatus);
+        setIsModalVisible(false);
+    };
+
+    const handleCancel = () => {
+        setIsModalVisible(false);
+    };
+
+    const showModal = (id) => {
+        setIdChangeStatus(id);
+        setIsModalVisible(true);
+    };
     const columns = [
         {
             title: 'STT',
@@ -123,7 +149,7 @@ function ProductManager() {
             title: 'Hình ảnh',
             dataIndex: 'code',
             key: 'images',
-            render: (_, record) => <img src={Array.isArray(record.images) ?  record.images[0] : "href"} style={{width: "65px", height: "auto", borderRadius: "10px"}} />,
+            render: (_, record) => <img src={Array.isArray(record.images) ? record.images[0] : "href"} style={{ width: "65px", height: "auto", borderRadius: "10px" }} />,
         },
         {
             title: 'Tên sản phẩm',
@@ -189,6 +215,13 @@ function ProductManager() {
     ];
     return (
         <>
+            <CommonPopup
+                visible={isModalVisible}
+                title="Xác nhận"
+                content={<p>Bạn chắc chắn cập nhật trạng thái bản ghi này?</p>}  // You can replace this with any content
+                onClose={handleCancel}
+                onOk={handleOk}
+            />
             <Row gutter={[16, 16]}>
                 <Col span={16}>
                     <Form.Item
@@ -198,11 +231,11 @@ function ProductManager() {
                     </Form.Item>
                 </Col>
                 <Col span={8} style={{ textAlign: 'right' }}>
-                <AddProduct fetchData={fetchData} modelItem={null} textButton={"Thêm mới"} isStyle={true} />
+                    <AddProduct fetchData={fetchData} modelItem={null} textButton={"Thêm mới"} isStyle={true} />
                 </Col>
             </Row>
             <Row gutter={[16, 16]}>
-            <Col span={8}>
+                <Col span={8}>
                     <Form.Item
                         label="Loại sản phẩm"
                         name="categoryId"
@@ -245,11 +278,10 @@ function ProductManager() {
                             style={{
                                 width: '100%',
                             }}
-                           
+
                         >
-                            <Option value={-1}>Tất cả</Option>
                             <Option value={1}>Hoạt động</Option>
-                            <Option value={2}>Không hoạt động</Option>
+                            <Option value={0}>Không hoạt động</Option>
                         </Select>
 
                     </Form.Item>

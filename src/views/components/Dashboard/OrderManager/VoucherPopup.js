@@ -1,15 +1,18 @@
 import { PlusSquareOutlined } from "@ant-design/icons";
-import { Button, Col, Form, Input, Modal, Row, Pagination, Checkbox, Table } from "antd";
+import { Button, Col, Form, Input, Modal, Row, Pagination, Space, Table } from "antd";
 import React, { useEffect, useState } from "react";
-import useProduct from '@api/useProduct';
+import useCoupon from '@api/useCoupons';
 import { toast } from 'react-toastify';
+import { format } from 'date-fns';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faCircleInfo, faCheckDouble } from "@fortawesome/free-solid-svg-icons"
 
-const ProductPopUp = ({ handleProductSelected, modelProduct, tabIndex }) => {
+const VoucherPopup = ({ handlePopupSelected, model }) => {
 
     const [modal2Open, setModal2Open] = useState(false);
-    const { getList } = useProduct();
+    const { getListCoupon } = useCoupon();
 
-    const [product, setProduct] = useState([])
+    const [coupons, setCoupons] = useState([])
     const [loading, setLoading] = useState(false);
     const [total, setTotal] = useState();
     const [tableParams, setTableParams] = useState({
@@ -19,37 +22,29 @@ const ProductPopUp = ({ handleProductSelected, modelProduct, tabIndex }) => {
             keySearch: ""
         },
     });
-    const [productSelecteds, setProductIdSelected] = useState([]);
 
     const fetchData = async () => {
-        const { success, data } = await getList(tableParams.pagination);
+        const { success, data } = await getListCoupon(tableParams.pagination);
         if (!success || data.status == 'Error') {
             toast.error('Có lỗi xảy ra')
         } else {
-            setProduct(data.data)
+            setCoupons(data.data)
             setLoading(false);
             setTotal(data.totalCount)
         }
     };
 
     const showModel = () => {
-        if(!modelProduct || modelProduct.length === 0){
-            modelProduct = [];
-            setProductIdSelected([]);
-        }else{
-            setProductIdSelected(modelProduct);
-        }
         setModal2Open(true);
         fetchData();
     }
 
     const onFinish = () => {
-        handleProductSelected(productSelecteds, tabIndex);    
         setModal2Open(false);
     }
 
     useEffect(() => {
-        if (modal2Open) {
+        if (modal2Open && coupons && coupons.length === 0) {
             fetchData();
         }
     }, [JSON.stringify(tableParams), loading])
@@ -61,11 +56,11 @@ const ProductPopUp = ({ handleProductSelected, modelProduct, tabIndex }) => {
             ...sorter,
         });
         if (pagination.pageSize !== tableParams.pagination?.pageSize) {
-            setProduct([]);
+            setCoupons([]);
         }
     };
 
-    const handleChangeSearchNameProd = (e) => {
+    const handleChangeKeySearch = (e) => {
         setTableParams((prevPrams) => ({
             ...prevPrams,
             pagination: {
@@ -75,25 +70,18 @@ const ProductPopUp = ({ handleProductSelected, modelProduct, tabIndex }) => {
                 keySearch: e.target.value
             }
         }));
+        setCoupons([]);
+    }
+    const handleSeletecCoupon = (model) => {
+        handlePopupSelected(model); 
+        setModal2Open(false);
     }
 
     function formatCurrencyVND(amount) {
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
     }
-    const handleSelectedAll = (event) => {
-        if (event.target.checked) {
-            setProductIdSelected(product);
-        } else {
-            setProductIdSelected([]);
-        }
-    };
-    const handleChangeSelected = (event, item) => {
-        if (event.target.checked) {
-            setProductIdSelected([...productSelecteds, { id: item.id, image: item.images && item.images.length > 0 ? item.images[0] : null, name: item.name, price: item.price, code: item.code, priceDiscount: item.priceDiscount, quantity: 1 }]);
-        } else {
-            setProductIdSelected([...productSelecteds].filter((e) => e.id != item.id));
-        }
-    }
+
+
     const onShowSizeChange = (current, pageSize) => {
         setTableParams({
             pagination: {
@@ -105,49 +93,57 @@ const ProductPopUp = ({ handleProductSelected, modelProduct, tabIndex }) => {
 
     const columns = [
         {
-            title: (<Checkbox onClick={(e) => handleSelectedAll(e)} checked={productSelecteds.length === product.length}></Checkbox>),
-            dataIndex: 'number',
-            key: 'number',
-            render: (_, record) => {
-                return <Checkbox checked={productSelecteds && productSelecteds.find(e => e.id === record.id)} onClick={(e) => handleChangeSelected(e, record)}></Checkbox>
-            },
-        },
-        {
-            title: 'Hình ảnh',
-            dataIndex: 'code',
-            key: 'images',
-            render: (_, record) => <img src={Array.isArray(record.images) ? record.images[0] : "href"} style={{ width: "65px", height: "auto", borderRadius: "10px" }} />,
-        },
-        {
-            title: 'Tên sản phẩm',
-            dataIndex: 'name',
-            key: 'name',
-            render: (text) => <a style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{text}</a>,
-        },
-        {
-            title: 'Mã sản phẩm',
+            title: 'Mã khuyến mại',
             dataIndex: 'code',
             key: 'code',
             render: (text) => <a style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{text}</a>,
         },
         {
-            title: 'Giá sản phẩm',
-            dataIndex: 'price',
-            render: (text) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{formatCurrencyVND(text)}</p>,
+            title: 'Tên khuyến mại',
+            dataIndex: 'name',
+            key: 'name',
+            render: (text) => <a style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{text}</a>,
         },
         {
-            title: 'Số lượng',
+            title: 'Loại khuyến mại',
+            dataIndex: 'price',
+            render: (_, record) => {
+                if (record.type === 1) {
+                    return <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>Chiết khấu phần trăm</p>
+                } else {
+                    return <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>Chiết khấu tiền</p>
+                }
+            },
+        },
+        {
+            title: 'Giá trị khuyến mại',
             dataIndex: 'stock',
             key: 'stock',
-            render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{record.stock}</p>,
-
+            render: (_, record) => {
+                if (record.type === 1) {
+                    return <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{record.couponAmount}%</p>
+                } else {
+                    return <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{formatCurrencyVND(record.couponAmount)}</p>
+                }
+            }
         },
         {
-            title: 'Mô tả',
-            dataIndex: 'description',
-            key: 'description',
-            render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{record.description}</p>
-        }
+            title: 'Hạn sử dụng',
+            dataIndex: 'date',
+            key: 'date',
+            render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{format(record.dateEnd, 'dd-MM-yyyy')}</p>
+        },
+        {
+            title: 'Thao tác',
+            key: 'action',
+            render: (_, record) => (
+                <Space>
+                     <Button onClick={(e) => handleSeletecCoupon(record)} type='primary' title='Select'>
+                             <FontAwesomeIcon icon={faCheckDouble} />
+                        </Button>
+                </Space>
+            ),
+        },
     ];
     return (
         <div>
@@ -162,12 +158,12 @@ const ProductPopUp = ({ handleProductSelected, modelProduct, tabIndex }) => {
                 }}
                 onClick={() => showModel()}
             >
-               Chọn sản phẩm
+                Áp dụng mã
             </Button>
 
             <Modal
                 width={'60%'}
-                title="Thêm sản phẩm đơn hàng"
+                title="Mã khuyến mại"
                 centered
                 visible={modal2Open}
                 onCancel={() => setModal2Open(false)}
@@ -179,10 +175,10 @@ const ProductPopUp = ({ handleProductSelected, modelProduct, tabIndex }) => {
                         <Form.Item
                             name="searchProduct"
                             rules={[{ required: false, message: "" }]}>
-                            <Input placeholder="Enter code, product name.." onChange={handleChangeSearchNameProd} />
+                            <Input placeholder="Enter code, name to search" onChange={handleChangeKeySearch} />
                         </Form.Item>
                     </Col>
-                    <Col span={6} style={{textAlign: 'right'}}>
+                    <Col span={6} style={{ textAlign: 'right' }}>
                         <Button
                             type="button"
                             value="small"
@@ -194,18 +190,16 @@ const ProductPopUp = ({ handleProductSelected, modelProduct, tabIndex }) => {
                             }}
                             onClick={() => onFinish()}
                         >
-                          Thêm giỏ hàng
+                            Áp dụng
                         </Button>
                     </Col>
                 </Row>
-
                 <Table
-                    dataSource={product} columns={columns}
+                    dataSource={coupons} columns={columns}
                     pagination={false}
                     loading={loading}
                     onChange={handleTableChange}
                 />
-
                 <Pagination
                     showSizeChanger
                     onChange={onShowSizeChange}
@@ -218,4 +212,4 @@ const ProductPopUp = ({ handleProductSelected, modelProduct, tabIndex }) => {
     );
 };
 
-export default ProductPopUp;
+export default VoucherPopup;

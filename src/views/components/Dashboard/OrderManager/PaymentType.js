@@ -6,7 +6,7 @@ function formatCurrencyVND(amount) {
 }
 
 
-const PaymentType = ({ callback, amount, deliveryId, paymentId }) => {
+const PaymentType = ({ callback, amount, deliveryId, paymentId, products, tabIds}) => {
     const [isModalVisible, setIsModalVisible] = useState(false);
 
     // Function to show the modal
@@ -16,7 +16,7 @@ const PaymentType = ({ callback, amount, deliveryId, paymentId }) => {
 
     // Function to handle closing the modal
     const handleOk = () => {
-        callback();
+        callback(products, tabIds);
         setIsModalVisible(false);
     };
 

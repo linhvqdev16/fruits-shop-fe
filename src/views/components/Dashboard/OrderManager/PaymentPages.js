@@ -186,13 +186,12 @@ const PaymentPage = ({ userInfo, producs, callback, tabId }) => {
                 value="small"
                 style={{
                     alignItems: "center",
-                    background: "#1fbf39",
+                    background: "#2596be",
                     marginBottom: "20px",
                     color: 'white'
                 }}
                 onClick={() => showModel()}
-            >
-                <PlusSquareOutlined /> Thanh toán
+            > Thanh toán
             </Button>
 
             <Modal
@@ -291,7 +290,6 @@ const PaymentPage = ({ userInfo, producs, callback, tabId }) => {
                             <span class="hide-menu" style={{ fontSize: "13px", color: "black", fontWeight: "bold" }}>Thông tin sản phẩm</span>
                         </Col>
                     </Row>
-
                     <Table
                         dataSource={producs} columns={columns}
                         pagination={false}

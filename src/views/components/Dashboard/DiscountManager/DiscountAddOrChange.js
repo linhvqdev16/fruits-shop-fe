@@ -1,12 +1,14 @@
 import { PlusSquareOutlined } from "@ant-design/icons";
-import { Button, Col, Form, Input, Modal, Row, Select, Table, Pagination, DatePicker, Checkbox } from "antd";
+import { Button, Col, Form, Input, Modal, Row, Select, Table, DatePicker, Checkbox } from "antd";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import useDiscount from "@api/useDiscount";
 import { Option } from 'antd/es/mentions';
 import TextArea from "antd/es/input/TextArea";
 import useProduct from "@api/useProduct";
-import useCategory from "@api/useCategory"
+import useCategory from "@api/useCategory";
+import { format } from 'date-fns';
+
 const DiscountAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
 
   const { generateCode, addOrChange } = useDiscount();
@@ -23,6 +25,12 @@ const DiscountAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
   const [productIdSelected, setProductIdSelected] = useState([]);
   const { RangePicker } = DatePicker;
   const [dates, setDates] = useState([]);
+
+
+
+  const [startDate, setStartDate] = useState();
+  const [endDate, setEndDate] = useState();
+
 
   const [tableParams, setTableParams] = useState({
     pagination: {
@@ -68,43 +76,50 @@ const DiscountAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
     }
   }
   const showModel = () => {
+    fetchCategory();
     if (modelItem) {
-      form.setFieldsValue({ code: modelItem.code, name: modelItem.name, description: modelItem.description });
+      form.setFieldsValue({ code: modelItem.code, name: modelItem.name, description: modelItem.description, typeId: modelItem.type, couponAmount: modelItem.type === 1 ? modelItem.percent : modelItem.moneyDiscount });
+      setStartDate(new Date(modelItem.startDate));
+      setEndDate(new Date(modelItem.endDate));
     } else {
       fetchGenerateCode();
+      setTypeProductDiscount(1);
     }
     setModal2Open(true);
-    setTypeProductDiscount(1);
-    fetchCategory();
   }
   useEffect(() => {
     if (typeProductDiscount === 3) {
       fetchProduct();
     }
   }, [tableParams, typeProductDiscount]);
+
+  const handleSetEndDate = date => {
+    setEndDate(date.format());
+  }
+
+  const handleSetStartDate = date => {
+    setStartDate(date.format());
+  }
+
+
   const onFinish = async (values) => {
-
-
     var date = dates;
-
-
     try {
       var objectModel = {
         name: values.name,
-        price: values.price,
         description: values.description,
         type: values.typeId,
-        startDate: dates[0].format('YYYY-MM-DD'),
-        endDate: dates[1].format('YYYY-MM-DD'),
-        quantity: values.quantity,
+        startDate: startDate,
+        endDate: endDate,
         moneyDiscount: values.couponAmount,
         status: 1,
         isDeleted: 0,
         id: modelItem ? modelItem.id : null,
         code: values.code,
-        percent: values.couponAmount
+        percent: values.couponAmount,
+        status: 1,
+        isDeleted: 0
       }
-
       const { success, data } = await addOrChange(objectModel);
       if (data.status != 'Error' && success) {
         setModal2Open(false);
@@ -274,23 +289,22 @@ const DiscountAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
 
             <Col span={12}>
               <Form.Item
-                label="Thời gian"
+                label="Ngày bắt đầu"
                 name="dateStart"
-                rules={[{ required: true, message: "Please input start date!" }]}
               >
-                <RangePicker
-                  value={dates}
-                  onChange={(e) => handeRangerPicker(e)}
-                  format="YYYY-MM-DD" // Format the date as YYYY-MM-DD
-                  placeholder={['Start Date', 'End Date']}
-                  style={{ width: '100%' }} />
+                <DatePicker onChange={handleSetStartDate} placeholder={startDate && format(startDate, "dd-MM-yyyy")} style={{ width: '100%' }} />
               </Form.Item>
             </Col>
-
-
-
-
             <Col span={12}>
+              <Form.Item
+                label="Ngày kết thúc"
+                name="dateEnd"
+               
+              >
+                <DatePicker onChange={handleSetEndDate} placeholder={endDate && format(endDate, "dd-MM-yyyy")} style={{ width: '100%' }} />
+              </Form.Item>
+            </Col>
+            <Col span={24}>
               <Form.Item
                 label="Mô tả"
                 name="description"
@@ -299,9 +313,7 @@ const DiscountAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
               </Form.Item>
             </Col>
           </Row>
-
-
-          <br />
+          {/* <br />
           <Row gutter={[5, 5]}>
             <Col span={16}>
               <span class="hide-menu" style={{ fontSize: "13px", color: "black", fontWeight: "bold" }}>Thông tin sản phẩm</span>
@@ -394,7 +406,7 @@ const DiscountAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
               style={{ textAlign: 'center', marginTop: '24px' }}
               defaultCurrent={tableParams.pagination.pageIndex}
               total={total}
-            /></>}
+            /></>} */}
           <Form.Item>
             <Button type="primary" htmlType="submit" >
               Lưu thông tin

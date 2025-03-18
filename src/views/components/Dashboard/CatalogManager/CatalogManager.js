@@ -7,9 +7,10 @@ import { Col, Form, Input, Modal, Row } from "antd";
 import { DownOutlined } from '@ant-design/icons';
 import { Option } from 'antd/es/mentions';
 import CatalogAddOrChange from './CatalogAddOrChange'
+import CommonPopup from './../Common/CommonPopup';
 
 function CatalogManager() {
-    const { getList } = useCatalog()
+    const { getList, changeStatus } = useCatalog()
 
     const [branch, setBranch] = useState([])
     const [loading, setLoading] = useState(false);
@@ -20,7 +21,7 @@ function CatalogManager() {
             pageIndex: 1,
             pageSize: 10,
             keySearch: "",
-            status: -1
+            status: 1
         },
     });
 
@@ -133,16 +134,54 @@ function CatalogManager() {
     const menu = (record) => (
         <Menu>
             <Menu.Item onClick={() => handleMenuClick('Edit', record)}>Edit</Menu.Item>
-            <Menu.Item onClick={() => handleMenuClick('Delete', record)}>Delete</Menu.Item>
+            <Menu.Item>
+                <Button
+                    type="button"
+                    value="small"
+                    onClick={(e) => showModal(record.id)}
+                >
+                    Delete
+                </Button>
+            </Menu.Item>
         </Menu>
     );
 
     const handleMenuClick = (action, record) => {
         console.log(`${action} action on row`, record);
     };
+    const [idChangeStatus, setIdChangeStatus] = useState();
+    const [isModalVisible, setIsModalVisible] = useState(false);
 
+    const handleChangeStatus = async (id) => {
+        const { success, data } = await changeStatus(id);
+        if (!success || data.status == 'Error') {
+            toast.error('Có lỗi xảy ra')
+        } else {
+            fetchData();
+        }
+    }
+    const handleOk = () => {
+        handleChangeStatus(idChangeStatus);
+        setIsModalVisible(false);
+    };
+
+    const handleCancel = () => {
+        setIsModalVisible(false);
+    };
+
+    const showModal = (id) => {
+        setIdChangeStatus(id);
+        setIsModalVisible(true);
+    };
     return (
         <>
+            <CommonPopup
+                visible={isModalVisible}
+                title="Xác nhận"
+                content={<p>Bạn chắc chắn cập nhật trạng thái bản ghi này?</p>}  // You can replace this with any content
+                onClose={handleCancel}
+                onOk={handleOk}
+            />
             <Row gutter={[16, 16]}>
                 <Col span={8}>
                     <Form.Item
@@ -164,15 +203,14 @@ function CatalogManager() {
                                 width: '100%',
                             }}
                         >
-                            <Option value={-1}>Tất cả</Option>
                             <Option value={1}>Hoạt động</Option>
-                            <Option value={2}>Không hoạt động</Option>
+                            <Option value={0}>Không hoạt động</Option>
                         </Select>
 
                     </Form.Item>
                 </Col>
                 <Col span={8} style={{ textAlign: 'right' }}>
-                    <CatalogAddOrChange fechtList={fetchData}/>
+                    <CatalogAddOrChange fechtList={fetchData} />
                 </Col>
             </Row>
             <Table

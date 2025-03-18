@@ -11,7 +11,10 @@ const Body = ({ children }) => {
 				padding: 10,
 				display: 'flex',
 				flexDirection: 'column',
-				overflow: 'auto'
+				overflow: 'auto',
+				margin: '0px 150px',
+				justifyContent: 'space-between',
+				flexWrap: 'wrap'
 			}}
 		>
 			{children}

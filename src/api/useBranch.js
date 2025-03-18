@@ -25,9 +25,9 @@ const useBranch = () => {
         params: params
     })
 
-    const deleteBranch = async (params) =>  createDeleteRequest({
+    const changeStatus = async (params) =>  createGetRequest({
         endpoint: '/delete',
-        params: params
+        params: {id: params}
     })
 
     return {
@@ -36,7 +36,7 @@ const useBranch = () => {
         createBranch,
         editBranch,
         getBranchById,
-        deleteBranch
+        changeStatus
     }
 }
 export default useBranch

@@ -15,7 +15,7 @@ const useRole = () => {
 		params: null
 	})
 	
-	const deleteItem = (id) => createDeleteRequest({
+	const changeStatus = (id) => createGetRequest({
 		endpoint: '/delete',
 		params: {id: id}
 	})
@@ -29,7 +29,7 @@ const useRole = () => {
 		getListRole, 
         getItemById, 
         generateCode, 
-        deleteItem, 
+        changeStatus, 
         addOrChange
 	}
 }

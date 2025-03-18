@@ -12,7 +12,7 @@ const useCategory = () => {
     const generateCode = () => createGetRequest({
 		endpoint: '/generate-code',
 	})
-	const deleteItem = (id) => createDeleteRequest({
+	const changeStatus = (id) => createGetRequest({
 		endpoint: '/delete',
 		params: {id: id}
 	})
@@ -24,7 +24,7 @@ const useCategory = () => {
 		getListType, 
         getItemById, 
         generateCode, 
-        deleteItem, 
+        changeStatus, 
         addOrChange
 	}
 }

@@ -15,7 +15,7 @@ const useCategory = () => {
 		params: null
 	})
 	
-	const deleteItem = (id) => createDeleteRequest({
+	const changeStatus = (id) => createGetRequest({
 		endpoint: '/delete',
 		params: {id: id}
 	})
@@ -29,7 +29,7 @@ const useCategory = () => {
 		getListCategory, 
         getItemById, 
         generateCode, 
-        deleteItem, 
+        changeStatus, 
         addOrChange
 	}
 }

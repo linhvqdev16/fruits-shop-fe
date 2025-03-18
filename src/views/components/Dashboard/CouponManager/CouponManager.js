@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Select, Dropdown, Table, Menu,DatePicker } from 'antd';
+import { Button, Select, Dropdown, Table, Menu, DatePicker } from 'antd';
 import { toast } from 'react-toastify';
 import { Pagination } from 'antd';
 import CouponAddOrChange from './CouponAddOrChange';
@@ -8,8 +8,10 @@ import { DownOutlined } from '@ant-design/icons';
 import { Option } from 'antd/es/mentions';
 import useCoupon from '../../../../api/useCoupons';
 import { format } from 'date-fns';
+import CommonPopup from './../Common/CommonPopup';
+
 function CouponManager() {
-    const { getListCoupon } = useCoupon();
+    const { getListCoupon, updateStatus } = useCoupon();
     const [coupon, setCoupon] = useState([])
     const [loading, setLoading] = useState(false);
     const [total, setTotal] = useState();
@@ -17,16 +19,16 @@ function CouponManager() {
         pagination: {
             pageIndex: 1,
             pageSize: 10,
-            startDate: null, 
-            endDate: null, 
-            minValue: null, 
-            maxValue: null, 
-            keySearch: null, 
-            status: null
+            startDate: null,
+            endDate: null,
+            minValue: null,
+            maxValue: null,
+            keySearch: null,
+            status: 1
         },
     });
     const { RangePicker } = DatePicker;
-        const [dates, setDates] = useState([]);
+    const [dates, setDates] = useState([]);
     const fetchData = async () => {
         const { success, data } = await getListCoupon(tableParams.pagination);
         if (!success || data.status === 'Error') {
@@ -58,6 +60,95 @@ function CouponManager() {
             }
         })
     };
+
+    const handleSetEndDate = date => {
+        setTableParams((prevPrams) => ({
+            ...prevPrams,
+            pagination: {
+                ...prevPrams.pagination,
+                endDate: date && date.toISOString().split("T")[0]
+            }
+        }))
+    }
+
+    const handleSetStartDate = date => {
+        setTableParams((prevPrams) => ({
+            ...prevPrams,
+            pagination: {
+                ...prevPrams.pagination,
+                startDate: date && date.toISOString().split("T")[0]
+            }
+        }))
+    }
+
+    const handleChangeStatusSelect = (e) => {
+        setTableParams((prevPrams) => ({
+            ...prevPrams,
+            pagination: {
+                ...prevPrams.pagination,
+                status: e
+            }
+        }))
+    }
+
+
+    const onSearchByKey = (e) => {
+        setTableParams((prevPrams) => ({
+            ...prevPrams,
+            pagination: {
+                ...prevPrams.pagination,
+                keySearch: e.target.value
+            }
+        }))
+    }
+
+    const onSearchMinValue = (e) => {
+        setTableParams((prevPrams) => ({
+            ...prevPrams,
+            pagination: {
+                ...prevPrams.pagination,
+                minValue: e.target.value
+            }
+        }))
+    }
+
+    const onSearchMaxValue = (e) => {
+        setTableParams((prevPrams) => ({
+            ...prevPrams,
+            pagination: {
+                ...prevPrams.pagination,
+                maxValue: e.target.value
+            }
+        }))
+    }
+
+
+
+    const [idChangeStatus, setIdChangeStatus] = useState();
+    const [isModalVisible, setIsModalVisible] = useState(false);
+
+    const handleChangeStatus = async (id) => {
+        const { success, data } = await updateStatus(id);
+        if (!success || data.status == 'Error') {
+            toast.error('Có lỗi xảy ra')
+        } else {
+            fetchData();
+        }
+    }
+    const handleOk = () => {
+        handleChangeStatus(idChangeStatus);
+        setIsModalVisible(false);
+    };
+
+    const handleCancel = () => {
+        setIsModalVisible(false);
+    };
+
+    const showModal = (id) => {
+        setIdChangeStatus(id);
+        setIsModalVisible(true);
+    };
+
     const menu = (record) => (
         <Menu>
             <Menu.Item>
@@ -67,7 +158,7 @@ function CouponManager() {
                 <Button
                     type="button"
                     value="small"
-                    onClick={null}
+                    onClick={(e) => showModal(record.id)}
                 >
                     Delete
                 </Button>
@@ -156,16 +247,23 @@ function CouponManager() {
     ];
     return (
         <>
+            <CommonPopup
+                visible={isModalVisible}
+                title="Xác nhận"
+                content={<p>Bạn chắc chắn cập nhật trạng thái bản ghi này?</p>}  // You can replace this with any content
+                onClose={handleCancel}
+                onOk={handleOk}
+            />
             <Row gutter={[16, 16]}>
                 <Col span={24} style={{ textAlign: 'right' }}>
                     <CouponAddOrChange fetchData={fetchData} modelItem={null} textButton={"Thêm mới"} isStyle={true} />
                 </Col>
             </Row>
             <Row gutter={[16, 16]}>
-            <Col span={8}>
+                <Col span={8}>
                     <Form.Item
                         label="Key search"
-                        name="keySearch"><Input placeholder="" />
+                        name="keySearch"><Input placeholder="" onChange={onSearchByKey}/>
                     </Form.Item>
                 </Col>
                 <Col span={8}>
@@ -173,7 +271,7 @@ function CouponManager() {
                         label="Giá trị bắt đầu"
                         name="minValue"
                     >
-                       <Input placeholder="" type='number' />
+                        <Input placeholder="" type='number' onChange={onSearchMinValue}/>
 
                     </Form.Item>
                 </Col>
@@ -182,25 +280,26 @@ function CouponManager() {
                         label="Giá trị bắt đầu"
                         name="typeId"
                     >
-                       <Input placeholder="" type='number' />
+                        <Input placeholder="" type='number' onChange={onSearchMaxValue}/>
 
                     </Form.Item>
                 </Col>
             </Row>
             <Row gutter={[16, 16]}>
-            <Col span={16}>
+                <Col span={8}>
                     <Form.Item
-                        label="Thời gian"
+                        label="Start date"
                         name="minValue"
                     >
-                       <RangePicker
-                            value={dates}
-                            onChange={null}
-                            format="YYYY-MM-DD" // Format the date as YYYY-MM-DD
-                            placeholder={['Start Date', 'End Date']}
-                            style={{ width: '100%' }}
-                        />
-
+                        <DatePicker onChange={handleSetStartDate} style={{ width: '100%' }} />
+                    </Form.Item>
+                </Col>
+                <Col span={8}>
+                    <Form.Item
+                        label="End date"
+                        name="minValue"
+                    >
+                        <DatePicker onChange={handleSetEndDate} style={{ width: '100%' }} />
                     </Form.Item>
                 </Col>
                 <Col span={8}>
@@ -210,14 +309,13 @@ function CouponManager() {
                     >
                         <Select
                             placeholder="Please select"
-                            onChange={null}
+                            onChange={handleChangeStatusSelect}
                             style={{
                                 width: '100%',
                             }}
                         >
-                            <Option value={-1}>Tất cả</Option>
                             <Option value={1}>Hoạt động</Option>
-                            <Option value={2}>Không hoạt động</Option>
+                            <Option value={0}>Không hoạt động</Option>
                         </Select>
 
                     </Form.Item>

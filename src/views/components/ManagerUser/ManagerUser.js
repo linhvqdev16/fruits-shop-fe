@@ -6,11 +6,12 @@ import { Option } from "antd/es/mentions";
 import useUser from "@api/useUser";
 import { format } from 'date-fns';
 import { DownOutlined } from '@ant-design/icons';
+import CommonPopup from './../../components/Dashboard/Common/CommonPopup';
 
 function ManagerUser() {
 
     const [user, setUsers] = useState([]);
-    const { getListUser } = useUser();
+    const { getListUser, changeStatus } = useUser();
 
     const [loading, setLoading] = useState(false)
     const [total, setTotal] = useState(0)
@@ -18,9 +19,9 @@ function ManagerUser() {
         pagination: {
             pageIndex: 1,
             pageSize: 10,
-            keySearch: '', 
-            roleId: 5, 
-            status: null
+            keySearch: '',
+            roleId: 5,
+            status: 1
         }
     })
 
@@ -62,9 +63,9 @@ function ManagerUser() {
 
     const onSearchByKey = (e) => {
         setTableParams((prevPrams) => ({
-            ...prevPrams, 
+            ...prevPrams,
             pagination: {
-                ...prevPrams.pagination, 
+                ...prevPrams.pagination,
                 keySearch: e.target.value
             }
         }))
@@ -72,9 +73,9 @@ function ManagerUser() {
 
     const onChangeStatus = (e) => {
         setTableParams((prevPrams) => ({
-            ...prevPrams, 
+            ...prevPrams,
             pagination: {
-                ...prevPrams.pagination, 
+                ...prevPrams.pagination,
                 status: e
             }
         }))
@@ -89,13 +90,37 @@ function ManagerUser() {
                 <Button
                     type="button"
                     value="small"
-                    onClick={null}
+                    onClick={(e) => showModal(record.id)}
                 >
                     Delete
                 </Button>
             </Menu.Item>
         </Menu >
     );
+    const [idChangeStatus, setIdChangeStatus] = useState();
+    const [isModalVisible, setIsModalVisible] = useState(false);
+
+    const handleChangeStatus = async (id) => {
+        const { success, data } = await changeStatus(id);
+        if (!success || data.status == 'Error') {
+            toast.error('Có lỗi xảy ra')
+        } else {
+            fetchData();
+        }
+    }
+    const handleOk = () => {
+        handleChangeStatus(idChangeStatus);
+        setIsModalVisible(false);
+    };
+
+    const handleCancel = () => {
+        setIsModalVisible(false);
+    };
+
+    const showModal = (id) => {
+        setIdChangeStatus(id);
+        setIsModalVisible(true);
+    };
     const columns = [
         {
             title: 'STT',
@@ -131,7 +156,7 @@ function ManagerUser() {
             title: 'Date birth',
             dataIndex: 'dateBirth',
             key: 'dateBirth',
-            render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{ record.dateBirth && format(record.dateBirth, 'dd-MM-yyyy')}</p>
+            render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{record.dateBirth && format(record.dateBirth, 'dd-MM-yyyy')}</p>
         },
         {
             title: 'UserName',
@@ -173,6 +198,13 @@ function ManagerUser() {
     return (
 
         <>
+            <CommonPopup
+                visible={isModalVisible}
+                title="Xác nhận"
+                content={<p>Bạn chắc chắn cập nhật trạng thái bản ghi này?</p>}  // You can replace this with any content
+                onClose={handleCancel}
+                onOk={handleOk}
+            />
             <Row gutter={[16, 16]}>
                 <Col span={8}>
                     <Form.Item
@@ -193,7 +225,7 @@ function ManagerUser() {
                                 width: '100%',
                             }}>
                             <Option value={1}>Hoạt động</Option>
-                            <Option value={2}>Không hoạt động</Option>
+                            <Option value={0}>Không hoạt động</Option>
                         </Select>
 
                     </Form.Item>

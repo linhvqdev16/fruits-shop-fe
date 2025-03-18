@@ -15,9 +15,9 @@ const useType = () => {
 		data: data,
 		headers: headers
 	})
-	const deleteProduct = (params) => createDeleteRequest({
+	const changeStatus = (params) => createGetRequest({
 		endpoint: '/delete',
-		params: params
+		params: {id: params}
 	})
 	const generateCode = () => createGetRequest({
 		endpoint: '/generate-code', 
@@ -25,7 +25,7 @@ const useType = () => {
 	})
 	return {
 		generateCode, 
-		deleteProduct, 
+		changeStatus, 
 		addOrChange, 
 		getById, 
 		getList

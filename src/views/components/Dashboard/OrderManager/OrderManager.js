@@ -3,10 +3,13 @@ import DetailOrder from "./DetailOrder"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faCircleInfo } from "@fortawesome/free-solid-svg-icons"
 import useOrder from '@api/useOrder';
+import usePayment from '@api/usePayment';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { Pagination, Table, Space, Button } from 'antd';
-import { Col, Form, Input, Modal, Row, Select, DatePicker } from "antd";
+import { Col, Form, Input, Modal, Row, Select, DatePicker, AutoComplete } from "antd";
+import useUser from "@api/useUser";
+import { Option } from "antd/es/mentions";
 
 import OrderAddOrChange from './OrderAddOrChange';
 
@@ -19,17 +22,67 @@ function OrderManager() {
     const { RangePicker } = DatePicker;
 
     const [dates, setDates] = useState([]);
-    const { getListOrder } = useOrder()
-    const [orders, setOrder] = useState([])
-    const [loading, setLoading] = useState(false)
-    const [total, setTotal] = useState()
+    const { getListOrder } = useOrder();
+    const { getListUser } = useUser();
+    const [orders, setOrder] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [total, setTotal] = useState();
+    const { getListPayment } = usePayment();
+    const [payments, setPayments] = useState([]);
+    const [tableEmployeeParams, setTableEmployeeParams] = useState({
+        pagination: {
+            pageIndex: 1,
+            pageSize: 10,
+            keySearch: '',
+            roleId: 6,
+            status: null
+        }
+    });
+    const [tableUserParams, setTableUserParams] = useState({
+        pagination: {
+            pageIndex: 1,
+            pageSize: 10,
+            keySearch: '',
+            roleId: 5,
+            status: null
+        }
+    });
+    const [queryUser, setQueryUser] = useState("");
+    const [user, setUsers] = useState([]);
+    const [optionUser, setOptionsUser] = useState([]);
+
+    const [queryEmployee, setQueryEmployee] = useState("");
+    const [employee, setEmployee] = useState([]);
+    const [optionEmployee, setOptionsEmployee] = useState([]);
     const [tableParams, setTableParams] = useState({
         pagination: {
             pageIndex: 1,
-            pageSize: 10
+            pageSize: 10,
+            paymentId: null,
+            userId: null,
+            employeeId: null,
+            status: null,
+            type: null,
+            startPrice: null,
+            endPrice: null,
+            startDate: null,
+            endDate: null
         }
     });
-
+    const fetchPayment = async () => {
+        const { success, data } = await getListPayment(tableParams.pagination);
+        if (!success || data.status == 'Error') {
+            toast.error('Có lỗi xảy ra')
+        } else {
+            const result = data.data.map((e) => {
+                return {
+                    value: e.id,
+                    label: e.name
+                }
+            });
+            setPayments(result);
+        }
+    }
     const handleDateChange = (value) => {
         setDates(value); // value is an array of two moment objects (startDate, endDate)
     };
@@ -46,8 +99,15 @@ function OrderManager() {
         }
     }
     useEffect(() => {
-        fetchData()    
-    }, [JSON.stringify(tableParams), loading])
+        if (tableEmployeeParams.pagination && tableEmployeeParams.pagination.keySearch.length > 0) {
+            fetchEmployee();
+        }
+        if (tableUserParams.pagination && tableUserParams.pagination.keySearch.length > 0) {
+            fetchUser();
+        }
+        fetchData();
+        fetchPayment();
+    }, [JSON.stringify(tableParams), JSON.stringify(tableEmployeeParams), JSON.stringify(tableUserParams), loading])
 
     const handleTableChange = (pagination, filters, sorter) => {
         setTableParams({
@@ -68,6 +128,90 @@ function OrderManager() {
             }
         })
     }
+
+    const handleSetStartDate = date => {
+        setTableParams((prevPrams) => ({
+            ...prevPrams,
+            pagination: {
+                ...prevPrams.pagination,
+                startDate: date && date.toISOString().split("T")[0]
+            }
+        }))
+    }
+
+    const handleSetEndDate = date => {
+        setTableParams((prevPrams) => ({
+            ...prevPrams,
+            pagination: {
+                ...prevPrams.pagination,
+                endDate: date && date.toISOString().split("T")[0]
+            }
+        }))
+    }
+
+    const handleChangeStatusSelect = (e) => {
+        setTableParams((prevPrams) => ({
+            ...prevPrams,
+            pagination: {
+                ...prevPrams.pagination,
+                status: e
+            }
+        }))
+    }
+
+
+    const onSearchByKey = (e) => {
+        debugger;
+        setTableParams((prevPrams) => ({
+            ...prevPrams,
+            pagination: {
+                ...prevPrams.pagination,
+                keySearch: e.target.value
+            }
+        }))
+    }
+
+    const onSearchMinValue = (e) => {
+        setTableParams((prevPrams) => ({
+            ...prevPrams,
+            pagination: {
+                ...prevPrams.pagination,
+                startPrice: e.target.value
+            }
+        }))
+    }
+
+    const handleSelectPayment = (e) => {
+        setTableParams((prevPrams) => ({
+            ...prevPrams,
+            pagination: {
+                ...prevPrams.pagination,
+                paymentId: e
+            }
+        }))
+    }
+
+
+    const handleSelectStatus = (e) => {
+        setTableParams((prevPrams) => ({
+            ...prevPrams,
+            pagination: {
+                ...prevPrams.pagination,
+                status: e
+            }
+        }))
+    }
+
+    const onSearchMaxValue = (e) => {
+        setTableParams((prevPrams) => ({
+            ...prevPrams,
+            pagination: {
+                ...prevPrams.pagination,
+                endPrice: e.target.value
+            }
+        }))
+    }
+
     const columns = [
         {
             title: 'STT',
@@ -110,29 +254,29 @@ function OrderManager() {
             dataIndex: 'orderStatus',
             key: 'orderStatus',
             render: (_, record) => {
-                if(record.orderStatus === 1){
-                    return <p style={{ fontSize: "13px", color: "red", fontWeight: "300" }}>Đã hủy</p>; 
+                if (record.orderStatus === 1) {
+                    return <p style={{ fontSize: "13px", color: "red", fontWeight: "300" }}>Đã hủy</p>;
                 }
-                if(record.orderStatus === 2){
-                    return <p style={{ fontSize: "13px", color: "yellow", fontWeight: "300" }}>Chờ xác nhận</p>; 
+                if (record.orderStatus === 2) {
+                    return <p style={{ fontSize: "13px", color: "yellow", fontWeight: "300" }}>Chờ xác nhận</p>;
                 }
-                if(record.orderStatus === 3){
-                    return <p style={{ fontSize: "13px", color: "yellowgreen", fontWeight: "300" }}>Xác  nhận</p>; 
+                if (record.orderStatus === 3) {
+                    return <p style={{ fontSize: "13px", color: "yellowgreen", fontWeight: "300" }}>Xác  nhận</p>;
                 }
-                if(record.orderStatus === 4){
-                    return <p style={{ fontSize: "13px", color: "orange", fontWeight: "300" }}>Chờ vận chuyển</p>; 
+                if (record.orderStatus === 4) {
+                    return <p style={{ fontSize: "13px", color: "orange", fontWeight: "300" }}>Chờ vận chuyển</p>;
                 }
-                if(record.orderStatus === 5){
-                    return <p style={{ fontSize: "13px", color: "blueviolet", fontWeight: "300" }}>Đang vận chuyển</p>; 
+                if (record.orderStatus === 5) {
+                    return <p style={{ fontSize: "13px", color: "blueviolet", fontWeight: "300" }}>Đang vận chuyển</p>;
                 }
-                if(record.orderStatus === 6){
-                    return <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>Đã giao hàng</p>; 
+                if (record.orderStatus === 6) {
+                    return <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>Đã giao hàng</p>;
                 }
-                if(record.orderStatus === 7){
-                    return <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>Đã thanh toán</p>; 
+                if (record.orderStatus === 7) {
+                    return <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>Đã thanh toán</p>;
                 }
-                if(record.orderStatus === 8){
-                    return <p style={{ fontSize: "13px", color: "green", fontWeight: "300" }}>Hoàn thành</p>; 
+                if (record.orderStatus === 8) {
+                    return <p style={{ fontSize: "13px", color: "green", fontWeight: "300" }}>Hoàn thành</p>;
                 }
             }
         },
@@ -159,17 +303,101 @@ function OrderManager() {
             ),
         },
 
-    ]
+    ];
+
+
+    const onSearchByKeyUser = (e) => {
+        setTableUserParams((prevPrams) => ({
+            ...prevPrams,
+            pagination: {
+                ...prevPrams.pagination,
+                keySearch: e
+            }
+        }))
+    };
+    const onSearchByKeyEmployee = (e) => {
+        setTableEmployeeParams((prevPrams) => ({
+            ...prevPrams,
+            pagination: {
+                ...prevPrams.pagination,
+                keySearch: e
+            }
+        }))
+    };
+    const handleSelectUser = (value, option, index) => {
+        setQueryUser(option.fullName);
+        setTableParams((prevPrams) => ({
+            ...prevPrams,
+            pagination: {
+                ...prevPrams.pagination,
+                userId: value
+            }
+        }));
+    };
+
+    const handleSelectEmployee = (value, option, index) => {
+        debugger;
+        setQueryEmployee(option.fullName);
+        setTableParams((prevPrams) => ({
+            ...prevPrams,
+            pagination: {
+                ...prevPrams.pagination,
+                employeeId: value
+            }
+        }));
+    };
+
+    const fetchUser = async () => {
+        const { success, data } = await getListUser(tableUserParams.pagination);
+        console.log(data);
+        if (success && data.status != 'Error') {
+            setUsers(data.data);
+            setLoading(false)
+            toast.success(data.message);
+            const model = data.data.map((e) => {
+                return {
+                    value: e.id,
+                    label: e.code + " - " + e.phoneNumber + " - " + e.fullName,
+                    key: e.id,
+                    fullName: e.fullName
+                }
+            });
+            setOptionsUser(model);
+        } else {
+            toast.error(data.message)
+        }
+    }
+
+    const fetchEmployee = async () => {
+        const { success, data } = await getListUser(tableEmployeeParams.pagination);
+        console.log(data);
+        if (success && data.status != 'Error') {
+            setEmployee(data.data);
+            setLoading(false)
+            toast.success(data.message);
+            const model = data.data.map((e) => {
+                return {
+                    value: e.id,
+                    label: e.code + " - " + e.phoneNumber + " - " + e.fullName,
+                    key: e.id,
+                    fullName: e.fullName
+                }
+            });
+            setOptionsEmployee(model);
+        } else {
+            toast.error(data.message)
+        }
+    }
     return (
         <>
             <Row gutter={[16, 16]}>
-                <Col span={16}>
+                {/* <Col span={16}>
                     <Form.Item
                         label="Key search"
                         name="productName"
-                        rules={[{ required: false, message: "Please input product name!" }]}><Input placeholder="Enter code, name order..." />
+                        rules={[{ required: false, message: "Please input product name!" }]}><Input placeholder="Enter code, name order..." onChange={onSearchByKey} />
                     </Form.Item>
-                </Col>
+                </Col> */}
                 {/* <Col span={8} style={{textAlign: 'right'}}>
                     <OrderAddOrChange />
                 </Col> */}
@@ -179,7 +407,37 @@ function OrderManager() {
                     <Form.Item
                         label="Khách hàng"
                         name="productName"
-                        rules={[{ required: false, message: "Please input product name!" }]}><Input placeholder="Enter code, phone number, name customer..." />
+                        rules={[{ required: false, message: "Please input product name!" }]}>
+
+                        <AutoComplete
+                            options={optionUser}
+                            onSearch={onSearchByKeyUser}
+                            onSelect={handleSelectUser}
+                            value={queryUser}
+                            onChange={setQueryUser}
+                            style={{ width: '100%' }}
+                        >
+                            <Input placeholder="Enter code, phone number, name customer..." />
+                        </AutoComplete>
+
+                    </Form.Item>
+                </Col>
+
+                <Col span={6}>
+                    <Form.Item
+                        label="Nhân viên"
+                        name="productName"
+                        rules={[{ required: false, message: "Please input product name!" }]}>
+                             <AutoComplete
+                            options={optionEmployee}
+                            onSearch={onSearchByKeyEmployee}
+                            onSelect={handleSelectEmployee}
+                            value={queryEmployee}
+                            onChange={setQueryEmployee}
+                            style={{ width: '100%' }}
+                        >
+                            <Input placeholder="Enter code, phone number, name customer..." />
+                        </AutoComplete>
                     </Form.Item>
                 </Col>
                 <Col span={6}>
@@ -189,19 +447,12 @@ function OrderManager() {
                     >
                         <Select
                             placeholder="Please select"
-                            onChange={null}
+                            onChange={handleSelectPayment}
                             style={{
                                 width: '100%',
                             }}
-                            options={origin}
+                            options={payments}
                         />
-                    </Form.Item>
-                </Col>
-                <Col span={6}>
-                    <Form.Item
-                        label="Nhân viên"
-                        name="productName"
-                        rules={[{ required: false, message: "Please input product name!" }]}><Input placeholder="Enter code, phone number, name employee..." />
                     </Form.Item>
                 </Col>
                 <Col span={6}>
@@ -211,12 +462,21 @@ function OrderManager() {
                     >
                         <Select
                             placeholder="Please select"
-                            onChange={null}
+                            onChange={handleChangeStatusSelect}
                             style={{
                                 width: '100%',
                             }}
-                            options={origin}
-                        />
+                            >
+                            <Option value={0}>Tất cả</Option>
+                            <Option value={1}>Đã hủy</Option>
+                            <Option value={2}>Chờ xác nhận</Option>
+                            <Option value={3}>Xác nhận</Option>
+                            <Option value={4}>Chờ vận chuyển</Option>
+                            <Option value={5}>Đang vận chuyển</Option>
+                            <Option value={6}>Đã giao hàng</Option>
+                            <Option value={7}>Đã thanh toán</Option>
+                            <Option value={7}>Hoàn thành</Option>
+                        </Select>
 
                     </Form.Item>
                 </Col>
@@ -229,25 +489,27 @@ function OrderManager() {
                         rules={[{ required: false, message: "Please input product name!" }]}>
                         <Row gutter={[16, 16]}>
                             <Col span={12}>
-                                <Input placeholder="Enter start price" type="number" /></Col>
+                                <Input placeholder="Enter start price" type="number" onChange={onSearchMinValue} /></Col>
                             <Col span={12}>
-                                <Input placeholder="Enter end price" type="number" /></Col>
+                                <Input placeholder="Enter end price" type="number" onChange={onSearchMaxValue} /></Col>
 
                         </Row>
                     </Form.Item>
                 </Col>
-                <Col span={12}>
+                <Col span={6}>
                     <Form.Item
-                        label="Thời gian"
-                        name="productName"
-                        rules={[{ required: false, message: "Please input product name!" }]}>
-                        <RangePicker
-                            value={dates}
-                            onChange={null}
-                            format="YYYY-MM-DD" // Format the date as YYYY-MM-DD
-                            placeholder={['Start Date', 'End Date']}
-                            style={{ width: '100%' }}
-                        />
+                        label="Start date"
+                        name="minValue"
+                    >
+                        <DatePicker onChange={handleSetStartDate} style={{ width: '100%' }} />
+                    </Form.Item>
+                </Col>
+                <Col span={6}>
+                    <Form.Item
+                        label="End date"
+                        name="minValue"
+                    >
+                        <DatePicker onChange={handleSetEndDate} style={{ width: '100%' }} />
                     </Form.Item>
                 </Col>
             </Row>

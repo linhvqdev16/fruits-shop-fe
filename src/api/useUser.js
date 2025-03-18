@@ -13,7 +13,7 @@ const useUser = () => {
 		endpoint: '/generate-code',
         params: params
 	})
-	const deleteItem = (id) => createDeleteRequest({
+	const changeStatus = (id) => createGetRequest({
 		endpoint: '/delete',
 		params: {id: id}
 	})
@@ -26,7 +26,7 @@ const useUser = () => {
 		getListUser, 
         getUserById, 
         generateCode, 
-        deleteItem, 
+        changeStatus, 
         addOrChange
 	}
 }

@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Menu, Select, Dropdown, Table, Form, Input,    Row, Col } from 'antd';
+import { Button, Menu, Select, Dropdown, Table, Form, Input, Row, Col } from 'antd';
 import { toast } from 'react-toastify';
 import { Pagination } from 'antd';
 import PaymentAdd from './PaymentAdd';
 import usePayment from '@api/usePayment';
 import DownOutlined from '@ant-design/icons';
+import CommonPopup from './../Common/CommonPopup';
 
 function PaymentManager() {
-    const { getListPayment } = usePayment()
+    const { getListPayment, changeStatus } = usePayment()
     const [payments, setPayments] = useState([])
     const [loading, setLoading] = useState(false);
     const [searchName, setSearchName] = useState('')
     const [total, setTotal] = useState();
+
     const [tableParams, setTableParams] = useState({
         pagination: {
             pageIndex: 1,
@@ -19,6 +21,32 @@ function PaymentManager() {
             keySearch: ''
         },
     });
+
+    const [idChangeStatus, setIdChangeStatus] = useState();
+    const [isModalVisible, setIsModalVisible] = useState(false);
+
+    const handleChangeStatus = async (id) => {
+        const { success, data } = await changeStatus(id);
+        if (!success || data.status == 'Error') {
+            toast.error('Có lỗi xảy ra')
+        } else {
+            fetchData();
+        }
+    }
+    const handleOk = () => {
+        handleChangeStatus(idChangeStatus);
+        setIsModalVisible(false);
+    };
+
+    const handleCancel = () => {
+        setIsModalVisible(false);
+    };
+
+    const showModal = (id) => {
+        setIdChangeStatus(id);
+        setIsModalVisible(true);
+    };
+    
 
     const fetchData = async () => {
         const { success, data } = await getListPayment(tableParams.pagination);
@@ -107,7 +135,6 @@ function PaymentManager() {
             ),
         },
     ];
-
     const menu = (record) => (
         <Menu>
             <Menu.Item>
@@ -117,7 +144,7 @@ function PaymentManager() {
                 <Button
                     type="button"
                     value="small"
-                    onClick={null}
+                    onClick={(e) => showModal(record.id)}
                 >
                     Delete
                 </Button>
@@ -126,9 +153,16 @@ function PaymentManager() {
     );
     return (
         <>
+            <CommonPopup
+                visible={isModalVisible}
+                title="Xác nhận"
+                content={<p>Bạn chắc chắn cập nhật trạng thái bản ghi này?</p>}  // You can replace this with any content
+                onClose={handleCancel}
+                onOk={handleOk}
+            />
             <Row gutter={[12, 12]}>
                 <Col span={16}>
-                <Form.Item
+                    <Form.Item
                         label="Key search"
                         name="keySearch"
                         rules={[{ required: false, message: "Please input product name!" }]}>

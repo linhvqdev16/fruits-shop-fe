@@ -99,12 +99,10 @@ function DeliveryManager() {
             }
         })
     };
-
     const showModal = (id) => {
         setIdChangeStatus(id);
         setIsModalVisible(true);
       };
-
     const menu = (record) => (
         <Menu>
             <Menu.Item>

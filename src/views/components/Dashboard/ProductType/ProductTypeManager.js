@@ -6,9 +6,10 @@ import useType from '@api/useType';
 import ProductTypeAdd from './ProductTypeAdd';
 import { Col, Form, Input, Row } from "antd";
 import { DownOutlined } from '@ant-design/icons';
+import CommonPopup from './../Common/CommonPopup';
 
 function ProductTypeManager() {
-    const { getListType } = useType()
+    const { getListType, changeStatus } = useType()
     const { Option } = Select;
 
     const [types, setType] = useState([])
@@ -21,7 +22,7 @@ function ProductTypeManager() {
             pageIndex: 1,
             pageSize: 10,
             keySearch: '',
-            status: null
+            status: 1
         },
     });
 
@@ -80,21 +81,46 @@ function ProductTypeManager() {
         })
     };
 
+        const [idChangeStatus, setIdChangeStatus] = useState();
+        const [isModalVisible, setIsModalVisible] = useState(false);
+    
+        const handleChangeStatus = async (id) => {
+            const { success, data } = await changeStatus(id);
+            if (!success || data.status == 'Error') {
+                toast.error('Có lỗi xảy ra')
+            } else {
+                fetchData();
+            }
+        }
+        const handleOk = () => {
+            handleChangeStatus(idChangeStatus);
+            setIsModalVisible(false);
+        };
+    
+        const handleCancel = () => {
+            setIsModalVisible(false);
+        };
+    
+        const showModal = (id) => {
+            setIdChangeStatus(id);
+            setIsModalVisible(true);
+        };
+
     const menu = (record) => (
         <Menu>
             <Menu.Item>
 
                 <ProductTypeAdd fetchData={fetchData} modelItem={record} textButton={"Edit"} isStyle={false} />
             </Menu.Item>
-            <Menu.Item>
-                <Button
-                    type="button"
-                    value="small"
-                    onClick={null}
-      >
-                Delete
-            </Button>
-        </Menu.Item>
+          <Menu.Item>
+                         <Button
+                             type="button"
+                             value="small"
+                             onClick={(e) => showModal(record.id)}
+                         >
+                             Delete
+                         </Button>
+                     </Menu.Item>
         </Menu >
     );
 
@@ -152,6 +178,13 @@ function ProductTypeManager() {
     ];
     return (
         <>
+             <CommonPopup
+                        visible={isModalVisible}
+                        title="Xác nhận"
+                        content={<p>Bạn chắc chắn cập nhật trạng thái bản ghi này?</p>}  // You can replace this with any content
+                        onClose={handleCancel}
+                        onOk={handleOk}
+                    />
             <Row gutter={[16, 16]}>
                 <Col span={8}>
                     <Form.Item
@@ -174,9 +207,8 @@ function ProductTypeManager() {
                                 width: '100%',
                             }}
                         >
-                            <Option value="-1">Tất cả</Option>
                             <Option value="1">Hoạt động</Option>
-                            <Option value="2">Không hoạt động</Option>
+                            <Option value="0">Không hoạt động</Option>
                         </Select>
                     </Form.Item>
                 </Col>

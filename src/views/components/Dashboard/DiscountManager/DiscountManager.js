@@ -19,14 +19,16 @@ function DiscountManager() {
         pagination: {
             pageIndex: 1,
             pageSize: 10,
-            startDate: null, 
-            endDate: null, 
-            minValue: null, 
-            maxValue: null, 
-            keySearch: null, 
-            status: null
+            startDate: null,
+            endDate: null,
+            minValue: null,
+            maxValue: null,
+            keySearch: null,
+            status: 1
         },
     });
+    const [startDate, setStartDate] = useState();
+    const [endDate, setEndDate] = useState();
     const fetchData = async () => {
         const { success, data } = await getListDiscount(tableParams.pagination);
         if (!success || data.status === 'Error') {
@@ -37,6 +39,49 @@ function DiscountManager() {
             setTotal(data.totalCount)
         }
     };
+
+    const handleSetEndDate = date => {
+        setTableParams((prevPrams) => ({
+            ...prevPrams,
+            pagination: {
+                ...prevPrams.pagination,
+                endDate: date &&  date.toISOString().split("T")[0]
+            }
+        }))
+    }
+
+    const handleSetStartDate = date => {
+        setTableParams((prevPrams) => ({
+            ...prevPrams,
+            pagination: {
+                ...prevPrams.pagination,
+                startDate: date &&  date.toISOString().split("T")[0]
+            }
+        }))
+    }
+
+    const handleChangeStatus = (e) => {
+        setTableParams((prevPrams) => ({
+            ...prevPrams,
+            pagination: {
+                ...prevPrams.pagination,
+                status: e
+            }
+        }))
+    }
+
+
+    const onSearchByKey = (e) => {
+        setTableParams((prevPrams) => ({
+            ...prevPrams,
+            pagination: {
+                ...prevPrams.pagination,
+                keySearch: e.target.value
+            }
+        }))
+    }
+
+
     useEffect(() => {
         fetchData();
     }, [JSON.stringify(tableParams), loading])
@@ -79,49 +124,36 @@ function DiscountManager() {
             title: 'STT',
             dataIndex: 'number',
             key: 'number',
-            render: (_, __, index) => <a style={{ fontSize: "12px", color: "black", fontWeight: "500" }}>{index + 1}</a>,
+            render: (_, __, index) => <a style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{index + 1}</a>,
         },
         {
             title: 'Tên chương trình khuyến mại',
             dataIndex: 'name',
             key: 'name',
-            render: (text) => <a style={{ fontSize: "12px", color: "black", fontWeight: "500" }}>{text}</a>,
+            render: (text) => <a style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{text}</a>,
         },
         {
             title: 'Kiểu khuyến mại',
             dataIndex: 'type',
             render: (value) => {
                 if (value === 1) {
-                    return <p style={{ fontSize: "12px", color: "black", fontWeight: "500" }}>Chiết khấu phần trăm sản phẩm </p>
+                    return <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>Chiết khấu phần trăm sản phẩm </p>
                 } else {
-                    return <p style={{ fontSize: "12px", color: "black", fontWeight: "500" }}>Chiết khấu giá trị sản phẩm </p>
+                    return <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>Chiết khấu giá trị sản phẩm </p>
                 }
             }
-        },
-        {
-            title: 'Số lượng',
-            dataIndex: 'quantity',
-            key: 'quantity',
-            render: (_, record) => <p style={{ fontSize: "12px", color: "black", fontWeight: "500" }}>{record.quantity}</p>,
-
-        },
-        {
-            title: 'Số lượng đã sử dụng',
-            dataIndex: 'quantityUsed',
-            key: 'quantityUsed',
-            render: (_, record) => <p style={{ fontSize: "12px", color: "black", fontWeight: "500" }}>{record.quantityUsed}</p>
         },
         {
             title: 'Thời gian bắt đầu',
             dataIndex: 'dateStart',
             key: 'dateStart',
-            render: (_, record) => <p style={{ fontSize: "12px", color: "black", fontWeight: "500" }}>{format(record.dateStart, 'dd-MM-yyyy')}</p>
+            render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{format(record.startDate, 'dd-MM-yyyy')}</p>
         },
         {
             title: 'Thời gian kết thúc',
             dataIndex: 'dateEnd',
             key: 'dateEnd',
-            render: (_, record) => <p style={{ fontSize: "12px", color: "black", fontWeight: "500" }}>{format(record.dateEnd, 'dd-MM-yyyy')}</p>
+            render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{format(record.endDate, 'dd-MM-yyyy')}</p>
         },
         {
             title: 'Trạng thái',
@@ -129,9 +161,9 @@ function DiscountManager() {
             key: 'status',
             render: (value) => {
                 if (value === 1) {
-                    return <p style={{ fontSize: "12px", color: "black", fontWeight: "500" }}>Hoạt động</p>
+                    return <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>Hoạt động</p>
                 } else {
-                    return <p style={{ fontSize: "12px", color: "black", fontWeight: "500" }}>Không hoạt động</p>
+                    return <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>Không hoạt động</p>
                 }
             }
         },
@@ -150,10 +182,10 @@ function DiscountManager() {
     return (
         <>
             <Row gutter={[16, 16]}>
-            <Col span={16}>
+                <Col span={16}>
                     <Form.Item
                         label="Key search"
-                        name="keySearch"><Input placeholder="" />
+                        name="keySearch"><Input placeholder="" onChange={onSearchByKey}/>
                     </Form.Item>
                 </Col>
                 <Col span={8} style={{ textAlign: 'right' }}>
@@ -161,19 +193,20 @@ function DiscountManager() {
                 </Col>
             </Row>
             <Row gutter={[16, 16]}>
-                <Col span={16}>
+                <Col span={8}>
                     <Form.Item
-                        label="Thời gian"
+                        label="Start date"
                         name="minValue"
                     >
-                       <RangePicker
-                            value={dates}
-                            onChange={null}
-                            format="YYYY-MM-DD" // Format the date as YYYY-MM-DD
-                            placeholder={['Start Date', 'End Date']}
-                            style={{ width: '100%' }}
-                        />
-
+                        <DatePicker onChange={handleSetStartDate} style={{ width: '100%' }} />
+                    </Form.Item>
+                </Col>
+                <Col span={8}>
+                    <Form.Item
+                        label="End date"
+                        name="minValue"
+                    >
+                        <DatePicker onChange={handleSetEndDate}  style={{ width: '100%' }} />
                     </Form.Item>
                 </Col>
                 <Col span={8}>
@@ -183,14 +216,13 @@ function DiscountManager() {
                     >
                         <Select
                             placeholder="Please select"
-                            onChange={null}
+                            onChange={handleChangeStatus}
                             style={{
                                 width: '100%',
                             }}
                         >
-                            <Option value={-1}>Tất cả</Option>
                             <Option value={1}>Hoạt động</Option>
-                            <Option value={2}>Không hoạt động</Option>
+                            <Option value={0}>Không hoạt động</Option>
                         </Select>
 
                     </Form.Item>
