@@ -1,5 +1,5 @@
 import { PlusSquareOutlined, CloseCircleOutlined } from "@ant-design/icons";
-import { Button, Col, Form, Input, Modal, Row, Select, Space, Table, AutoComplete } from "antd";
+import { Button, Col, Form, Input, Modal, Row, Select, Space, Table, Timeline  } from "antd";
 import React, { useEffect, useState } from "react";
 import useProduct from "@api/useProduct";
 import { toast } from "react-toastify";
@@ -469,6 +469,14 @@ const OrderDetail = () => {
 
     return (
         <div>
+             {/* <Timeline>
+        <Timeline.Item color="green">Create a services site 2022-12-01</Timeline.Item>
+        <Timeline.Item color="green">Create a deployment site 2022-12-01</Timeline.Item>
+        <Timeline.Item color="green">Design the front-end 2023-01-01</Timeline.Item>
+        <Timeline.Item color="green">Release version 1.0 2023-02-01</Timeline.Item>
+        <Timeline.Item color="red">Error found, fixing it 2023-03-01</Timeline.Item>
+        <Timeline.Item color="blue">Fixed error and tested 2023-03-05</Timeline.Item>
+      </Timeline> */}
             {/* <Row>
 
                 <Col span={24} style={{ textAlign: 'right' }}>
@@ -765,8 +773,10 @@ const OrderDetail = () => {
                                 </Col>
                             </Row>
                             <br />
-                            <Col span={6} style={{ textAlign: 'left' }}>
-                                <PaymentType callback={onCreateOrder} amount={totalPrice + feeDelivery - discount} paymentId={paymentId} deliveryId={deleveryId} products={tab.products} tabIds={tab.id} />
+                            <Col span={24} style={{ textAlign: 'right' }}>
+                                  <Button type="primary" onClick={null}>
+                                              Cập nhật
+                                          </Button>
                             </Col>
                         </Form>
                     )
