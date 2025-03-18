@@ -47,7 +47,7 @@ const AddProduct = ({fetchData, modelItem, textButton, isStyle}) => {
   }
 
   const fetchCategory = async () => {
-    const { success, data } = await getListCategory({ pageIndex: 1, pageSize: 20 });
+    const { success, data } = await getListCategory({ pageIndex: 1, pageSize: 20, status: 1 });
     if (data != null && success) {
       var dataCategory = data.data.map((item) => {
         return {
@@ -61,7 +61,7 @@ const AddProduct = ({fetchData, modelItem, textButton, isStyle}) => {
 
 
   const fetchTypes = async () => {
-    const { success, data } = await getListType({ pageIndex: 1, pageSize: 20 });
+    const { success, data } = await getListType({ pageIndex: 1, pageSize: 20, status: 1 });
     if (data != null && success) {
       var dataOrigin = data.data.map((item) => {
         return {

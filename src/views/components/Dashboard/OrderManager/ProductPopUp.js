@@ -82,7 +82,12 @@ const ProductPopUp = ({ handleProductSelected, modelProduct, tabIndex }) => {
     }
     const handleSelectedAll = (event) => {
         if (event.target.checked) {
-            setProductIdSelected(product);
+            const rusult = product.map((item) => {
+                return {
+                    id: item.id, image: item.images && item.images.length > 0 ? item.images[0] : null, name: item.name, price: item.price, code: item.code, priceDiscount: item.priceDiscount, quantity: 1 
+                }
+            });
+            setProductIdSelected(rusult);
         } else {
             setProductIdSelected([]);
         }

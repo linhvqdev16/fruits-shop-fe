@@ -15,45 +15,15 @@ import CustomerPopup from "./CustomerPopup";
 import { Option } from "antd/es/mentions";
 import useAddress from "@api/useAddress";
 import useOrder from '@api/useOrder';
+import { useParams } from 'react-router-dom';
 const Tab = ({ label, activeTab, setActiveTab, closeTab }) => {
     return (
-        <div
-            onClick={() => setActiveTab(label)}
-            style={{
-                display: 'inline-block',
-                padding: '5px 5px',
-                cursor: 'pointer',
-                backgroundColor: activeTab === label ? '#2596be' : '#fff',
-                margin: '5px',
-                borderRadius: 10,
-            }}
-        >
-            <input
-                type="text"
-                value={label}
-                onChange={(e) => null}
-                style={{
-                    border: 'none',
-                    backgroundColor: 'transparent',
-                    fontSize: '14px',
-                    fontWeight: 'bold',
-                    cursor: 'pointer',
-                    color: activeTab === label ? '#fff' : '#000'
-                }}
-            />
-
-            <CircleX size={25} onClick={(e) => {
-                e.stopPropagation(); // Prevent tab switching on close button click
-                closeTab(label);
-            }}
-                color={activeTab === label ? '#fff' : '#000'}
-            />
-        </div>
+      <></>
     );
 };
 
 
-const OrderCounter = () => {
+const OrderDetail = () => {
     const [form] = Form.useForm();
     const { createProduct } = useProduct();
     const [loading, setLoading] = useState(false);
@@ -76,7 +46,7 @@ const OrderCounter = () => {
     const [discount, setDiscount] = useState(0);
     const [couponModel, setCouponModel] = useState(null);
     const [userModel, setUserModel] = useState(null);
-        const { createOrder } = useOrder();
+    const { createOrder,getOrderDetail } = useOrder();
     const [tableParams, setTableParams] = useState({
         pagination: {
             pageIndex: 1,
@@ -98,6 +68,9 @@ const OrderCounter = () => {
     const [provinceId, setProvinceId] = useState(null);
     const [districtId, setDistrictId] = useState(null);
     const [wardId, setWardId] = useState(null);
+    
+    const { id } = useParams(); 
+
     const handleProductSelected = (products, index) => {
         const modelTabs = [...tabs];
         modelTabs[index] = { ...modelTabs[index], products: products };
@@ -127,6 +100,17 @@ const OrderCounter = () => {
             toast.error("Only can create 5 order in one time!");
         }
     };
+    
+    const fetchOrderDetail = async () => {
+        const { success, data } = await getOrderDetail(id);
+        if (!success || data.status == 'Error') {
+            toast.error('Có lỗi xảy ra')
+        } else {
+            modelTabs[index] = { ...modelTabs[index], products: data.data.product };
+            setTabs(modelTabs);
+        }
+    }
+
     const fetchPayment = async () => {
         const { success, data } = await getListPayment(tableParams.pagination);
         if (!success || data.status == 'Error') {
@@ -163,7 +147,7 @@ const OrderCounter = () => {
             setActiveTab(newTabs[newTabs.length - 1].id);
         }
     };
-    const onCreateOrder = async (modelProducts,tabIds) => {
+    const onCreateOrder = async (modelProducts, tabIds) => {
         try {
             const addressModel = address.map((e) => {
                 return {
@@ -190,7 +174,7 @@ const OrderCounter = () => {
                 roleId: 8,
                 description: "Customer visitor",
                 status: 1,
-                id:  null
+                id: null
             }
             var product = modelProducts.map((e) => {
                 return {
@@ -215,7 +199,7 @@ const OrderCounter = () => {
                 realPrice: totalPrice,
                 addressId: userModel ? (userModel.address && userModel.address[0].id) : null,
                 orderDetailModels: product,
-                couponCode: couponModel && couponModel.code, 
+                couponCode: couponModel && couponModel.code,
                 userModel: model,
                 userType: userModel ? 2 : 1
             }
@@ -278,6 +262,7 @@ const OrderCounter = () => {
         if (tableParams.pagination && tableParams.pagination.keySearch.length > 0) {
             fetchData();
         }
+        fetchOrderDetail();
         fetchDelivery();
         fetchPayment();
         fetchProvince();
@@ -288,7 +273,7 @@ const OrderCounter = () => {
         const models = [...modelTabs[tabIndex].products];
         models[index] = { ...models[index], quantity: parseInt(value) };
         modelTabs[tabIndex] = { ...modelTabs[tabIndex], products: models }
-        
+
         const sum = modelTabs[tabIndex].products.reduce((accumulator, currentItem) => accumulator + (currentItem.price * currentItem.quantity), 0);
         setTotalPrice(sum);
         setTabs(modelTabs);
@@ -464,7 +449,7 @@ const OrderCounter = () => {
 
     return (
         <div>
-            <Row>
+            {/* <Row>
 
                 <Col span={24} style={{ textAlign: 'right' }}>
                     <Button
@@ -479,7 +464,7 @@ const OrderCounter = () => {
                     >  Thêm đơn hàng
                     </Button>
                 </Col>
-            </Row>
+            </Row> */}
             <div style={{ marginBottom: '10px' }}>
                 {tabs.map((tab) => (
                     <Tab
@@ -522,7 +507,7 @@ const OrderCounter = () => {
                                         </Col>
 
                                         <br />
-                                        <Col span={18}>
+                                        {/* <Col span={18}> */}
                                             {/* <AutoComplete
                                                 options={option}
                                                 onSearch={onSearchByKey}
@@ -533,12 +518,12 @@ const OrderCounter = () => {
                                             >
                                                 <Input placeholder="Enter code, phone number, name customer..." />
                                             </AutoComplete> */}
-                                            <Input readOnly={true} value={userModel != null ? userModel.fullName : "Khách hàng lẻ"} />
+                                            {/* <Input readOnly={true} value={userModel != null ? userModel.fullName : "Khách hàng lẻ"} />
 
                                         </Col>
                                         <Col span={6} style={{ textAlign: 'right' }}>
                                             <CustomerPopup handlePopupSelected={handleSelectUser} model={userModel} />
-                                        </Col>
+                                        </Col> */}
 
 
                                         <Col span={12}>
@@ -548,7 +533,7 @@ const OrderCounter = () => {
                                                 style={{ fontWeight: '500' }}
                                                 rules={[{ required: true, message: "" }]}
                                             >
-                                                <Input placeholder="" type="text" value={userModel && userModel.fullName} onChange={(e) => setFullName(e.target.value)}/>
+                                                <Input placeholder="" type="text" value={userModel && userModel.fullName} onChange={(e) => setFullName(e.target.value)} />
                                             </Form.Item>
                                         </Col>
 
@@ -569,7 +554,7 @@ const OrderCounter = () => {
                                                 style={{ fontWeight: '500' }}
                                                 rules={[{ required: true, message: "" }]}
                                             >
-                                                <Input placeholder="" type="text" value={userModel && userModel.email} onChange={(e) => setEmail(e.target.value)}/>
+                                                <Input placeholder="" type="text" value={userModel && userModel.email} onChange={(e) => setEmail(e.target.value)} />
                                             </Form.Item>
                                         </Col>
                                         {deleveryId > 0 && deleveryId !== 1 && <>
@@ -759,7 +744,7 @@ const OrderCounter = () => {
                             </Row>
                             <br />
                             <Col span={6} style={{ textAlign: 'left' }}>
-                                <PaymentType callback={onCreateOrder} amount={totalPrice + feeDelivery - discount} paymentId={paymentId} deliveryId={deleveryId} products={tab.products} tabIds={tab.id}/>
+                                <PaymentType callback={onCreateOrder} amount={totalPrice + feeDelivery - discount} paymentId={paymentId} deliveryId={deleveryId} products={tab.products} tabIds={tab.id} />
                             </Col>
                         </Form>
                     )
@@ -768,4 +753,4 @@ const OrderCounter = () => {
     );
 };
 
-export default OrderCounter;
+export default OrderDetail;

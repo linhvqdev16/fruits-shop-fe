@@ -11,9 +11,14 @@ const useOrder = () => {
 		endpoint: '/get-list-order',
 		params: params
 	})
+	const getOrderDetail = (id) => createGetRequest({
+		endpoint: '/get-by-order-id',
+		params: {id: id}
+	})
 	return {
 		createOrder,
-		getListOrder
+		getListOrder,
+		getOrderDetail
 	}
 } 
 export default useOrder

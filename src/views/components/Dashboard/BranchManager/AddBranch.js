@@ -25,7 +25,7 @@ const AddBranch = ({ fechtList }) => {
   };
 
   const fetchCatalog = async () => {
-    const { success, data } = await getList({ pageIndex: 1, pageSize: 20 });
+    const { success, data } = await getList({ pageIndex: 1, pageSize: 20, status: 1 });
     if (data != null && success) {
       var dataResults = data.data.map((item) => {
         return {

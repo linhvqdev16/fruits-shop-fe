@@ -293,7 +293,7 @@ function OrderManager() {
             key: 'action',
             render: (_, record) => (
                 <Space>
-                    <Link to={record.id}>
+                    <Link to={`/dashboard/order-detail/${record.orderId}`}>
                         <Button type='primary' title='Detail Order'>
                             <FontAwesomeIcon icon={faCircleInfo} />
                         </Button>

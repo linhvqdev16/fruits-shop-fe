@@ -38,6 +38,7 @@ import EmployeeManager from "@views/components/Dashboard/EmployeeManager/Employe
 import RollbackOrderManager from "@views/components/Dashboard/RollbackOrderManager/RollbackOrderManager";
 import DeliveryManager from "@views/components/Dashboard/DeliveryManager/DeliveryManager";
 import OrderCounter from './../views/components/Dashboard/OrderManager/OrderCounter';
+import OrderDetail from './../views/components/Dashboard/OrderManager/OrderDetail';
 
 
 const useRoutes = () => {
@@ -392,6 +393,14 @@ const useRoutes = () => {
         <OrderCounter />
       </Layout>
     },
+      {
+        key: "/dashboard/order-detail/:id",
+        label: "OrderCounter",
+        path: "/dashboard/order-detail/:id",
+        element: <Layout>
+          <OrderDetail />
+        </Layout>
+      },
   ];
 
   return {
