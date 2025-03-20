@@ -89,8 +89,8 @@ const CouponAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
         type: values.typeId,
         minValue: values.minValue,
         maxValue: values.maxValue,
-        dateStart: values.dateStart,
-        dateEnd: values.dateEnd,
+        dateStart: startDate,
+        dateEnd: endDate,
         quantity: values.quantity,
         couponAmount: values.couponAmount,
         status: 1,
@@ -225,7 +225,6 @@ const CouponAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
               <Form.Item
                 label="Ngày bắt đầu"
                 name="dateStart"
-                rules={[{ required: true, message: "Please input start date!" }]}
               >
                 <DatePicker onChange={handleSetStartDate} placeholder={startDate && format(startDate, "dd-MM-yyyy")} style={{ width: '100%' }} />
               </Form.Item>
@@ -234,9 +233,6 @@ const CouponAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
               <Form.Item
                 label="Ngày kết thúc"
                 name="dateEnd"
-                rules={[
-                  { required: true, message: "Please input end date!" },
-                ]}
               >
                 <DatePicker onChange={handleSetEndDate} placeholder={endDate && format(endDate, "dd-MM-yyyy")} style={{ width: '100%' }} />
               </Form.Item>

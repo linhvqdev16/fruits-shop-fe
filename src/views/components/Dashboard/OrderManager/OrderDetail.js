@@ -11,11 +11,15 @@ import useCoupon from "@api/useCoupons";
 import useAddress from "@api/useAddress";
 import useOrder from '@api/useOrder';
 import { useParams } from 'react-router-dom';
+import { format } from 'date-fns';
+import CustomPopup from './../Common/CustomPopup';
 const Tab = ({ label, activeTab, setActiveTab, closeTab }) => {
     return (
         <></>
     );
 };
+
+
 const OrderDetail = () => {
     const [form] = Form.useForm();
     const { createProduct } = useProduct();
@@ -40,7 +44,7 @@ const OrderDetail = () => {
     const [discount, setDiscount] = useState(0);
     const [couponModel, setCouponModel] = useState(null);
     const [userModel, setUserModel] = useState(null);
-    const { createOrder, getOrderDetail } = useOrder();
+    const { createOrder, getOrderDetail, changeStatus } = useOrder();
     const [orderModel, setOrderModel] = useState(null);
     const [tableParams, setTableParams] = useState({
         pagination: {
@@ -65,7 +69,7 @@ const OrderDetail = () => {
     const [wardId, setWardId] = useState(null);
 
     const [steps, setSteps] = useState([]);
-
+    const [actions, setLogActions] = useState([]);
 
     const { id } = useParams();
 
@@ -100,17 +104,6 @@ const OrderDetail = () => {
     };
 
     const fetchOrderDetail = async () => {
-
-        const apiSteps = [
-            { name: "Chờ xác nhận", createdDate: null, status: 1 },
-            { name: "Xác nhận", createdDate: null, status: 2 },
-            { name: "Đang giao hàng", createdDate: null, status: 3 },
-            { name: "Giao hàng thành công", createdDate: null, status: 4 },
-            { name: "Hoàn thành", createdDate: null, status: 5 }
-        ];
-
-        setSteps(apiSteps);
-
         const { success, data } = await getOrderDetail(id);
         if (!success || data.status == 'Error') {
             toast.error('Có lỗi xảy ra')
@@ -137,6 +130,34 @@ const OrderDetail = () => {
                     }
                     setDiscount(discountNumber);
                 }
+            }
+            setLogActions(data.data.logActionOrderModels);
+            if (data.data.status === 6) {
+                const apiSteps = [
+                    { name: "Tạo đơn hàng", createdDate: null, status: 1 },
+                    { name: "Xác nhận", createdDate: null, status: 2 },
+                    { name: "Khách hàng hủy đơn", createdDate: null, status: 6 }
+                ];
+
+                setSteps(apiSteps);
+            } else if (data.data.status === 7) {
+                const apiSteps = [
+                    { name: "Tạo đơn hàng", createdDate: null, status: 1 },
+                    { name: "Xác nhận", createdDate: null, status: 2 },
+                    { name: "Đang giao hàng", createdDate: null, status: 3 },
+                    { name: "Không giao hàng thành công", createdDate: null, status: 7 }
+                ];
+
+                setSteps(apiSteps);
+            } else {
+                const apiSteps = [
+                    { name: "Tạo đơn hàng", createdDate: null, status: 1 },
+                    { name: "Xác nhận", createdDate: null, status: 2 },
+                    { name: "Đang giao hàng", createdDate: null, status: 3 },
+                    { name: "Giao hàng thành công", createdDate: null, status: 4 },
+                    { name: "Hoàn thành", createdDate: null, status: 5 }
+                ];
+                setSteps(apiSteps);
             }
         }
     }
@@ -278,6 +299,18 @@ const OrderDetail = () => {
             toast.error(data.message)
         }
     }
+
+    const updateStatus = async (id, status, description) => {
+        const { success, data } = await changeStatus(id, status, description);
+        console.log(data);
+        if (success && data.status != 'Error') {
+            toast.success(data.message);
+            fetchOrderDetail();
+        } else {
+            toast.error(data.message)
+        }
+    }
+
     useEffect(() => {
         if (tableParams.pagination && tableParams.pagination.keySearch.length > 0) {
             fetchData();
@@ -466,16 +499,75 @@ const OrderDetail = () => {
             toast.warning("Giá trị đơn hàng không đủ để sử dụng khuyến mại");
         }
     }
+    const [isModalAccept, setIsModalAccept] = useState(false);
+    const [isModalDelivery, setIsModalDelivery] = useState(false);
+    const [isModalFinish, setIsModalFinish] = useState(false);
 
+    const handleOkAccept = () => {
+        updateStatus(orderModel.id, 3, '');
+        setIsModalAccept(false);
+    };
+
+    const handleCancelAccept = (e) => {
+        setIsModalAccept(false);
+    };
+
+    const handleRejectAccept = (e) => {
+        updateStatus(orderModel.id, 6, e);
+        setIsModalAccept(false);
+    };
+
+    const showAcceptModel = () => {
+        setIsModalAccept(true);
+    }
+
+
+    const handleOkFinish = () => {
+        updateStatus(orderModel.id, 5, '');
+        setIsModalFinish(false);
+    };
+
+    const handleCancelFinish = (e) => {
+        setIsModalFinish(false);
+    };
+
+    const handleRejectFinish = (e) => {
+        updateStatus(orderModel.id, 7, e);
+        setIsModalFinish(false);
+    };
+
+    const showAcceptFinish = () => {
+        setIsModalFinish(true);
+    }
     return (
         <div>
-            <Card>
-                <Steps current={steps.findIndex((step) => step.status === 4)}>
-                    {steps.map((step, index) => (
-                        <Step key={index} title={step.name} description="Test" />
-                    ))}
-                </Steps>
-            </Card>
+            <CustomPopup
+                visible={isModalAccept}
+                title="Xác nhận"
+                content={<p>Xác nhận đơn hàng và giao cho đơn vị vận chuyển?</p>}  // You can replace this with any content
+                onClose={handleCancelAccept}
+                onOk={handleOkAccept}
+                onReject={handleRejectAccept}
+            />
+
+            <CustomPopup
+                visible={isModalFinish}
+                title="Xác nhận"
+                content={<p>Giao hàng thành công và hoàn thành đơn hàng?</p>}  // You can replace this with any content
+                onClose={handleCancelFinish}
+                onOk={handleOkFinish}
+                onReject={handleRejectFinish}
+            />
+            {
+                steps && <Card title="Lịch sử đơn hàng">
+                    <Steps current={steps.findIndex((step) => actions && actions[actions.length - 1] && step.status === actions[actions.length - 1].statusId)}>
+                        {steps.map((step, index) => (
+                            <Step key={index} title={step.name} description={actions && actions.find((e) => e.statusId === step.status) 
+                                                                             && format(actions.find((e) => e.statusId === step.status).createdDate, 'dd-MM-yyyy hh:MM')} />
+                        ))}
+                    </Steps>
+                </Card>
+            }
             <div style={{ marginBottom: '10px', marginTop: '60px' }}>
                 {tabs.map((tab) => (
                     <Tab
@@ -586,10 +678,51 @@ const OrderDetail = () => {
                                 />
                             </Card>
                             <br />
+
                             <Col span={24} style={{ textAlign: 'right' }}>
-                                <Button type="primary" onClick={null}>
-                                    Cập nhật
-                                </Button>
+                                {
+                                    orderModel && orderModel.status === 1 &&
+                                    <Button
+                                        type="button"
+                                        value="small"
+                                        style={{
+                                            alignItems: "center",
+                                            background: "#2596be",
+                                            marginRight: "20px",
+                                            color: 'white'
+                                        }}
+                                        onClick={() => showAcceptModel()}
+                                    >
+                                        Xác nhận giao hàng
+                                    </Button>
+                                }
+                                {
+                                    orderModel && orderModel.status === 3 && <Button
+                                        type="button"
+                                        value="small"
+                                        style={{
+                                            alignItems: "center",
+                                            background: "#2596be",
+                                            marginRight: "20px",
+                                            color: 'white'
+                                        }}
+                                        onClick={() => showAcceptFinish()}
+                                    >
+                                        Xác nhận hoàn thành
+                                    </Button>
+                                }
+                                {
+                                    orderModel && orderModel.status === 1 && <Button type="button"
+                                        value="small"
+                                        style={{
+                                            alignItems: "center",
+                                            background: "#2596be",
+                                            marginRight: "20px",
+                                            color: 'white'
+                                        }} onClick={null}>
+                                        Cập nhật
+                                    </Button>
+                                }
                             </Col>
                         </Form>
                     )

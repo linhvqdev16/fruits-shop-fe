@@ -36,14 +36,13 @@ const PaymentType = ({ callback, amount, deliveryId, paymentId, products, tabIds
                 onOk={handleOk} // Button to confirm payment
                 onCancel={handleCancel} // Button to close the modal
             >
-                {deliveryId && deliveryId === 1 && <>
-                    {paymentId && paymentId === 1 && <>
+               {paymentId && paymentId === 1 && <>
                         <p>Số tiền cần phải thanh toán: </p>
                         <h2>{formatCurrencyVND(amount)}</h2>
                     </>}
 
-                    {paymentId && paymentId === 2 && <>
-                        <p>Quét QR Code để thanh toán: </p>
+                    {paymentId && paymentId !== 1 && <>
+                        <p>Quét QR Code để thanh toán: <h2>{formatCurrencyVND(amount)}</h2></p>
                         <div style={{
                             display: 'flex',
                             justifyContent: 'center',
@@ -59,13 +58,11 @@ const PaymentType = ({ callback, amount, deliveryId, paymentId, products, tabIds
                             />
                         </div>
                     </>}
-                </>
-                }
-                {deliveryId && deliveryId !== 1 && <>
+                {/* {deliveryId && deliveryId !== 1 && <>
                     <p>Xác nhận đơn hàng giao cho đơn vị vận chuyển: </p>
                     <h2>Giá trị: {formatCurrencyVND(amount)}</h2>
                 </>
-                }
+                } */}
             </Modal>
         </div>
     );

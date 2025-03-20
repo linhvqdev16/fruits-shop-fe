@@ -26,7 +26,8 @@ const PaymentAdd = ({ fetchData, modelItem, textButton, isStyle }) => {
       const branch = {
         name: values.name, 
         code: values.code, 
-        id: modelItem != null ? modelItem.id : null 
+        id: modelItem != null ? modelItem.id : null,
+        status: 1 
       }
       const { success, data } = await addOrChange(branch)
       console.log(success, data);

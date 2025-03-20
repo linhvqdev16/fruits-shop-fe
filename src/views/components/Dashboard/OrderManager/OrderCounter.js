@@ -1,5 +1,5 @@
 import { PlusSquareOutlined, CloseCircleOutlined } from "@ant-design/icons";
-import { Button, Col, Form, Input, Modal, Row, Select, Space, Table, AutoComplete } from "antd";
+import { Button, Col, Form, Input, Modal, Row, Select, Space, Table, Card } from "antd";
 import React, { useEffect, useState } from "react";
 import useProduct from "@api/useProduct";
 import { toast } from "react-toastify";
@@ -57,7 +57,7 @@ const OrderCounter = () => {
     const [form] = Form.useForm();
     const { createProduct } = useProduct();
     const [loading, setLoading] = useState(false);
-    const [tabs, setTabs] = useState([{ id: 'Đơn hàng 1', active: true, user: null, products: [] }]);
+    const [tabs, setTabs] = useState([{ id: 'Đơn hàng 1',active: true, user: null, products: [] }]);
     const [activeTab, setActiveTab] = useState('Đơn hàng 1');
     const [query, setQuery] = useState("");
     const [user, setUsers] = useState([]);
@@ -83,7 +83,7 @@ const OrderCounter = () => {
             pageSize: 10,
             keySearch: '',
             roleId: 5,
-            status: null
+            status: 1
         }
     });
     const [fullName, setFullName] = useState(0);
@@ -121,7 +121,7 @@ const OrderCounter = () => {
     const addTab = () => {
         if (tabs.length < 5) {
             const newTabId = `Đơn hàng ${tabs.length + 1}`;
-            setTabs([...tabs, { id: newTabId, active: false, user: null, products: [] }]);
+            setTabs([...tabs, { id: newTabId,  active: false, user: null, products: [] }]);
             setActiveTab(newTabId);
         } else {
             toast.error("Only can create 5 order in one time!");
@@ -370,9 +370,19 @@ const OrderCounter = () => {
     }
     const handlePaymentId = (e) => {
         setPaymentId(e);
-        if (delivery && delivery.length > 0) {
-            const deliveryModel = delivery.find((m) => m.id === e);
-            setFeeDelivery(deliveryModel ? deliveryModel.fee : 0);
+        debugger;
+        if (e !== 3) {
+            fetchDelivery();
+            setDeleveryId(1);
+        } else {
+            const models = [...delivery];
+            const result = models.map((e) => {
+                return {
+                    value: e.id,
+                    label: e.name
+                }
+            });
+            setOptionDelivery(result.filter(e => e.value !== 1));
         }
     }
     const handleSelectDelivery = (e) => {
@@ -496,9 +506,10 @@ const OrderCounter = () => {
                 ))}
             </div>
 
-            {tabs.map(
-                (tab, index) =>
-                    activeTab === tab.id && (
+            {tabs.map((tab, index) =>
+                  {  
+                    // const [f] = Form.useForm(); 
+                    return (  activeTab === tab.id && (
                         <Form
                             form={form}
                             onFinish={null}
@@ -506,37 +517,29 @@ const OrderCounter = () => {
                             initialValues={{ layout: "horizontal" }}
                             layout="vertical"
                         >
-                            <Row gutter={[16, 16]}>
-                                <Col span={24} style={{ textAlign: 'right' }}>
-                                    <ProductPopUp handleProductSelected={handleProductSelected} modelProduct={tab.products} tabIndex={index} />
-                                </Col>
-                            </Row>
-                            <Table
-                                dataSource={tab.products} columns={columns}
-                                pagination={false}
-                                loading={false}
-                                onChange={null}
-                            />
+                            <Card>
+                                <Row gutter={[16, 16]}>
+                                    <Col span={24} style={{ textAlign: 'right' }}>
+                                        <ProductPopUp handleProductSelected={handleProductSelected} modelProduct={tab.products} tabIndex={index} />
+                                    </Col>
+                                </Row>
+                                <Table
+                                    dataSource={tab.products} columns={columns}
+                                    pagination={false}
+                                    loading={false}
+                                    onChange={null}
+                                />
+                            </Card>
                             <br />
                             <Row gutter={[25, 25]} style={{ justifyContent: 'space-between' }}>
                                 <Col span={11}>
-                                    <Row gutter={[16, 16]}>
+                                    <Card>   <Row gutter={[16, 16]}>
                                         <Col span={24}>
                                             <span class="hide-menu" style={{ fontSize: "13px", color: "black", fontWeight: "bold" }}>Thông tin khách hàng</span>
                                         </Col>
 
                                         <br />
                                         <Col span={18}>
-                                            {/* <AutoComplete
-                                                options={option}
-                                                onSearch={onSearchByKey}
-                                                onSelect={handleSelect}
-                                                value={query}
-                                                onChange={setQuery}
-                                                style={{ width: '100%' }}
-                                            >
-                                                <Input placeholder="Enter code, phone number, name customer..." />
-                                            </AutoComplete> */}
                                             <Input readOnly={true} value={userModel != null ? userModel.fullName : "Khách hàng lẻ"} />
 
                                         </Col>
@@ -662,103 +665,105 @@ const OrderCounter = () => {
                                                     <Input placeholder="" type="text" onChange={(e) => handleChangeAddress(e)} />
                                                 </Form.Item>
                                             </Col></>}
-                                    </Row>
+                                    </Row></Card>
                                 </Col>
                                 <Col span={11}>
-                                    <Row gutter={[16, 16]}>
-                                        <Col span={24}>
-                                            <span class="hide-menu" style={{ fontSize: "13px", color: "black", fontWeight: "bold" }}>Thông tin thanh toán</span>
-                                        </Col>
-                                        <br />
-                                        <Col span={24}>
-                                            <Row>
-                                                <Col span={6}>
-                                                    <p style={{ fontWeight: '500' }}>Mã khuyến mại: </p>
-                                                </Col>
-                                                <Col span={10}>
-                                                    <Input placeholder="" value={couponModel && couponModel.code} type="text" onBlur={handleChange} readOnly={true} /></Col>
-                                                <Col span={8} style={{ textAlign: 'right' }}>
-                                                    <VoucherPopup handlePopupSelected={handleSelectCounpon} model={couponModel} />
-                                                </Col>
-                                            </Row>
-                                        </Col>
-                                        <br />
-                                        <Col span={24}>
-                                            <Row>
-                                                <Col span={6}>
-                                                    <p style={{ fontWeight: '500' }}>Thanh toán: </p>
-                                                </Col>
-                                                <Col span={18}>
+                                    <Card>
+                                        <Row gutter={[16, 16]}>
+                                            <Col span={24}>
+                                                <span class="hide-menu" style={{ fontSize: "13px", color: "black", fontWeight: "bold" }}>Thông tin thanh toán</span>
+                                            </Col>
+                                            <br />
+                                            <Col span={24}>
+                                                <Row>
+                                                    <Col span={6}>
+                                                        <p style={{ fontWeight: '500' }}>Mã khuyến mại: </p>
+                                                    </Col>
+                                                    <Col span={10}>
+                                                        <Input placeholder="" value={couponModel && couponModel.code} type="text" onBlur={handleChange} readOnly={true} /></Col>
+                                                    <Col span={8} style={{ textAlign: 'right' }}>
+                                                        <VoucherPopup handlePopupSelected={handleSelectCounpon} model={couponModel} />
+                                                    </Col>
+                                                </Row>
+                                            </Col>
+                                            <br />
+                                            <Col span={24}>
+                                                <Row>
+                                                    <Col span={6}>
+                                                        <p style={{ fontWeight: '500' }}>Thanh toán: </p>
+                                                    </Col>
+                                                    <Col span={18}>
 
-                                                    <Select
-                                                        placeholder="Please select"
-                                                        onChange={handlePaymentId}
-                                                        style={{
-                                                            width: '100%',
-                                                        }}
-                                                        options={payments}
-                                                    /></Col>
-                                            </Row>
-                                        </Col>
-                                        <br />
-                                        <Col span={24}>
-                                            <Row>
-                                                <Col span={6}>
-                                                    <p style={{ fontWeight: '500' }}>Giao hàng: </p>
-                                                </Col>
-                                                <Col span={18}>
-                                                    <Select
-                                                        placeholder="Please select"
-                                                        onChange={(e) => handleSelectDelivery(e)}
-                                                        style={{
-                                                            width: '100%',
-                                                        }}
-                                                        options={optionDelivery}
-                                                    /></Col>
-                                            </Row>
+                                                        <Select
+                                                            placeholder="Please select"
+                                                            onChange={handlePaymentId}
+                                                            style={{
+                                                                width: '100%',
+                                                            }}
+                                                            options={payments}
+                                                        /></Col>
+                                                </Row>
+                                            </Col>
+                                            <br />
+                                            {paymentId === 3 && <Col span={24}>
+                                                <Row>
+                                                    <Col span={6}>
+                                                        <p style={{ fontWeight: '500' }}>Giao hàng: </p>
+                                                    </Col>
+                                                    <Col span={18}>
+                                                        <Select
+                                                            placeholder="Please select"
+                                                            onChange={(e) => handleSelectDelivery(e)}
+                                                            style={{
+                                                                width: '100%',
+                                                            }}
+                                                            options={optionDelivery}
+                                                        /></Col>
+                                                </Row>
 
-                                        </Col>
-                                        <br />
-                                        <Col span={24}>
-                                            <Row>
-                                                <Col span={6}>
-                                                    <p style={{ fontWeight: '500' }}>Tiền hàng: </p>
-                                                </Col>
-                                                <Col span={18} style={{ textAlign: 'right' }}>
-                                                    <p style={{ fontWeight: '500' }}>{formatCurrencyVND(totalPrice)}</p></Col>
-                                            </Row>
+                                            </Col>}
+                                            <br />
+                                            <Col span={24}>
+                                                <Row>
+                                                    <Col span={6}>
+                                                        <p style={{ fontWeight: '500' }}>Tiền hàng: </p>
+                                                    </Col>
+                                                    <Col span={18} style={{ textAlign: 'right' }}>
+                                                        <p style={{ fontWeight: '500' }}>{formatCurrencyVND(totalPrice)}</p></Col>
+                                                </Row>
 
-                                        </Col>
-                                        <Col span={24}>
-                                            <Row>
-                                                <Col span={6}>
-                                                    <p style={{ fontWeight: '500' }}>Phí vận chuyển: </p>
-                                                </Col>
-                                                <Col span={18} style={{ textAlign: 'right' }}>
-                                                    <p style={{ fontWeight: '500' }}>{feeDelivery && formatCurrencyVND(feeDelivery ?? 0)}</p></Col>
-                                            </Row>
+                                            </Col>
+                                            <Col span={24}>
+                                                <Row>
+                                                    <Col span={6}>
+                                                        <p style={{ fontWeight: '500' }}>Phí vận chuyển: </p>
+                                                    </Col>
+                                                    <Col span={18} style={{ textAlign: 'right' }}>
+                                                        <p style={{ fontWeight: '500' }}>{feeDelivery && formatCurrencyVND(feeDelivery ?? 0)}</p></Col>
+                                                </Row>
 
-                                        </Col>
-                                        <Col span={24}>
-                                            <Row>
-                                                <Col span={8}>
-                                                    <p style={{ fontWeight: '500' }}>Tiền giảm giá voucher: </p>
-                                                </Col>
-                                                <Col span={16} style={{ textAlign: 'right' }}>
-                                                    <p style={{ fontWeight: '500' }}>{discount && formatCurrencyVND(discount ?? 0)}</p></Col>
-                                            </Row>
+                                            </Col>
+                                            <Col span={24}>
+                                                <Row>
+                                                    <Col span={8}>
+                                                        <p style={{ fontWeight: '500' }}>Tiền giảm giá voucher: </p>
+                                                    </Col>
+                                                    <Col span={16} style={{ textAlign: 'right' }}>
+                                                        <p style={{ fontWeight: '500' }}>{discount && formatCurrencyVND(discount ?? 0)}</p></Col>
+                                                </Row>
 
-                                        </Col>
-                                        <Col span={24}>
-                                            <Row>
-                                                <Col span={8}>
-                                                    <p style={{ fontWeight: '500' }}>Tổng thanh toán: </p>
-                                                </Col>
-                                                <Col span={16} style={{ textAlign: 'right' }}>
-                                                    <p style={{ fontWeight: '500' }}>{discount && formatCurrencyVND(totalPrice + feeDelivery - discount)}</p></Col>
-                                            </Row>
-                                        </Col>
-                                    </Row>
+                                            </Col>
+                                            <Col span={24}>
+                                                <Row>
+                                                    <Col span={8}>
+                                                        <p style={{ fontWeight: '500' }}>Tổng thanh toán: </p>
+                                                    </Col>
+                                                    <Col span={16} style={{ textAlign: 'right' }}>
+                                                        <p style={{ fontWeight: '500' }}>{discount && formatCurrencyVND(totalPrice + feeDelivery - discount)}</p></Col>
+                                                </Row>
+                                            </Col>
+                                        </Row>
+                                    </Card>
                                 </Col>
                             </Row>
                             <br />
@@ -766,7 +771,8 @@ const OrderCounter = () => {
                                 <PaymentType callback={onCreateOrder} amount={totalPrice + feeDelivery - discount} paymentId={paymentId} deliveryId={deleveryId} products={tab.products} tabIds={tab.id} />
                             </Col>
                         </Form>
-                    )
+                    ))
+                  }
             )}
         </div>
     );
