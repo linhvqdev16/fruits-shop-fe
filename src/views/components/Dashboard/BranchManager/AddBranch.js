@@ -6,7 +6,7 @@ import useCategory from "@api/useCategory"
 import { useToast } from "@utils/toastContext";
 import useCatalog from "@api/useCatalog";
 
-const AddBranch = ({ fechtList }) => {
+const AddBranch = ({ fechtList, modelItem, textButton }) => {
 
   const [modal2Open, setModal2Open] = useState(false);
   const [form] = Form.useForm();
@@ -45,8 +45,9 @@ const AddBranch = ({ fechtList }) => {
         name: values.name,
         description: values.description,
         status: 1,
-        isDeleted: 0, 
-        catalogId: values.catalogId
+        isDeleted: 0,
+        catalogId: values.catalogId,
+        id: modelItem && modelItem.id
       }
       const { success, data } = await addOrChange(models)
       console.log(success, data);
@@ -62,9 +63,14 @@ const AddBranch = ({ fechtList }) => {
       toast.error(error)
     }
   };
+
   const showModel = () => {
+    if (modelItem) {
+      form.setFieldsValue({ code: modelItem.code, catalogId: modelItem.catalogId, name: modelItem.name, description: modelItem.description });
+    } else {
+      fetchGenerateCode();
+    }
     setModal2Open(true);
-    fetchGenerateCode();
     fetchCatalog();
   };
   const onFinishFailed = () => { };
@@ -75,11 +81,10 @@ const AddBranch = ({ fechtList }) => {
       style={{
         alignItems: "center",
         background: "#1fbf39",
-        marginBottom: "20px",
       }}
       onClick={() => showModel()}
     >
-      <PlusSquareOutlined /> Thêm mới
+      {textButton}
     </Button>
 
     <Modal

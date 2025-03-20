@@ -316,16 +316,15 @@ const UserAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
     return (
         <div>
             <Button
-                type={isStyle ? "primary" : "button"}
+                type={'primary'}
                 value="small"
-                style={isStyle ? {
+                style={{
                     alignItems: "center",
                     background: "#1fbf39",
-                    marginBottom: "20px",
-                } : null}
+                }}
                 onClick={() => handleOpenModal()}
             >
-                {isStyle && <PlusSquareOutlined />} {textButton}
+               {textButton}
             </Button>
 
             <Modal

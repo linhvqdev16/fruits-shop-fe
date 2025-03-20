@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Select, Dropdown, Table, Menu, DatePicker } from 'antd';
+import { Button, Select, Space, Table, Menu, DatePicker } from 'antd';
 import { toast } from 'react-toastify';
 import { Pagination } from 'antd';
 import DiscountAddOrChange from './DiscountAddOrChange';
@@ -8,13 +8,14 @@ import { DownOutlined } from '@ant-design/icons';
 import { Option } from 'antd/es/mentions';
 import useDiscount from '../../../../api/useDiscount';
 import { format } from 'date-fns';
+import CommonPopup from './../Common/CommonPopup';
+
 function DiscountManager() {
-    const { getListDiscount } = useDiscount();
+    const { getListDiscount, changeStatus } = useDiscount();
     const [coupon, setCoupon] = useState([])
     const [loading, setLoading] = useState(false);
     const [total, setTotal] = useState();
-    const { RangePicker } = DatePicker;
-    const [dates, setDates] = useState([]);
+    const [form] = Form.useForm();
     const [tableParams, setTableParams] = useState({
         pagination: {
             pageIndex: 1,
@@ -45,7 +46,7 @@ function DiscountManager() {
             ...prevPrams,
             pagination: {
                 ...prevPrams.pagination,
-                endDate: date &&  date.toISOString().split("T")[0]
+                endDate: date && date.toISOString().split("T")[0]
             }
         }))
     }
@@ -55,7 +56,7 @@ function DiscountManager() {
             ...prevPrams,
             pagination: {
                 ...prevPrams.pagination,
-                startDate: date &&  date.toISOString().split("T")[0]
+                startDate: date && date.toISOString().split("T")[0]
             }
         }))
     }
@@ -119,6 +120,35 @@ function DiscountManager() {
             </Menu.Item>
         </Menu >
     );
+
+    const [idChangeStatus, setIdChangeStatus] = useState();
+    const [status, setStatus] = useState();
+    const [isModalVisible, setIsModalVisible] = useState(false);
+
+    const updateStatus = async (id, status) => {
+        const { success, data } = await changeStatus(id, status);
+        if (!success || data.status == 'Error') {
+            toast.error('Có lỗi xảy ra')
+        } else {
+            fetchData();
+        }
+    }
+    const handleOk = () => {
+        updateStatus(idChangeStatus, status);
+        setIsModalVisible(false);
+    };
+
+    const handleCancel = () => {
+        setIsModalVisible(false);
+    };
+
+    const showModal = (id, status) => {
+        debugger;
+        setIdChangeStatus(id);
+        setStatus(status);
+        setIsModalVisible(true);
+    };
+
     const columns = [
         {
             title: 'STT',
@@ -171,63 +201,122 @@ function DiscountManager() {
             title: 'Action',
             key: 'action',
             render: (_, record) => (
-                <Dropdown overlay={menu(record)} trigger={['click']}>
-                    <Button>
-                        Actions <DownOutlined />
-                    </Button>
-                </Dropdown>
+                <Space>
+                    <DiscountAddOrChange fetchData={fetchData} modelItem={record} textButton={"Sửa"} isStyle={true} />
+                    {record.status === 1 && <Button
+                        type={"primary"}
+                        value="small"
+                        style={{
+                            alignItems: "center",
+                            background: "#e74421",
+                        }}
+                        onClick={() => showModal(record.id, 0)}
+                    > Khóa </Button>}
+                    {record.status === 0 && <Button
+                        type={"primary"}
+                        value="small"
+                        style={{
+                            alignItems: "center",
+                            background: "#e2ddd1",
+                            color: '#100d06'
+                        }}
+                        onClick={() => showModal(record.id, 1)}
+                    > Mở khóa </Button>}
+                </Space>
             ),
         },
     ];
     return (
         <>
-            <Row gutter={[16, 16]}>
-                <Col span={16}>
-                    <Form.Item
-                        label="Key search"
-                        name="keySearch"><Input placeholder="" onChange={onSearchByKey}/>
-                    </Form.Item>
-                </Col>
-                <Col span={8} style={{ textAlign: 'right' }}>
-                    <DiscountAddOrChange fetchData={fetchData} modelItem={null} textButton={"Thêm mới"} isStyle={true} />
-                </Col>
-            </Row>
-            <Row gutter={[16, 16]}>
-                <Col span={8}>
-                    <Form.Item
-                        label="Start date"
-                        name="minValue"
-                    >
-                        <DatePicker onChange={handleSetStartDate} style={{ width: '100%' }} />
-                    </Form.Item>
-                </Col>
-                <Col span={8}>
-                    <Form.Item
-                        label="End date"
-                        name="minValue"
-                    >
-                        <DatePicker onChange={handleSetEndDate}  style={{ width: '100%' }} />
-                    </Form.Item>
-                </Col>
-                <Col span={8}>
-                    <Form.Item
-                        label="Trạng thái"
-                        name="status"
-                    >
-                        <Select
-                            placeholder="Please select"
-                            onChange={handleChangeStatus}
-                            style={{
-                                width: '100%',
-                            }}
-                        >
-                            <Option value={1}>Hoạt động</Option>
-                            <Option value={0}>Không hoạt động</Option>
-                        </Select>
+    <CommonPopup
+                visible={isModalVisible}
+                title="Xác nhận"
+                content={<p>Bạn chắc chắn cập nhật trạng thái bản ghi này?</p>}  // You can replace this with any content
+                onClose={handleCancel}
+                onOk={handleOk}
+            />
+            <Form
+                form={form}
+                initialValues={{ layout: "horizontal" }}
+                layout="vertical"
 
-                    </Form.Item>
-                </Col>
-            </Row>
+            >
+                <Row gutter={[16, 16]}>
+                    <Col span={16}>
+                        <Form.Item
+                            label="Key search"
+                            name="keySearch"><Input placeholder="" onChange={onSearchByKey} />
+                        </Form.Item>
+                    </Col>
+                    <Col span={8} style={{ textAlign: 'right' }}>
+                        <Row justify={'end'}>
+                            <Button
+                                type="button"
+                                value="small"
+                                style={{
+                                    alignItems: "center",
+                                    background: "#2596be",
+                                    marginBottom: "20px",
+                                    color: 'white',
+                                    marginRight: '10px'
+                                }}
+                                onClick={() => {
+                                    setTableParams((prevPrams) => ({
+                                        ...prevPrams,
+                                        pagination: {
+                                            ...prevPrams.pagination,
+                                            pageIndex: 1,
+                                            status: null,
+                                            keySearch: null,
+                                            startDate: null,
+                                            endDate: null,
+                                        }
+                                    }));
+                                    form.setFieldsValue({ keySearch: null, status: null });
+                                }}
+                            >
+                                Thiết lập lại
+                            </Button>
+
+                            <DiscountAddOrChange fetchData={fetchData} modelItem={null} textButton={"Thêm mới"} isStyle={true} />
+                        </Row>
+                    </Col>
+                    <Col span={8}>
+                        <Form.Item
+                            label="Start date"
+                            name="minValue"
+                        >
+                            <DatePicker onChange={handleSetStartDate} style={{ width: '100%' }} />
+                        </Form.Item>
+                    </Col>
+                    <Col span={8}>
+                        <Form.Item
+                            label="End date"
+                            name="maxValue"
+                        >
+                            <DatePicker onChange={handleSetEndDate} style={{ width: '100%' }} />
+                        </Form.Item>
+                    </Col>
+                    <Col span={8}>
+                        <Form.Item
+                            label="Trạng thái"
+                            name="status"
+                        >
+                            <Select
+                                placeholder="Please select"
+                                onChange={handleChangeStatus}
+                                style={{
+                                    width: '100%',
+                                }}
+                            >
+                                <Option value={1}>Hoạt động</Option>
+                                <Option value={0}>Không hoạt động</Option>
+                            </Select>
+
+                        </Form.Item>
+                    </Col>
+                </Row>
+            </Form>
             <Table
                 dataSource={coupon} columns={columns}
                 pagination={false}

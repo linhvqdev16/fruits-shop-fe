@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Select, Dropdown, Table, Menu, DatePicker } from 'antd';
+import { Button, Select, Dropdown, Table, Menu, DatePicker, Space } from 'antd';
 import { toast } from 'react-toastify';
 import { Pagination } from 'antd';
 import CouponAddOrChange from './CouponAddOrChange';
@@ -15,6 +15,7 @@ function CouponManager() {
     const [coupon, setCoupon] = useState([])
     const [loading, setLoading] = useState(false);
     const [total, setTotal] = useState();
+    const [form] = Form.useForm();
     const [tableParams, setTableParams] = useState({
         pagination: {
             pageIndex: 1,
@@ -126,9 +127,9 @@ function CouponManager() {
 
     const [idChangeStatus, setIdChangeStatus] = useState();
     const [isModalVisible, setIsModalVisible] = useState(false);
-
-    const handleChangeStatus = async (id) => {
-        const { success, data } = await updateStatus(id);
+    const [status, setStatus] = useState();
+    const handleChangeStatus = async (id, status) => {
+        const { success, data } = await updateStatus(id, status);
         if (!success || data.status == 'Error') {
             toast.error('Có lỗi xảy ra')
         } else {
@@ -136,7 +137,7 @@ function CouponManager() {
         }
     }
     const handleOk = () => {
-        handleChangeStatus(idChangeStatus);
+        handleChangeStatus(idChangeStatus, status);
         setIsModalVisible(false);
     };
 
@@ -144,8 +145,9 @@ function CouponManager() {
         setIsModalVisible(false);
     };
 
-    const showModal = (id) => {
+    const showModal = (id, status) => {
         setIdChangeStatus(id);
+        setStatus(status)
         setIsModalVisible(true);
     };
 
@@ -237,11 +239,28 @@ function CouponManager() {
             title: 'Action',
             key: 'action',
             render: (_, record) => (
-                <Dropdown overlay={menu(record)} trigger={['click']}>
-                    <Button>
-                        Actions <DownOutlined />
-                    </Button>
-                </Dropdown>
+                <Space>
+                    <CouponAddOrChange fetchData={fetchData} modelItem={record} textButton={"Sửa"} isStyle={true} />
+                    {record.status === 1 && <Button
+                        type={"primary"}
+                        value="small"
+                        style={{
+                            alignItems: "center",
+                            background: "#e74421",
+                        }}
+                        onClick={() => showModal(record.id, 0)}
+                    > Khóa </Button>}
+                    {record.status === 0 && <Button
+                        type={"primary"}
+                        value="small"
+                        style={{
+                            alignItems: "center",
+                            background: "#e2ddd1",
+                            color: '#100d06'
+                        }}
+                        onClick={() => showModal(record.id, 1)}
+                    > Mở khóa </Button>}
+                </Space>
             ),
         },
     ];
@@ -254,73 +273,104 @@ function CouponManager() {
                 onClose={handleCancel}
                 onOk={handleOk}
             />
-            <Row gutter={[16, 16]}>
-                <Col span={24} style={{ textAlign: 'right' }}>
-                    <CouponAddOrChange fetchData={fetchData} modelItem={null} textButton={"Thêm mới"} isStyle={true} />
-                </Col>
-            </Row>
-            <Row gutter={[16, 16]}>
-                <Col span={8}>
-                    <Form.Item
-                        label="Key search"
-                        name="keySearch"><Input placeholder="" onChange={onSearchByKey}/>
-                    </Form.Item>
-                </Col>
-                <Col span={8}>
-                    <Form.Item
-                        label="Giá trị bắt đầu"
-                        name="minValue"
-                    >
-                        <Input placeholder="" type='number' onChange={onSearchMinValue}/>
+            <Form
+                form={form}
+                initialValues={{ layout: "horizontal" }}
+                layout="vertical"
 
-                    </Form.Item>
-                </Col>
-                <Col span={8}>
-                    <Form.Item
-                        label="Giá trị bắt đầu"
-                        name="typeId"
-                    >
-                        <Input placeholder="" type='number' onChange={onSearchMaxValue}/>
-
-                    </Form.Item>
-                </Col>
-            </Row>
-            <Row gutter={[16, 16]}>
-                <Col span={8}>
-                    <Form.Item
-                        label="Start date"
-                        name="minValue"
-                    >
-                        <DatePicker onChange={handleSetStartDate} style={{ width: '100%' }} />
-                    </Form.Item>
-                </Col>
-                <Col span={8}>
-                    <Form.Item
-                        label="End date"
-                        name="minValue"
-                    >
-                        <DatePicker onChange={handleSetEndDate} style={{ width: '100%' }} />
-                    </Form.Item>
-                </Col>
-                <Col span={8}>
-                    <Form.Item
-                        label="Trạng thái"
-                        name="status"
-                    >
-                        <Select
-                            placeholder="Please select"
-                            onChange={handleChangeStatusSelect}
-                            style={{
-                                width: '100%',
-                            }}
+            >
+                <Row gutter={[16, 16]}>
+                    <Col span={6}>
+                        <Form.Item
+                            label="Key search"
+                            name="keySearch"><Input placeholder="" onChange={onSearchByKey} />
+                        </Form.Item>
+                    </Col>
+                    <Col span={6}>
+                        <Form.Item
+                            label="Trạng thái"
+                            name="status"
                         >
-                            <Option value={1}>Hoạt động</Option>
-                            <Option value={0}>Không hoạt động</Option>
-                        </Select>
+                            <Select
+                                placeholder="Please select"
+                                onChange={handleChangeStatusSelect}
+                                style={{
+                                    width: '100%',
+                                }}
+                            >
+                                <Option value={1}>Hoạt động</Option>
+                                <Option value={0}>Không hoạt động</Option>
+                            </Select>
 
-                    </Form.Item>
-                </Col>
-            </Row>
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Row justify={'end'}>
+                            <Button
+                                type="button"
+                                value="small"
+                                style={{
+                                    alignItems: "center",
+                                    background: "#2596be",
+                                    marginBottom: "20px",
+                                    color: 'white',
+                                    marginRight: '10px'
+                                }}
+                                onClick={() => {
+                                    setTableParams((prevPrams) => ({
+                                        ...prevPrams,
+                                        pagination: {
+                                            ...prevPrams.pagination,
+                                            pageIndex: 1,
+                                            status: null,
+                                            keySearch: null,
+                                            minValue: null,
+                                            maxValue: null,
+                                            startDate: null,
+                                            endDate: null
+                                        }
+                                    }));
+                                    form.setFieldsValue({ keySearch: null, status: null });
+                                }}
+                            >
+                                Thiết lập lại
+                            </Button>
+                            <CouponAddOrChange fetchData={fetchData} modelItem={null} textButton={"Thêm mới"} isStyle={true} />
+                        </Row>
+                    </Col>
+                    <Col span={6}>
+                        <Form.Item
+                            label="Giá trị bắt đầu"
+                            name="minValue"
+                        >
+                            <Input placeholder="" type='number' onChange={onSearchMinValue} />
+                        </Form.Item>
+                    </Col>
+                    <Col span={6}>
+                        <Form.Item
+                            label="Giá trị kết thúc"
+                            name="maxValue"
+                        >
+                            <Input placeholder="" type='number' onChange={onSearchMaxValue} />
+                        </Form.Item>
+                    </Col>
+                    <Col span={6}>
+                        <Form.Item
+                            label="Start date"
+                            name="startDate"
+                        ><DatePicker onChange={handleSetStartDate} style={{ width: '100%' }} />
+                        </Form.Item>
+                    </Col>
+                    <Col span={6}>
+                        <Form.Item
+                            label="End date"
+                            name="endDate"
+                        >
+                            <DatePicker onChange={handleSetEndDate} style={{ width: '100%' }} />
+                        </Form.Item>
+                    </Col>
+                </Row>
+            </Form>
             <Table
                 dataSource={coupon} columns={columns}
                 pagination={false}

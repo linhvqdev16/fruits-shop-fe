@@ -1,4 +1,4 @@
-import { Col, Form, Input, Button, Row, Dropdown, Select, Menu, Table, Pagination } from "antd";
+import { Col, Form, Input, Button, Row, Dropdown, Select, Menu, Table, Pagination, Space } from "antd";
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import UserAddOrChange from './UserAddOrChange'
@@ -14,14 +14,15 @@ function ManagerUser() {
     const { getListUser, changeStatus } = useUser();
 
     const [loading, setLoading] = useState(false)
-    const [total, setTotal] = useState(0)
+    const [total, setTotal] = useState(0);
+    const [form] = Form.useForm();
     const [tableParams, setTableParams] = useState({
         pagination: {
             pageIndex: 1,
             pageSize: 10,
             keySearch: '',
             roleId: 5,
-            status: 1
+            status: null
         }
     })
 
@@ -99,9 +100,10 @@ function ManagerUser() {
     );
     const [idChangeStatus, setIdChangeStatus] = useState();
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const [status, setStatus] = useState();
 
-    const handleChangeStatus = async (id) => {
-        const { success, data } = await changeStatus(id);
+    const handleChangeStatus = async (id, status) => {
+        const { success, data } = await changeStatus(id, status);
         if (!success || data.status == 'Error') {
             toast.error('Có lỗi xảy ra')
         } else {
@@ -109,7 +111,7 @@ function ManagerUser() {
         }
     }
     const handleOk = () => {
-        handleChangeStatus(idChangeStatus);
+        handleChangeStatus(idChangeStatus, status);
         setIsModalVisible(false);
     };
 
@@ -117,8 +119,9 @@ function ManagerUser() {
         setIsModalVisible(false);
     };
 
-    const showModal = (id) => {
+    const showModal = (id, status) => {
         setIdChangeStatus(id);
+        setStatus(status);
         setIsModalVisible(true);
     };
     const columns = [
@@ -129,19 +132,19 @@ function ManagerUser() {
             render: (_, __, index) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{index + 1}</p>
         },
         {
-            title: 'User code',
+            title: 'Mã',
             dataIndex: 'code',
             key: 'code',
             render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{record.code}</p>
         },
         {
-            title: 'Full name',
+            title: 'Họ tên',
             dataIndex: 'fullName',
             key: 'fullName',
             render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{record.fullName}</p>
         },
         {
-            title: 'PhoneNumber',
+            title: 'SĐT',
             dataIndex: 'phoneNumber',
             key: 'phoneNumber',
             render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{record.phoneNumber}</p>
@@ -153,19 +156,19 @@ function ManagerUser() {
             render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{record.email}</p>
         },
         {
-            title: 'Date birth',
+            title: 'Ngày sinh',
             dataIndex: 'dateBirth',
             key: 'dateBirth',
             render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{record.dateBirth && format(record.dateBirth, 'dd-MM-yyyy')}</p>
         },
         {
-            title: 'UserName',
+            title: 'Tên đăng nhập',
             dataIndex: 'userName',
             key: 'userName',
             render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{record.userName}</p>
         },
         {
-            title: 'Gender',
+            title: 'Giới tính',
             dataIndex: 'gender',
             key: 'gender',
             render: (_, record) => {
@@ -177,20 +180,50 @@ function ManagerUser() {
             }
         },
         {
-            title: 'RoleCode',
+            title: 'Vai trò',
             dataIndex: 'roleCode',
             key: 'roleCode',
             render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{record.roleCode}</p>
         },
         {
-            title: 'Action',
+            title: 'Trạng thái',
+            dataIndex: 'roleCode',
+            key: 'status',
+            render: (_, record) => {
+                if(record.status === 1){
+                    return <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>Hoạt động</p>
+                }
+                if(record.status === 0){
+                    return <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>Không hoạt động</p>
+                }
+            }
+        },
+        {
+            title: 'Thao tác',
             key: 'action',
             render: (_, record) => (
-                <Dropdown overlay={menu(record)} trigger={['click']}>
-                    <Button>
-                        Actions <DownOutlined />
-                    </Button>
-                </Dropdown>
+                <Space>
+                    <UserAddOrChange fetchData={fetchData} modelItem={record} textButton={"Sửa"} isStyle={false} />
+                    {record.status === 1 && <Button
+                        type={"primary"}
+                        value="small"
+                        style={{
+                            alignItems: "center",
+                            background: "#e74421",
+                        }}
+                        onClick={() => showModal(record.id, 0)}
+                    > Khóa </Button>}
+                    {record.status === 0 && <Button
+                        type={"primary"}
+                        value="small"
+                        style={{
+                            alignItems: "center",
+                            background: "#e2ddd1",
+                            color: '#100d06'
+                        }}
+                        onClick={() => showModal(record.id, 1)}
+                    > Mở khóa </Button>}
+                </Space>
             ),
         },
 
@@ -205,35 +238,68 @@ function ManagerUser() {
                 onClose={handleCancel}
                 onOk={handleOk}
             />
-            <Row gutter={[16, 16]}>
-                <Col span={8}>
-                    <Form.Item
-                        label="Key search"
-                        name="keySearch"
-                        rules={[{ required: false }]}><Input placeholder="Enter code, phone number, name customer..." onChange={onSearchByKey} />
-                    </Form.Item>
-                </Col>
-                <Col span={8}>
-                    <Form.Item
-                        label="Trạng thái"
-                        name="statusId"
-                    >
-                        <Select
-                            placeholder="Please select"
-                            onChange={onChangeStatus}
-                            style={{
-                                width: '100%',
-                            }}>
-                            <Option value={1}>Hoạt động</Option>
-                            <Option value={0}>Không hoạt động</Option>
-                        </Select>
+            <Form
+                form={form}
+                initialValues={{ layout: "horizontal" }}
+                layout="vertical"
 
-                    </Form.Item>
-                </Col>
-                <Col span={8} style={{ textAlign: 'right' }}>
-                    <UserAddOrChange fetchData={fetchData} modelItem={null} textButton={"Thêm mới"} isStyle={true} />
-                </Col>
-            </Row>
+            >
+                <Row gutter={[16, 16]}>
+                    <Col span={8}>
+                        <Form.Item
+                            label="Key search"
+                            name="keySearch"
+                            rules={[{ required: false }]}><Input placeholder="Enter code, phone number, name customer..." onChange={onSearchByKey} />
+                        </Form.Item>
+                    </Col>
+                    <Col span={8}>
+                        <Form.Item
+                            label="Trạng thái"
+                            name="status"
+                        >
+                            <Select
+                                placeholder="Please select"
+                                onChange={onChangeStatus}
+                                style={{
+                                    width: '100%',
+                                }}>
+                                <Option value={1}>Hoạt động</Option>
+                                <Option value={0}>Không hoạt động</Option>
+                            </Select>
+
+                        </Form.Item>
+                    </Col>
+                    <Col span={8} style={{ textAlign: 'right' }}>
+                        <Row justify={'end'}>
+                            <Button
+                                type="button"
+                                value="small"
+                                style={{
+                                    alignItems: "center",
+                                    background: "#2596be",
+                                    marginBottom: "20px",
+                                    color: 'white',
+                                    marginRight: '10px'
+                                }}
+                                onClick={() => {
+                                    setTableParams((prevPrams) => ({
+                                        ...prevPrams,
+                                        pagination: {
+                                            ...prevPrams.pagination,
+                                            pageIndex: 1,
+                                            status: null,
+                                            keySearch: null
+                                        }
+                                    }));
+                                    form.setFieldsValue({ keySearch: null, status: null });
+                                }}
+                            >
+                                Thiết lập lại
+                            </Button>
+                            <UserAddOrChange fetchData={fetchData} modelItem={null} textButton={"Thêm mới"} isStyle={true} />
+                        </Row>
+                    </Col>
+                </Row></Form>
             <Table
                 dataSource={user}
                 columns={columns}

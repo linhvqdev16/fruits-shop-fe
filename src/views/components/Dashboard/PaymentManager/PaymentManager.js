@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Menu, Select, Dropdown, Table, Form, Input, Row, Col } from 'antd';
+import { Button, Menu, Select, Dropdown, Table, Form, Input, Row, Col, Space } from 'antd';
 import { toast } from 'react-toastify';
 import { Pagination } from 'antd';
 import PaymentAdd from './PaymentAdd';
 import usePayment from '@api/usePayment';
-import DownOutlined from '@ant-design/icons';
+import { Option } from 'antd/es/mentions';
 import CommonPopup from './../Common/CommonPopup';
 
 function PaymentManager() {
@@ -13,20 +13,22 @@ function PaymentManager() {
     const [loading, setLoading] = useState(false);
     const [searchName, setSearchName] = useState('')
     const [total, setTotal] = useState();
-
+    const [form] = Form.useForm();
     const [tableParams, setTableParams] = useState({
         pagination: {
             pageIndex: 1,
             pageSize: 10,
-            keySearch: ''
+            keySearch: '',
+            status: null
         },
     });
 
     const [idChangeStatus, setIdChangeStatus] = useState();
+    const [status, setStatus] = useState();
     const [isModalVisible, setIsModalVisible] = useState(false);
 
-    const handleChangeStatus = async (id) => {
-        const { success, data } = await changeStatus(id);
+    const handleChangeStatus = async (id, status) => {
+        const { success, data } = await changeStatus(id, status);
         if (!success || data.status == 'Error') {
             toast.error('Có lỗi xảy ra')
         } else {
@@ -34,7 +36,7 @@ function PaymentManager() {
         }
     }
     const handleOk = () => {
-        handleChangeStatus(idChangeStatus);
+        handleChangeStatus(idChangeStatus, status);
         setIsModalVisible(false);
     };
 
@@ -42,11 +44,12 @@ function PaymentManager() {
         setIsModalVisible(false);
     };
 
-    const showModal = (id) => {
+    const showModal = (id, status) => {
         setIdChangeStatus(id);
+        setStatus(status);
         setIsModalVisible(true);
     };
-    
+
 
     const fetchData = async () => {
         const { success, data } = await getListPayment(tableParams.pagination);
@@ -127,30 +130,42 @@ function PaymentManager() {
             title: 'Action',
             key: 'action',
             render: (_, record) => (
-                <Dropdown overlay={menu(record)} trigger={['click']}>
-                    <Button>
-                        Actions <DownOutlined />
-                    </Button>
-                </Dropdown>
+                <Space>
+                    <PaymentAdd fetchData={fetchData} modelItem={record} textButton={"Sửa"} isStyle={true} />
+                    {record.status === 1 && <Button
+                        type={"primary"}
+                        value="small"
+                        style={{
+                            alignItems: "center",
+                            background: "#e74421",
+                        }}
+                        onClick={() => showModal(record.id, 0)}
+                    > Khóa </Button>}
+                    {record.status === 0 && <Button
+                        type={"primary"}
+                        value="small"
+                        style={{
+                            alignItems: "center",
+                            background: "#e2ddd1",
+                            color: '#100d06'
+                        }}
+                        onClick={() => showModal(record.id, 1)}
+                    > Mở khóa </Button>}
+                </Space>
             ),
         },
     ];
-    const menu = (record) => (
-        <Menu>
-            <Menu.Item>
-                <PaymentAdd fetchData={fetchData} modelItem={record} textButton={"Edit"} isStyle={false} />
-            </Menu.Item>
-            <Menu.Item>
-                <Button
-                    type="button"
-                    value="small"
-                    onClick={(e) => showModal(record.id)}
-                >
-                    Delete
-                </Button>
-            </Menu.Item>
-        </Menu >
-    );
+
+    const handleChangeSelect = (value) => {
+        setTableParams((prevParms) => ({
+            ...prevParms,
+            pagination: {
+                ...prevParms.pagination,
+                status: value
+            }
+        }));
+    };
+
     return (
         <>
             <CommonPopup
@@ -160,19 +175,71 @@ function PaymentManager() {
                 onClose={handleCancel}
                 onOk={handleOk}
             />
-            <Row gutter={[12, 12]}>
-                <Col span={16}>
-                    <Form.Item
-                        label="Key search"
-                        name="keySearch"
-                        rules={[{ required: false, message: "Please input product name!" }]}>
-                        <Input placeholder="Enter code, name category" onChange={(e) => handleChangeName(e)} />
-                    </Form.Item>
-                </Col>
-                <Col span={8} style={{ textAlign: 'right' }}>
-                    <PaymentAdd fetchData={fetchData} modelItem={null} textButton={"Thêm mới"} isStyle={true} />
-                </Col>
-            </Row>
+            <Form
+                form={form}
+                initialValues={{ layout: "horizontal" }}
+                layout="vertical"
+
+            ><Row gutter={[12, 12]}>
+                    <Col span={8}>
+                        <Form.Item
+                            label="Key search"
+                            name="keySearch"
+                            rules={[{ required: false, message: "Please input product name!" }]}>
+                            <Input placeholder="Enter code, name category" onChange={(e) => handleChangeName(e)} />
+                        </Form.Item>
+                    </Col>
+                    <Col span={8}>
+                        <Form.Item
+                            label="Trạng thái"
+                            name="status"
+                        >
+                            <Select
+                                value={tableParams.pagination.status}
+                                placeholder="Please select"
+                                onChange={handleChangeSelect}
+                                style={{
+                                    width: '100%',
+                                }}
+                            >
+                                <Option value={1}>Hoạt động</Option>
+                                <Option value={0}>Không hoạt động</Option>
+                            </Select>
+
+                        </Form.Item>
+                    </Col>
+                    <Col span={8} style={{ textAlign: 'right' }}>
+                        <Row justify={'end'}>
+                            <Button
+                                type="button"
+                                value="small"
+                                style={{
+                                    alignItems: "center",
+                                    background: "#2596be",
+                                    marginBottom: "20px",
+                                    color: 'white',
+                                    marginRight: '10px'
+                                }}
+                                onClick={() => {
+                                    setTableParams((prevPrams) => ({
+                                        ...prevPrams,
+                                        pagination: {
+                                            ...prevPrams.pagination,
+                                            pageIndex: 1,
+                                            status: null,
+                                            keySearch: null
+                                        }
+                                    }));
+                                    form.setFieldsValue({ keySearch: null, status: null });
+                                }}
+                            >
+                                Thiết lập lại
+                            </Button>
+                            <PaymentAdd fetchData={fetchData} modelItem={null} textButton={"Thêm mới"} isStyle={true} />
+                        </Row>
+                    </Col>
+                </Row></Form>
+
             <Table
                 dataSource={payments} columns={columns}
                 pagination={false}

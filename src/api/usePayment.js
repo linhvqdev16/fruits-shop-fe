@@ -15,9 +15,9 @@ const usePayment = () => {
 		data: data,
 		headers: headers
 	})
-	const changeStatus = (id) => createGetRequest({
+	const changeStatus = (id, status) => createGetRequest({
 		endpoint: '/delete',
-		params: {id: id}
+		params: {id: id, status: status}
 	})
 	const generateCode = () => createGetRequest({
 		endpoint: '/generate-code', 

@@ -14,9 +14,9 @@ const useCoupon = () => {
 		endpoint: '/add-or-change',
 		data: data
 	})
-	const updateStatus = (params) => createGetRequest({
+	const updateStatus = (params,status) => createGetRequest({
 		endpoint: '/delete',
-		params: {id: params}
+		params: {id: params, status: status}
 	})
 	const generateCode = () => createGetRequest({
 		endpoint: '/generate-code', 

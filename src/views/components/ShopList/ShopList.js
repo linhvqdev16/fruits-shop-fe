@@ -8,6 +8,8 @@ import "../../../css/style.css";
 import StarRating from "@components/Rate/StarRating";
 import { Link } from "react-router-dom";
 import classNames from "classnames/bind";
+import useCategory from '@api/useCategory';
+
 function formatCurrencyVND(amount) {
     return new Intl.NumberFormat("vi-VN", {
         style: "currency",
@@ -27,26 +29,67 @@ const ShopList = () => {
     const [color, setColor] = useState("blue");
 
     const [activeItem, setActiveItem] = useState(null);
-    const { getAll } = useProduct(); // goi toi ham getAll ben file useProduct de lay tat ca san pham
+    const { getList } = useProduct(); // goi toi ham getAll ben file useProduct de lay tat ca san pham
     const { getBranch } = useBranch(); //su dung hook, lay ham getBranch ben useBranch tu ket qua tra ve cua ham useBranch va luu vao bien getBranch, ten bien phai giong ham ben useBranch
-    const fetchProduct = async () => {
-        //lay san pham tu server
-        const { success, data } = await getAll({
-            //duoc goi voi cac tham so ben duoi
-            pageIndex: currentPage,
-            pageSize: 16,
-            ProductName: nameSearch,
-            BranchId: branchName,
-            SortBy: sortValue,
-        });
 
-        if (success && data.status != "Error") {
-            setData(data.data.items);
-            setTotalPage(data.data.totalPage);
+    const { getListCategory } = useCategory();
+    const [product, setProduct] = useState([]);
+    const [tableParams, setTableParams] = useState({
+        pagination: {
+            pageIndex: 1,
+            pageSize: 10,
+            status: null,
+            categoryId: null,
+            typeId: null,
+            keySearch: ''
+        },
+    });
+    const [total, setTotal] = useState();
+ const [loading, setLoading] = useState(false);
+    const fetchData = async () => {
+        const { success, data } = await getList(tableParams.pagination);
+        if (!success || data.status == 'Error') {
+            toast.error('Có lỗi xảy ra')
         } else {
-            toast.error(data.data.message);
+            setProduct(data.data)
+            setLoading(false);
+            setTotal(data.totalCount)
         }
     };
+
+    const fetchCategory = async () => {
+        const { success, data } = await getListCategory({
+            pageIndex: 1,
+            pageSize: 10,
+            keySearch: "",
+            status: 1
+        });
+        if (!success || data.status == 'Error') {
+            toast.error('Có lỗi xảy ra')
+        } else {
+            setBranch(data.data)
+            setLoading(false);
+            setTotal(data.totalCount)
+        }
+    }
+    // const fetchProduct = async () => {
+    //     //lay san pham tu server
+    //     const { success, data } = await getAll({
+    //         //duoc goi voi cac tham so ben duoi
+    //         pageIndex: currentPage,
+    //         pageSize: 16,
+    //         ProductName: nameSearch,
+    //         BranchId: branchName,
+    //         SortBy: sortValue,
+    //     });
+
+    //     if (success && data.status != "Error") {
+    //         setData(data.data.items);
+    //         setTotalPage(data.data.totalPage);
+    //     } else {
+    //         toast.error(data.data.message);
+    //     }
+    // };
     const handleSort = (e) => {
         setSortValue(e.target.value);
     };
@@ -64,19 +107,36 @@ const ShopList = () => {
     };
 
     const hanleChangeNameSearch = (e) => {
-        setNameSearch(e.target.value);
+        setTableParams((prevPrams) => ({
+            ...prevPrams,
+            pagination: {
+                ...prevPrams.pagination,
+                pageIndex: 1,
+                keySearch: e.target.value
+            }
+        }));
     };
     const handleSearch = () => {
-        fetchProduct();
+        // fetchProduct();
     };
     const hanleGetByBranch = (v) => {
         setBranchSearch(v);
         setActiveItem(v);
+        setTableParams((prevPrams) => ({
+            ...prevPrams,
+            pagination: {
+                ...prevPrams.pagination,
+                pageIndex: 1,
+                categoryId: v
+            }
+        }));
     };
     useEffect(() => {
-        fetchProduct();
-        fetchBranch();
-    }, [branchName, nameSearch, currentPage, sortValue, rangeValue]);
+        fetchData();
+        fetchCategory();
+        // fetchBranch();
+    }, [JSON.stringify(tableParams) ,branchName, nameSearch, currentPage, sortValue, rangeValue]);
+
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
     };
@@ -131,7 +191,7 @@ const ShopList = () => {
                                                 class="d-flex justify-content-between fruite-name"
                                                 onClick={() =>
                                                     hanleGetByBranch(null)
-                                                }
+                                                }   
                                                 style={{
                                                     cursor: "pointer",
                                                 }}
@@ -148,7 +208,7 @@ const ShopList = () => {
                                                     className={classNames({
                                                         activeItem:
                                                             activeItem ===
-                                                                items.id &&
+                                                            items.id &&
                                                             activeItem != null,
                                                     })}
                                                 >
@@ -164,7 +224,7 @@ const ShopList = () => {
                                                         }}
                                                     >
                                                         <div>
-                                                            {items.branchName}
+                                                            {items.name}
                                                         </div>
                                                         {/* <span>({items.countProduct})</span> */}
                                                     </div>
@@ -257,20 +317,19 @@ const ShopList = () => {
 
                                 <div class="col-lg-12">
                                     <div class="row g-4 justify-content-center">
-                                        {dataProduct.map((fruitt, index) => {
+                                        {product && product.map((fruitt, index) => {
                                             return (
                                                 <CardItem
                                                     imgSrc={
-                                                        fruitt.listFile[0]
-                                                            ?.fileName
+                                                        fruitt.images &&  fruitt.images[0]
                                                     }
                                                     key={fruitt.id}
                                                     id={fruitt.id}
-                                                    name={fruitt.productName}
+                                                    name={fruitt.name}
                                                     description={
-                                                        fruitt.productDescription
+                                                        fruitt.description
                                                     }
-                                                    price={fruitt.prodcutPrice}
+                                                    price={fruitt.price}
                                                 />
                                             );
                                         })}
@@ -297,7 +356,7 @@ const ShopList = () => {
                                                             href="#"
                                                             className={
                                                                 currentPage ===
-                                                                index + 1
+                                                                    index + 1
                                                                     ? "active rounded"
                                                                     : "rounded"
                                                             }

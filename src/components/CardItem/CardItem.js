@@ -38,27 +38,20 @@ const CardItem = ({ id, imgSrc, name, description, price }) => {
                                 width: "300px",
                                 height: "209.8px",
                                 objectFit: "contain",
+                                padding: "10px"
                             }}
                             src={imgSrc}
                             className="img-fluid w-100 rounded-top"
                             alt=""
                         />
                     </div>
-                    {/* <div
-          className="text-white bg-secondary px-3 py-1 rounded position-absolute"
-          style={{ top: "10px", left: "10px" }}
-        >
-          Fruits
-        </div> */}
                     <div className="p-4 border border-secondary border-top-0 rounded-bottom">
-                        {/* <h4 style={{lineHeight:"48px"}}>{name}</h4> */}
-                        <h4 style={{ height: "72px", color: "black" }}>
+                        <h4 style={{ height: "72px", color: "gray", fontSize: "18px" }}>
                             {name}
                         </h4>
-
-                        {/* <p>{description}</p> */}
+                        <br/>
                         <div className="d-flex justify-content-between flex-lg-wrap">
-                            <p className="text-dark fs-5 fw-bold mb-0">
+                            <p className="text-dark fs-10 fw-bold mb-0">
                                 {formatCurrencyVND(price)}
                             </p>
                             <div

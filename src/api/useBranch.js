@@ -25,9 +25,9 @@ const useBranch = () => {
         params: params
     })
 
-    const changeStatus = async (params) =>  createGetRequest({
+    const changeStatus = async (params, status) =>  createGetRequest({
         endpoint: '/delete',
-        params: {id: params}
+        params: {id: params, status: status}
     })
 
     return {

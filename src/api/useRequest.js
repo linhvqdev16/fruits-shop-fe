@@ -19,6 +19,7 @@ const useRequest = (prefixPath = '') => {
 		headers: {
 			Accept: 'application/json; charset=utf-8',
 			'Content-Type': 'application/json',
+			'Access-Control-Allow-Origin': '*',
 			Authorization: `Bearer ${token}`
 		},
 		signal: controller.signal

@@ -91,9 +91,9 @@ function OrderManager() {
         const { success, data } = await getListOrder(tableParams.pagination);
         console.log(data);
         if (success && data.status != 'Error') {
-            setOrder(data.data)
-            setLoading(false)
-            setTotal(data.totalCount)
+            setOrder(data.data);
+            setLoading(false);
+            setTotal(data.totalCount);
         } else {
             toast.error(data.message)
         }
@@ -220,68 +220,68 @@ function OrderManager() {
             }
         },
         {
-            title: 'Order code',
+            title: 'Mã đơn hàng',
             render: (data) => {
                 return (<p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{`${data.orderCode}`}</p>)
             }
         },
         {
-            title: 'Customer name',
+            title: 'Ngày tạo',
+            render: (data) => {
+                return (<p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{`${data.orderDate}`}</p>)
+            }
+        },
+        {
+            title: 'Tên khách hàng',
             render: (data) => {
                 return (<p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{`${data.customerName}`}</p>)
             }
         },
         {
-            title: 'Phone number',
+            title: 'Số điện thoại',
             render: (data) => {
                 return (<p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{`${data.phoneNumber}`}</p>)
             }
         },
         {
-            title: 'Address',
+            title: 'Địa chỉ',
             dataIndex: 'address',
             key: 'addressDetail',
             render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{record.addressDetail}</p>
         },
         {
-            title: 'Employee name',
+            title: 'Nhân viên',
             dataIndex: 'employeeName',
             key: 'employeeName',
             render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{record.employeeName}</p>
         },
         {
-            title: 'Order status',
+            title: 'Trạng thái',
             dataIndex: 'orderStatus',
             key: 'orderStatus',
             render: (_, record) => {
                 if (record.orderStatus === 1) {
-                    return <p style={{ fontSize: "13px", color: "red", fontWeight: "300" }}>Đã hủy</p>;
+                    return <p style={{ fontSize: "13px", color: "red", fontWeight: "300" }}>Chờ xác nhận</p>;
                 }
                 if (record.orderStatus === 2) {
-                    return <p style={{ fontSize: "13px", color: "yellow", fontWeight: "300" }}>Chờ xác nhận</p>;
+                    return <p style={{ fontSize: "13px", color: "yellow", fontWeight: "300" }}>Xác nhận</p>;
                 }
                 if (record.orderStatus === 3) {
-                    return <p style={{ fontSize: "13px", color: "yellowgreen", fontWeight: "300" }}>Xác  nhận</p>;
-                }
-                if (record.orderStatus === 4) {
-                    return <p style={{ fontSize: "13px", color: "orange", fontWeight: "300" }}>Chờ vận chuyển</p>;
-                }
-                if (record.orderStatus === 5) {
                     return <p style={{ fontSize: "13px", color: "blueviolet", fontWeight: "300" }}>Đang vận chuyển</p>;
                 }
-                if (record.orderStatus === 6) {
+                if (record.orderStatus === 4) {
                     return <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>Đã giao hàng</p>;
                 }
-                if (record.orderStatus === 7) {
-                    return <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>Đã thanh toán</p>;
-                }
-                if (record.orderStatus === 8) {
+                if (record.orderStatus === 5) {
                     return <p style={{ fontSize: "13px", color: "green", fontWeight: "300" }}>Hoàn thành</p>;
+                }
+                if (record.orderStatus === 0) {
+                    return <p style={{ fontSize: "13px", color: "green", fontWeight: "300" }}>Hủy đơn</p>;
                 }
             }
         },
         {
-            title: 'Price',
+            title: 'Giá trị',
             dataIndex: 'totalPrice',
             key: 'totalPrice',
             render: (_, data) => {
@@ -289,7 +289,7 @@ function OrderManager() {
             }
         },
         {
-            title: 'Action',
+            title: 'Thao tác',
             key: 'action',
             render: (_, record) => (
                 <Space>

@@ -65,6 +65,7 @@ function ProductDetail(id) {
             toast.error(data.message);
         }
     };
+    
     const fetchDataComments = async () => {
         const { success, data } = await getCommentByProduct({
             ProductID: params.id,

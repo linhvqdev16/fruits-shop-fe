@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import { useToast } from "@utils/toastContext";
 import useCatalog from "../../../../api/useCatalog";
 
-const CatalogAddOrChange = ({fechtList}) =>  {
+const CatalogAddOrChange = ({fechtList, modelItem, text}) =>  {
 
     const [modal2Open, setModal2Open] = useState(false);
     const [form] = Form.useForm()
@@ -27,7 +27,8 @@ const CatalogAddOrChange = ({fechtList}) =>  {
               name: values.name, 
               description: values.description, 
               status: 1, 
-              isDeleted: 0
+              isDeleted: 0, 
+              id: modelItem && modelItem.id
             }
            const {success,data}  = await addOrChange(models)
             console.log(success,data);
@@ -45,7 +46,11 @@ const CatalogAddOrChange = ({fechtList}) =>  {
       };
       const showModel = () => {
         setModal2Open(true); 
-        fetchGenerateCode();
+        if(modelItem){
+          form.setFieldsValue({code: modelItem.code, name: modelItem.name, description: modelItem.description});
+        }else{
+          fetchGenerateCode();
+        }
       };
       const onFinishFailed = () => {};
     return ( <>  <div>
@@ -55,11 +60,10 @@ const CatalogAddOrChange = ({fechtList}) =>  {
           style={{
             alignItems: "center",
             background: "#1fbf39",
-            marginBottom: "20px",
           }}
           onClick={() => showModel()}
         >
-          <PlusSquareOutlined /> Thêm mới
+          {text}
         </Button>
   
         <Modal

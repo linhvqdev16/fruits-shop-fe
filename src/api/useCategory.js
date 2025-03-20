@@ -15,9 +15,9 @@ const useCategory = () => {
 		params: null
 	})
 	
-	const changeStatus = (id) => createGetRequest({
+	const changeStatus = (id, status) => createGetRequest({
 		endpoint: '/delete',
-		params: {id: id}
+		params: {id: id, status: status}
 	})
 
 	const addOrChange = (params) => createPostRequest({

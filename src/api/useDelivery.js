@@ -15,9 +15,9 @@ const useDelivery = () => {
         data: data,
         headers: headers
     })
-    const changeStatusDelivery = (params) => createGetRequest({
+    const changeStatusDelivery = (params, status) => createGetRequest({
         endpoint: '/delete',
-        params: {id : params}
+        params: {id : params, status: status}
     })
     const generateCode = () => createGetRequest({
         endpoint: '/generate-code', 

@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Dropdown, Menu, Select, Table } from 'antd';
+import { Button, Dropdown, Menu, Select, Table,Space } from 'antd';
 import { toast } from 'react-toastify';
 import { Pagination } from 'antd';
 import useCatalog from '@api/useCatalog';
 import { Col, Form, Input, Modal, Row } from "antd";
-import { DownOutlined } from '@ant-design/icons';
 import { Option } from 'antd/es/mentions';
 import CatalogAddOrChange from './CatalogAddOrChange'
 import CommonPopup from './../Common/CommonPopup';
@@ -14,14 +13,14 @@ function CatalogManager() {
 
     const [branch, setBranch] = useState([])
     const [loading, setLoading] = useState(false);
-
+    const [form] = Form.useForm();
     const [total, setTotal] = useState();
     const [tableParams, setTableParams] = useState({
         pagination: {
             pageIndex: 1,
             pageSize: 10,
             keySearch: "",
-            status: 1
+            status: null
         },
     });
 
@@ -102,11 +101,28 @@ function CatalogManager() {
             title: 'Action',
             key: 'action',
             render: (_, record) => (
-                <Dropdown overlay={menu(record)} trigger={['click']}>
-                    <Button>
-                        Actions <DownOutlined />
-                    </Button>
-                </Dropdown>
+                <Space>
+                    <CatalogAddOrChange fechtList={fetchData} modelItem={record} text={"Sửa"} />
+                    {record.status === 1 && <Button
+                        type={"primary"}
+                        value="small"
+                        style={{
+                            alignItems: "center",
+                            background: "#e74421",
+                        }}
+                        onClick={() => showModal(record.id, 0)}
+                    > Khóa </Button>}
+                    {record.status === 0 && <Button
+                        type={"primary"}
+                        value="small"
+                        style={{
+                            alignItems: "center",
+                            background: "#e2ddd1",
+                            color: '#100d06'
+                        }}
+                        onClick={() => showModal(record.id, 1)}
+                    > Mở khóa </Button>}
+                </Space>
             ),
         },
     ];
@@ -131,29 +147,15 @@ function CatalogManager() {
         }));
     };
 
-    const menu = (record) => (
-        <Menu>
-            <Menu.Item onClick={() => handleMenuClick('Edit', record)}>Edit</Menu.Item>
-            <Menu.Item>
-                <Button
-                    type="button"
-                    value="small"
-                    onClick={(e) => showModal(record.id)}
-                >
-                    Delete
-                </Button>
-            </Menu.Item>
-        </Menu>
-    );
-
     const handleMenuClick = (action, record) => {
         console.log(`${action} action on row`, record);
     };
     const [idChangeStatus, setIdChangeStatus] = useState();
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const [status, setStatus] = useState();
 
-    const handleChangeStatus = async (id) => {
-        const { success, data } = await changeStatus(id);
+    const handleChangeStatus = async (id, status) => {
+        const { success, data } = await changeStatus(id, status);
         if (!success || data.status == 'Error') {
             toast.error('Có lỗi xảy ra')
         } else {
@@ -161,7 +163,7 @@ function CatalogManager() {
         }
     }
     const handleOk = () => {
-        handleChangeStatus(idChangeStatus);
+        handleChangeStatus(idChangeStatus, status);
         setIsModalVisible(false);
     };
 
@@ -169,8 +171,9 @@ function CatalogManager() {
         setIsModalVisible(false);
     };
 
-    const showModal = (id) => {
+    const showModal = (id, status) => {
         setIdChangeStatus(id);
+        setStatus(status);
         setIsModalVisible(true);
     };
     return (
@@ -182,37 +185,70 @@ function CatalogManager() {
                 onClose={handleCancel}
                 onOk={handleOk}
             />
-            <Row gutter={[16, 16]}>
-                <Col span={8}>
-                    <Form.Item
-                        label="Key search"
-                        name="productName"
-                        rules={[{ required: false, message: "Please input product name!" }]}><Input placeholder="Enter code, name category" onChange={(e) => handleChangeName(e)} />
-                    </Form.Item>
-                </Col>
-                <Col span={8}>
-                    <Form.Item
-                        label="Trạng thái"
-                        name="originId"
-                    >
-                        <Select
-                            value={tableParams.pagination.status}
-                            placeholder="Please select"
-                            onChange={handleChangeSelect}
-                            style={{
-                                width: '100%',
-                            }}
-                        >
-                            <Option value={1}>Hoạt động</Option>
-                            <Option value={0}>Không hoạt động</Option>
-                        </Select>
 
-                    </Form.Item>
-                </Col>
-                <Col span={8} style={{ textAlign: 'right' }}>
-                    <CatalogAddOrChange fechtList={fetchData} />
-                </Col>
-            </Row>
+            <Form
+                form={form}
+                initialValues={{ layout: "horizontal" }}
+                layout="vertical"
+
+            >  <Row gutter={[16, 16]}>
+                    <Col span={8}>
+                        <Form.Item
+                            label="Key search"
+                            name="keySearch"
+                            rules={[{ required: false, message: "Please input product name!" }]}><Input placeholder="Enter code, name category" onChange={(e) => handleChangeName(e)} />
+                        </Form.Item>
+                    </Col>
+                    <Col span={8}>
+                        <Form.Item
+                            label="Trạng thái"
+                            name="status"
+                        >
+                            <Select
+                                value={tableParams.pagination.status}
+                                placeholder="Please select"
+                                onChange={handleChangeSelect}
+                                style={{
+                                    width: '100%',
+                                }}
+                            >
+                                <Option value={1}>Hoạt động</Option>
+                                <Option value={0}>Không hoạt động</Option>
+                            </Select>
+
+                        </Form.Item>
+                    </Col>
+                    <Col span={8} style={{ textAlign: 'right' }}>
+                        <Row justify={'end'}>
+                            <Button
+                                type="button"
+                                value="small"
+                                style={{
+                                    alignItems: "center",
+                                    background: "#2596be",
+                                    marginBottom: "20px",
+                                    color: 'white',
+                                    marginRight: '10px'
+                                }}
+                                onClick={() => {
+                                    setTableParams((prevPrams) => ({
+                                        ...prevPrams,
+                                        pagination: {
+                                            ...prevPrams.pagination,
+                                            pageIndex: 1,
+                                            status: null,
+                                            keySearch: null
+                                        }
+                                    }));
+                                    form.setFieldsValue({ keySearch: null, status: null });
+                                }}
+                            >
+                                Thiết lập lại
+                            </Button>
+                            <CatalogAddOrChange fechtList={fetchData} modelItem={null} text={'Thêm mới'} />
+                        </Row>
+                    </Col>
+                </Row></Form>
             <Table
                 dataSource={branch} columns={columns}
                 pagination={false}

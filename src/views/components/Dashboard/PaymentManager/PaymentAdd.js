@@ -60,11 +60,9 @@ const PaymentAdd = ({ fetchData, modelItem, textButton, isStyle }) => {
       style={isStyle ? {
         alignItems: "center",
         background: "#1fbf39",
-        marginBottom: "20px",
       } : null}
       onClick={() => showModel()}
-    >
-       {isStyle &&  <PlusSquareOutlined />} {textButton}
+    > {textButton}
     </Button>
 
     <Modal

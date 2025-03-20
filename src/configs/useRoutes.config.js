@@ -15,8 +15,8 @@ import ForgotPass from "@views/components/Login/ForgotPass";
 import LayoutUser from "@views/layouts/LayoutUser";
 import ProfileUser from "@views/components/ProfileUser/ProfileUser";
 import History from "@views/components/History/History";
-import Edit from "@views/components/Dashboard/ProductManager/Edit";
-import Detail from "@views/components/Dashboard/ProductManager/Detail";
+// import Edit from "@views/components/Dashboard/ProductManager/Edit";
+// import Detail from "@views/components/Dashboard/ProductManager/Detail";
 import ProductManager from "@views/components/Dashboard/ProductManager/ProductManager";
 import BranchManager from "@views/components/Dashboard/BranchManager/BranchManager";
 import DetailBranch from "@views/components/Dashboard/BranchManager/DetailBranch";
@@ -182,22 +182,22 @@ const useRoutes = () => {
       </Layout>,
     },
 
-    {
-      key: "/dashboard/product/edit/:id",
-      label: "Edit",
-      path: "/dashboard/product/edit/:id",
-      element: <Layout>
-        <Edit />
-      </Layout>,
-    },
-    {
-      key: "/dashboard/product/:id",
-      label: "product",
-      path: "/dashboard/product/:id",
-      element: <Layout>
-        <Detail />
-      </Layout>,
-    },
+    // {
+    //   key: "/dashboard/product/edit/:id",
+    //   label: "Edit",
+    //   path: "/dashboard/product/edit/:id",
+    //   element: <Layout>
+    //     <Edit />
+    //   </Layout>,
+    // },
+    // {
+    //   key: "/dashboard/product/:id",
+    //   label: "product",
+    //   path: "/dashboard/product/:id",
+    //   element: <Layout>
+    //     <Detail />
+    //   </Layout>,
+    // },
     // branch
     {
       key: "/dashboard/branch",

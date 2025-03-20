@@ -76,7 +76,7 @@ const OrderCounter = () => {
     const [discount, setDiscount] = useState(0);
     const [couponModel, setCouponModel] = useState(null);
     const [userModel, setUserModel] = useState(null);
-        const { createOrder } = useOrder();
+    const { createOrder } = useOrder();
     const [tableParams, setTableParams] = useState({
         pagination: {
             pageIndex: 1,
@@ -163,7 +163,7 @@ const OrderCounter = () => {
             setActiveTab(newTabs[newTabs.length - 1].id);
         }
     };
-    const onCreateOrder = async (modelProducts,tabIds) => {
+    const onCreateOrder = async (modelProducts, tabIds) => {
         try {
             const addressModel = address.map((e) => {
                 return {
@@ -190,7 +190,7 @@ const OrderCounter = () => {
                 roleId: 8,
                 description: "Customer visitor",
                 status: 1,
-                id:  null
+                id: null
             }
             var product = modelProducts.map((e) => {
                 return {
@@ -209,22 +209,26 @@ const OrderCounter = () => {
                 feeDelivery: feeDelivery,
                 deliveryType: deleveryId,
                 description: null,
-                status: deleveryId === 1 ? 8 : 4,
+                status: deleveryId === 1 ? 4 : 1,
                 stage: 1,
                 type: 1,
                 realPrice: totalPrice,
                 addressId: userModel ? (userModel.address && userModel.address[0].id) : null,
                 orderDetailModels: product,
-                couponCode: couponModel && couponModel.code, 
+                couponCode: couponModel && couponModel.code,
                 userModel: model,
                 userType: userModel ? 2 : 1
             }
             const { success, data } = await createOrder(objectModel);
             if (data.status != 'Error' && success) {
-                closeTab(tabIds);
-                toast.success(data.message);
+                if (data.code == 200) {
+                    closeTab(tabIds);
+                    toast.success(data.message);
+                } else {
+                    toast.error(data.message);
+                }
             } else {
-                toast.error(data.message)
+                toast.error(data.message);
             }
         } catch (error) {
             console.log(error);
@@ -288,7 +292,7 @@ const OrderCounter = () => {
         const models = [...modelTabs[tabIndex].products];
         models[index] = { ...models[index], quantity: parseInt(value) };
         modelTabs[tabIndex] = { ...modelTabs[tabIndex], products: models }
-        
+
         const sum = modelTabs[tabIndex].products.reduce((accumulator, currentItem) => accumulator + (currentItem.price * currentItem.quantity), 0);
         setTotalPrice(sum);
         setTabs(modelTabs);
@@ -548,7 +552,7 @@ const OrderCounter = () => {
                                                 style={{ fontWeight: '500' }}
                                                 rules={[{ required: true, message: "" }]}
                                             >
-                                                <Input placeholder="" type="text" value={userModel && userModel.fullName} onChange={(e) => setFullName(e.target.value)}/>
+                                                <Input placeholder="" type="text" value={userModel && userModel.fullName} onChange={(e) => setFullName(e.target.value)} />
                                             </Form.Item>
                                         </Col>
 
@@ -569,7 +573,7 @@ const OrderCounter = () => {
                                                 style={{ fontWeight: '500' }}
                                                 rules={[{ required: true, message: "" }]}
                                             >
-                                                <Input placeholder="" type="text" value={userModel && userModel.email} onChange={(e) => setEmail(e.target.value)}/>
+                                                <Input placeholder="" type="text" value={userModel && userModel.email} onChange={(e) => setEmail(e.target.value)} />
                                             </Form.Item>
                                         </Col>
                                         {deleveryId > 0 && deleveryId !== 1 && <>
@@ -759,7 +763,7 @@ const OrderCounter = () => {
                             </Row>
                             <br />
                             <Col span={6} style={{ textAlign: 'left' }}>
-                                <PaymentType callback={onCreateOrder} amount={totalPrice + feeDelivery - discount} paymentId={paymentId} deliveryId={deleveryId} products={tab.products} tabIds={tab.id}/>
+                                <PaymentType callback={onCreateOrder} amount={totalPrice + feeDelivery - discount} paymentId={paymentId} deliveryId={deleveryId} products={tab.products} tabIds={tab.id} />
                             </Col>
                         </Form>
                     )

@@ -7,6 +7,7 @@ import useCategory from "@api/useCategory";
 import useType from "@api/useType";
 import useProduct from "@api/useProduct";
 import { toast } from "react-toastify";
+import { format } from 'date-fns';
 
 const getBase64 = (file) =>
   new Promise((resolve, reject) => {
@@ -16,13 +17,12 @@ const getBase64 = (file) =>
     reader.onerror = (error) => reject(error);
   });
 
-const AddProduct = ({fetchData, modelItem, textButton, isStyle}) => {
+const AddProduct = ({ fetchData, modelItem, textButton, isStyle }) => {
 
-  const { generateCode, addOrChange } = useProduct();
+  const { generateCode, addOrChange, getById } = useProduct();
 
   const [modal2Open, setModal2Open] = useState(false);
   const [form] = Form.useForm();
-  const { createProduct } = useProduct();
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState('');
 
@@ -73,16 +73,75 @@ const AddProduct = ({fetchData, modelItem, textButton, isStyle}) => {
     }
   }
 
+  const fetchById = async () => {
+    const { success, data } = await getById(modelItem.id);
+    if (data != null && success) {
+      if (data.code === 200) {
+        form.setFieldsValue({
+          code: data.data.code,
+          name: data.data.name,
+          price: data.data.price,
+          stock: data.data.stock,
+          description: data.data.description,
+          categoryId: data.data.categoryId,
+          typeId: data.data.typeId,
+          authorPublish: data.data.publisher,
+          series: data.data.series,
+          authorPublic: data.data.authorPublish,
+          author: data.data.author
+        });
+        debugger;
+        setDatePublish(data.data.datePublish && new Date(data.data.datePublish));
+        setDatePublic(data.data.datePublic && new Date(data.data.datePublic));
+        if (data.data.images && data.data.images.length > 0) {
+          data.data.images.map((item) => {
+            return handleConvert(item);
+          });
+        }
+      } else {
+        toast.error(data.message);
+      }
+    } else {
+      toast.error(data.message);
+    }
+  }
+
+  const handleConvert = async (url) => {
+    try {
+      setFileList([]);
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Failed to fetch the file');
+      }
+      const blob = await response.blob();
+      const fileName = url.split('/').pop(); // Extract the file name from the URL
+      const fileType = blob.type; // Mime type of the file
+      const file = new File([blob], 'image.jpg', { type: fileType });
+      setFileList((previewItems) => [...previewItems, {
+        uid: '-1',  // Required: unique id for each file
+        name: fileName,
+        status: 'done',
+        url: URL.createObjectURL(file),  // You can also use the object URL
+        originFileObj: file,  // Store the file object itself
+      },]);
+    } catch (error) {
+      console.error('Error converting URL to file:', error);
+    }
+  };
 
   const showModel = () => {
     setModal2Open(true);
     fetchCategory();
     fetchTypes();
-    fetchGenerateCode();
+    if (modelItem) {
+      fetchById();
+    } else {
+      fetchGenerateCode();
+    }
   }
 
   const [fileList, setFileList] = useState([]);
-  const [fileListUpload, setfileListUpload] = useState([]);
+
   const handlePreview = async (file) => {
     if (!file.url && !file.preview) {
       file.preview = await getBase64(file.originFileObj);
@@ -90,8 +149,8 @@ const AddProduct = ({fetchData, modelItem, textButton, isStyle}) => {
     setPreviewImage(file.url || file.preview);
     setPreviewOpen(true);
   };
+
   const handleChangeFile = ({ fileList: newFileList }) => {
-    
     newFileList.forEach(items => items.status = 'done')
     setFileList(newFileList);
   };
@@ -120,7 +179,7 @@ const AddProduct = ({fetchData, modelItem, textButton, isStyle}) => {
   const onFinish = async (values) => {
     try {
       const formData = new FormData()
-      
+
       var product = {
         typeId: values.typeId,
         categoryId: values.categoryId,
@@ -128,7 +187,15 @@ const AddProduct = ({fetchData, modelItem, textButton, isStyle}) => {
         price: values.price,
         stock: values.stock,
         description: values.description,
-        code: values.code
+        code: values.code,
+        datePublic: datePublic, 
+        authorPublish: values.authorPublic,
+        publisher: values.authorPublish, 
+        author: values.author,
+        series: values.series,
+        datePublish: datePublish, 
+        id: modelItem && modelItem.id,
+        status: 1
       }
       formData.append("productModel", JSON.stringify(product));
       fileList.forEach((file) => {
@@ -137,7 +204,7 @@ const AddProduct = ({fetchData, modelItem, textButton, isStyle}) => {
       const { success, data } = await addOrChange(formData, { "Content-Type": "multipart/form-data" });
       if (data.status != 'Error' && success) {
         setModal2Open(false);
-        toast.success(data.message); 
+        toast.success(data.message);
         fetchData();
       } else {
         toast.error(data.message)
@@ -153,25 +220,24 @@ const AddProduct = ({fetchData, modelItem, textButton, isStyle}) => {
   const handleChange = (value) => {
     console.log(`Selected: ${value}`);
   };
-  const handleSetDatePublish= date => {
+  const handleSetDatePublish = date => {
     setDatePublish(date.format());
-}
-const handleSetDatePublic = date => {
-  setDatePublic(date.format());
-}
+  }
+  const handleSetDatePublic = date => {
+    setDatePublic(date.format());
+  }
   return (
     <div>
-       <Button
-        type= {isStyle ? "primary" : "button"}
+      <Button
+        type={isStyle ? "primary" : "button"}
         value="small"
-        style={ isStyle ? {
+        style={isStyle ? {
           alignItems: "center",
           background: "#1fbf39",
-          marginBottom: "20px",
         } : null}
         onClick={() => showModel()}
       >
-        {isStyle &&  <PlusSquareOutlined />} {textButton}
+     {textButton}
       </Button>
 
       <Modal
@@ -190,7 +256,7 @@ const handleSetDatePublic = date => {
           layout="vertical"
 
         >
-          <Row gutter={[5,5]} >
+          <Row gutter={[5, 5]} >
 
             <Col span={12}>
               <Form.Item
@@ -204,7 +270,7 @@ const handleSetDatePublic = date => {
 
             <Col span={12}>
               <Form.Item
-                label="Tên sách"
+                label="Tên truyện"
                 name="name"
                 rules={[{ required: true, message: "Please input product name!" }]}
               >
@@ -298,7 +364,7 @@ const handleSetDatePublic = date => {
                 label="Ngày xuất bản"
                 name="datePublish"
               >
-                <DatePicker onChange={handleSetDatePublish} style={{ width: '100%' }}  />
+                <DatePicker onChange={handleSetDatePublish} placeholder={datePublish && format(datePublish, "dd-MM-yyyy")}  style={{ width: '100%' }} />
               </Form.Item>
             </Col>
 
@@ -310,7 +376,7 @@ const handleSetDatePublic = date => {
                   { required: true, message: "Please input product quantity!" },
                 ]}
               >
-              <DatePicker onChange={handleSetDatePublic} style={{ width: '100%' }}  />
+                <DatePicker onChange={handleSetDatePublic} placeholder={datePublic && format(datePublic, "dd-MM-yyyy")}  style={{ width: '100%' }} />
               </Form.Item>
             </Col>
 

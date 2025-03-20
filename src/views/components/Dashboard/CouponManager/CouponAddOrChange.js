@@ -71,7 +71,7 @@ const CouponAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
     fetchTypes();
     debugger;
     if (modelItem) {
-      form.setFieldsValue({ code: modelItem.code, name: modelItem.name, description: modelItem.description, typeId: modelItem.type, couponAmount: modelItem.couponAmount, minValue: modelItem.minValue, maxValue: modelItem.maxValue, quantity: modelItem.quantity});
+      form.setFieldsValue({ code: modelItem.code, name: modelItem.name, description: modelItem.description, typeId: modelItem.type, couponAmount: modelItem.couponAmount, minValue: modelItem.minValue, maxValue: modelItem.maxValue, quantity: modelItem.quantity });
       setStartDate(new Date(modelItem.dateStart));
       setEndDate(new Date(modelItem.dateEnd));
     } else {
@@ -125,11 +125,10 @@ const CouponAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
         style={isStyle ? {
           alignItems: "center",
           background: "#1fbf39",
-          marginBottom: "20px",
         } : null}
         onClick={() => showModel()}
       >
-        {isStyle && <PlusSquareOutlined />} {textButton}
+        {textButton}
       </Button>
 
       <Modal

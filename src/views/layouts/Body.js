@@ -12,7 +12,6 @@ const Body = ({ children }) => {
 				display: 'flex',
 				flexDirection: 'column',
 				overflow: 'auto',
-				margin: '0px 150px',
 				justifyContent: 'space-between',
 				flexWrap: 'wrap'
 			}}

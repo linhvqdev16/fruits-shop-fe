@@ -12,9 +12,9 @@ const useCategory = () => {
     const generateCode = () => createGetRequest({
 		endpoint: '/generate-code',
 	})
-	const changeStatus = (id) => createGetRequest({
+	const changeStatus = (id, status) => createGetRequest({
 		endpoint: '/delete',
-		params: {id: id}
+		params: {id: id, status: status}
 	})
 	const addOrChange = (params) => createPostRequest({
 		endpoint: '/add-or-change',

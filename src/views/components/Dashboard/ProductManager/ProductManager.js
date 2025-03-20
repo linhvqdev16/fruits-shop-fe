@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Select, Dropdown, Table, Menu } from 'antd';
+import { Button, Select, Space, Table, Menu } from 'antd';
 import useProduct from '@api/useProduct';
 import { toast } from 'react-toastify';
 import { Pagination } from 'antd';
 import AddProduct from './AddProduct';
 import { Col, Form, Input, Row } from "antd";
-import { DownOutlined } from '@ant-design/icons';
 import { Option } from 'antd/es/mentions';
 import useCategory from '@api/useCategory';
 import useType from '@api/useType';
@@ -23,13 +22,16 @@ function ProductManager() {
 
     const [product, setProduct] = useState([])
     const [loading, setLoading] = useState(false);
-
+    const [form] = Form.useForm();
     const [total, setTotal] = useState();
     const [tableParams, setTableParams] = useState({
         pagination: {
             pageIndex: 1,
             pageSize: 10,
-            status: 1
+            status: null,
+            categoryId: null,
+            typeId: null,
+            keySearch: ''
         },
     });
     const [category, setCategory] = useState([]);
@@ -78,7 +80,6 @@ function ProductManager() {
         fetchType();
     }, [JSON.stringify(tableParams), loading])
 
-
     const handleTableChange = (pagination, filters, sorter) => {
         setTableParams({
             pagination,
@@ -89,6 +90,7 @@ function ProductManager() {
             setProduct([]);
         }
     };
+
     const onShowSizeChange = (current, pageSize) => {
         setTableParams({
             pagination: {
@@ -101,7 +103,7 @@ function ProductManager() {
     const menu = (record) => (
         <Menu>
             <Menu.Item>
-                <AddProduct fetchData={fetchData} modelItem={record} textButton={"Edit"} isStyle={false} />
+                <AddProduct fetchData={fetchData} modelItem={record} textButton={"Sửa"} isStyle={false} />
             </Menu.Item>
             <Menu.Item>
                 <Button
@@ -114,11 +116,13 @@ function ProductManager() {
             </Menu.Item>
         </Menu >
     );
+
     const [idChangeStatus, setIdChangeStatus] = useState();
+    const [status, setStatusChange] = useState();
     const [isModalVisible, setIsModalVisible] = useState(false);
 
-    const handleChangeStatus = async (id) => {
-        const { success, data } = await changeStatus(id);
+    const handleChangeStatus = async (id, status) => {
+        const { success, data } = await changeStatus(id,status);
         if (!success || data.status == 'Error') {
             toast.error('Có lỗi xảy ra')
         } else {
@@ -126,7 +130,7 @@ function ProductManager() {
         }
     }
     const handleOk = () => {
-        handleChangeStatus(idChangeStatus);
+        handleChangeStatus(idChangeStatus, status);
         setIsModalVisible(false);
     };
 
@@ -134,8 +138,9 @@ function ProductManager() {
         setIsModalVisible(false);
     };
 
-    const showModal = (id) => {
+    const showModal = (id,status) => {
         setIdChangeStatus(id);
+        setStatusChange(status);
         setIsModalVisible(true);
     };
     const columns = [
@@ -187,32 +192,88 @@ function ProductManager() {
             key: 'typeName',
             render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{record.typeName}</p>
         },
-        {
-            title: 'Mô tả',
-            dataIndex: 'description',
-            key: 'description',
-            render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{record.description}</p>
-        },
-        {
-            title: 'Số lượng đã bán',
-            dataIndex: 'soldQuantity',
-            key: 'soldQuantity',
-            render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{record.soldQuantity ? record.soldQuantity : 0}</p>,
+        // {
+        //     title: 'Số lượng đã bán',
+        //     dataIndex: 'soldQuantity',
+        //     key: 'soldQuantity',
+        //     render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{record.soldQuantity ? record.soldQuantity : 0}</p>,
 
-        },
+        // },
         {
 
             title: 'Action',
             key: 'action',
             render: (_, record) => (
-                <Dropdown overlay={menu(record)} trigger={['click']}>
-                    <Button>
-                        Actions <DownOutlined />
-                    </Button>
-                </Dropdown>
+                <Space>
+                    <AddProduct fetchData={fetchData} modelItem={record} textButton={"Sửa"} isStyle={true} />
+                    {record.status === 1 && <Button
+                        type={"primary"}
+                        value="small"
+                        style={{
+                            alignItems: "center",
+                            background: "#e74421",
+                        }}
+                        onClick={() => showModal(record.id, 0)}
+                    > Khóa </Button>}
+
+                    {record.status === 0 && <Button
+                        type={"primary"}
+                        value="small"
+                        style={{
+                            alignItems: "center",
+                            background: "#e2ddd1",
+                            color: '#100d06'
+                        }}
+                        onClick={() => showModal(record.id, 1)}
+                    > Mở khóa </Button>}
+                </Space>
             ),
         },
     ];
+    const handleSelectCategory = (e) => {
+        setTableParams((prevPrams) => ({
+            ...prevPrams,
+            pagination: {
+                ...prevPrams.pagination,
+                pageIndex: 1,
+                categoryId: e
+            }
+        }))
+    }
+
+    const handleSeletecType = (e) => {
+        setTableParams((prevPrams) => ({
+            ...prevPrams,
+            pagination: {
+                ...prevPrams.pagination,
+                pageIndex: 1,
+                typeId: e
+            }
+        }))
+    }
+
+    const handleSelectStatus = (e) => {
+        setTableParams((prevPrams) => ({
+            ...prevPrams,
+            pagination: {
+                ...prevPrams.pagination,
+                pageIndex: 1,
+                status: e
+            }
+        }))
+    }
+
+    const handleKeySearch = (e) => {
+        setTableParams((prevPrams) => ({
+            ...prevPrams,
+            pagination: {
+                ...prevPrams.pagination,
+                pageIndex: 1,
+                keySearch: e.target.value
+            }
+        }))
+    }
+
     return (
         <>
             <CommonPopup
@@ -222,71 +283,108 @@ function ProductManager() {
                 onClose={handleCancel}
                 onOk={handleOk}
             />
-            <Row gutter={[16, 16]}>
-                <Col span={16}>
-                    <Form.Item
-                        label="Key search"
-                        name="keySearch"
-                        rules={[{ required: false, message: "Please input product name!" }]}><Input placeholder="Enter code, name category" />
-                    </Form.Item>
-                </Col>
-                <Col span={8} style={{ textAlign: 'right' }}>
-                    <AddProduct fetchData={fetchData} modelItem={null} textButton={"Thêm mới"} isStyle={true} />
-                </Col>
-            </Row>
-            <Row gutter={[16, 16]}>
-                <Col span={8}>
-                    <Form.Item
-                        label="Loại sản phẩm"
-                        name="categoryId"
-                    >
-                        <Select
-                            placeholder="Please select"
-                            onChange={null}
-                            style={{
-                                width: '100%',
-                            }}
-                            options={category}
-                        />
+            <Form
+                form={form}
+                initialValues={{ layout: "horizontal" }}
+                layout="vertical"
 
-                    </Form.Item>
-                </Col>
-                <Col span={8}>
-                    <Form.Item
-                        label="Gói bán SP"
-                        name="typeId"
-                    >
-                        <Select
-                            placeholder="Please select"
-                            onChange={null}
-                            style={{
-                                width: '100%',
-                            }}
-                            options={types}
-                        />
-
-                    </Form.Item>
-                </Col>
-                <Col span={8}>
-                    <Form.Item
-                        label="Trạng thái"
-                        name="status"
-                    >
-                        <Select
-                            placeholder="Please select"
-                            onChange={null}
-                            style={{
-                                width: '100%',
-                            }}
-
+            >
+                <Row gutter={[16, 16]}>
+                    <Col span={16}>
+                        <Form.Item
+                            label="Key search"
+                            name="keySearch"
+                            rules={[{ required: false, message: "Please input product name!" }]}><Input placeholder="Enter code, name category" onChange={handleKeySearch} />
+                        </Form.Item>
+                    </Col>
+                    <Col span={8} style={{ textAlign: 'right' }}>
+                        <Row justify="end">
+                            <Button
+                                type="button"
+                                value="small"
+                                style={{
+                                    alignItems: "center",
+                                    background: "#2596be",
+                                    marginBottom: "20px",
+                                    color: 'white',
+                                    marginRight: '10px'
+                                }}
+                                onClick={() => {
+                                    setTableParams((prevPrams) => ({
+                                        ...prevPrams,
+                                        pagination: {
+                                            ...prevPrams.pagination,
+                                            pageIndex: 1,
+                                            keySearch: "",
+                                            categoryId: null,
+                                            typeId: null,
+                                            status: null
+                                        }
+                                    }));
+                                    form.setFieldsValue({ keySearch: null, typeId: null, categoryId: null, status: null });
+                                }}
+                            >
+                                Thiết lập lại
+                            </Button>
+                            <AddProduct fetchData={fetchData} modelItem={null} textButton={"Thêm mới"} isStyle={true} />
+                        </Row>
+                    </Col>
+                </Row>
+                <Row gutter={[16, 16]}>
+                    <Col span={8}>
+                        <Form.Item
+                            label="Loại sản phẩm"
+                            name="categoryId"
                         >
-                            <Option value={1}>Hoạt động</Option>
-                            <Option value={0}>Không hoạt động</Option>
-                        </Select>
+                            <Select
+                                placeholder="Please select"
+                                value={tableParams.pagination.categoryId}
+                                onChange={handleSelectCategory}
+                                style={{
+                                    width: '100%',
+                                }}
+                                options={category}
+                            />
+                        </Form.Item>
+                    </Col>
+                    <Col span={8}>
+                        <Form.Item
+                            label="Gói bán SP"
+                            name="typeId"
+                        >
+                            <Select
+                                placeholder="Please select"
+                                value={tableParams.pagination.typeId}
+                                onChange={handleSeletecType}
+                                style={{
+                                    width: '100%',
+                                }}
+                                options={types}
+                            />
 
-                    </Form.Item>
-                </Col>
-            </Row>
+                        </Form.Item>
+                    </Col>
+                    <Col span={8}>
+                        <Form.Item
+                            label="Trạng thái"
+                            name="status"
+                        >
+                            <Select
+                                placeholder="Please select"
+                                value={tableParams.pagination.status}
+                                onChange={handleSelectStatus}
+                                style={{
+                                    width: '100%',
+                                }}
+                            >
+                                <Option value={1}>Hoạt động</Option>
+                                <Option value={0}>Không hoạt động</Option>
+                            </Select>
+
+                        </Form.Item>
+                    </Col>
+                </Row>
+            </Form>
             <Table
                 dataSource={product} columns={columns}
                 pagination={false}

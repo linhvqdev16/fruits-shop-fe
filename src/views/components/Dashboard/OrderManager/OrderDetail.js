@@ -1,28 +1,21 @@
-import { PlusSquareOutlined, CloseCircleOutlined } from "@ant-design/icons";
-import { Button, Col, Form, Input, Modal, Row, Select, Space, Table, Timeline  } from "antd";
+import { Button, Col, Form, Input, Modal, Row, Card, Space, Table, Divider, Steps } from "antd";
 import React, { useEffect, useState } from "react";
 import useProduct from "@api/useProduct";
 import { toast } from "react-toastify";
 import useUser from "@api/useUser";
 import { EyeClosed, Trash2, CircleX, Eye } from "lucide-react";
 import ProductPopUp from "./ProductPopUp";
-import VoucherPopup from "./VoucherPopup";
-import PaymentType from "./PaymentType";
 import usePayment from '@api/usePayment';
 import useDelivery from '@api/useDelivery';
 import useCoupon from "@api/useCoupons";
-import CustomerPopup from "./CustomerPopup";
-import { Option } from "antd/es/mentions";
 import useAddress from "@api/useAddress";
 import useOrder from '@api/useOrder';
 import { useParams } from 'react-router-dom';
 const Tab = ({ label, activeTab, setActiveTab, closeTab }) => {
     return (
-      <></>
+        <></>
     );
 };
-
-
 const OrderDetail = () => {
     const [form] = Form.useForm();
     const { createProduct } = useProduct();
@@ -35,6 +28,7 @@ const OrderDetail = () => {
     const { getListUser } = useUser();
     const [payments, setPayments] = useState([]);
     const [delivery, setDelivery] = useState([]);
+    const { Step } = Steps;
     const [optionDelivery, setOptionDelivery] = useState([]);
     const { getListPayment } = usePayment();
     const { getListDelivery } = useDelivery();
@@ -46,7 +40,8 @@ const OrderDetail = () => {
     const [discount, setDiscount] = useState(0);
     const [couponModel, setCouponModel] = useState(null);
     const [userModel, setUserModel] = useState(null);
-    const { createOrder,getOrderDetail } = useOrder();
+    const { createOrder, getOrderDetail } = useOrder();
+    const [orderModel, setOrderModel] = useState(null);
     const [tableParams, setTableParams] = useState({
         pagination: {
             pageIndex: 1,
@@ -68,8 +63,11 @@ const OrderDetail = () => {
     const [provinceId, setProvinceId] = useState(null);
     const [districtId, setDistrictId] = useState(null);
     const [wardId, setWardId] = useState(null);
-    
-    const { id } = useParams(); 
+
+    const [steps, setSteps] = useState([]);
+
+
+    const { id } = useParams();
 
     const handleProductSelected = (products, index) => {
         const modelTabs = [...tabs];
@@ -100,16 +98,28 @@ const OrderDetail = () => {
             toast.error("Only can create 5 order in one time!");
         }
     };
-    
+
     const fetchOrderDetail = async () => {
+
+        const apiSteps = [
+            { name: "Chờ xác nhận", createdDate: null, status: 1 },
+            { name: "Xác nhận", createdDate: null, status: 2 },
+            { name: "Đang giao hàng", createdDate: null, status: 3 },
+            { name: "Giao hàng thành công", createdDate: null, status: 4 },
+            { name: "Hoàn thành", createdDate: null, status: 5 }
+        ];
+
+        setSteps(apiSteps);
+
         const { success, data } = await getOrderDetail(id);
         if (!success || data.status == 'Error') {
             toast.error('Có lỗi xảy ra')
         } else {
+            setOrderModel(data.data);
             const modelTabs = [...tabs];
-            modelTabs[0] = { ...modelTabs[0], products: data.data.orderDetailModels  };
+            modelTabs[0] = { ...modelTabs[0], products: data.data.orderDetailModels };
             const sum = data.data.orderDetailModels.reduce((accumulator, currentItem) => accumulator + (currentItem.price * currentItem.quantity), 0);
-            form.setFieldsValue({addressDetail: data.data.addressModel.fullInfo, customerName: data.data.userModel.fullName, email: data.data.userModel.email, phoneNumber: data.data.userModel.phoneNumber});
+            form.setFieldsValue({ addressDetail: data.data.addressModel.fullInfo, customerName: data.data.userModel.fullName, email: data.data.userModel.email, phoneNumber: data.data.userModel.phoneNumber });
             setCouponModel(data.data.couponModel);
             setPaymentId(data.data.paymentModel.id);
             setDeleveryId(data.data.deliveryModel.id);
@@ -267,16 +277,6 @@ const OrderDetail = () => {
         } else {
             toast.error(data.message)
         }
-    }
-    const onSearchByKey = (e) => {
-        setQuery(e);
-        setTableParams((prevPrams) => ({
-            ...prevPrams,
-            pagination: {
-                ...prevPrams.pagination,
-                keySearch: e
-            }
-        }))
     }
     useEffect(() => {
         if (tableParams.pagination && tableParams.pagination.keySearch.length > 0) {
@@ -469,31 +469,14 @@ const OrderDetail = () => {
 
     return (
         <div>
-             {/* <Timeline>
-        <Timeline.Item color="green">Create a services site 2022-12-01</Timeline.Item>
-        <Timeline.Item color="green">Create a deployment site 2022-12-01</Timeline.Item>
-        <Timeline.Item color="green">Design the front-end 2023-01-01</Timeline.Item>
-        <Timeline.Item color="green">Release version 1.0 2023-02-01</Timeline.Item>
-        <Timeline.Item color="red">Error found, fixing it 2023-03-01</Timeline.Item>
-        <Timeline.Item color="blue">Fixed error and tested 2023-03-05</Timeline.Item>
-      </Timeline> */}
-            {/* <Row>
-
-                <Col span={24} style={{ textAlign: 'right' }}>
-                    <Button
-                        type="primary"
-                        value="large"
-                        style={{
-                            alignItems: "center",
-                            background: "#2596be",
-                            marginRight: "10px"
-                        }}
-                        onClick={() => addTab()}
-                    >  Thêm đơn hàng
-                    </Button>
-                </Col>
-            </Row> */}
-            <div style={{ marginBottom: '10px' }}>
+            <Card>
+                <Steps current={steps.findIndex((step) => step.status === 4)}>
+                    {steps.map((step, index) => (
+                        <Step key={index} title={step.name} description="Test" />
+                    ))}
+                </Steps>
+            </Card>
+            <div style={{ marginBottom: '10px', marginTop: '60px' }}>
                 {tabs.map((tab) => (
                     <Tab
                         key={tab.id}
@@ -515,268 +498,98 @@ const OrderDetail = () => {
                             initialValues={{ layout: "horizontal" }}
                             layout="vertical"
                         >
-                            <Row gutter={[16, 16]}>
-                                <Col span={24} style={{ textAlign: 'right' }}>
-                                    <ProductPopUp handleProductSelected={handleProductSelected} modelProduct={tab.products} tabIndex={index} />
-                                </Col>
-                            </Row>
-                            <Table
-                                dataSource={tab.products} columns={columns}
-                                pagination={false}
-                                loading={false}
-                                onChange={null}
-                            />
-                            <br />
-                            <Row gutter={[25, 25]} style={{ justifyContent: 'space-between' }}>
-                                <Col span={11}>
-                                    <Row gutter={[16, 16]}>
-                                        <Col span={24}>
-                                            <span class="hide-menu" style={{ fontSize: "13px", color: "black", fontWeight: "bold" }}>Thông tin khách hàng</span>
-                                        </Col>
+                            <Card>
 
-                                        <br />
-                                        {/* <Col span={18}> */}
-                                            {/* <AutoComplete
-                                                options={option}
-                                                onSearch={onSearchByKey}
-                                                onSelect={handleSelect}
-                                                value={query}
-                                                onChange={setQuery}
-                                                style={{ width: '100%' }}
-                                            >
-                                                <Input placeholder="Enter code, phone number, name customer..." />
-                                            </AutoComplete> */}
-                                            {/* <Input readOnly={true} value={userModel != null ? userModel.fullName : "Khách hàng lẻ"} />
-
-                                        </Col>
-                                        <Col span={6} style={{ textAlign: 'right' }}>
-                                            <CustomerPopup handlePopupSelected={handleSelectUser} model={userModel} />
-                                        </Col> */}
-
-
-                                        <Col span={12}>
-                                            <Form.Item
-                                                label="Họ tên khách hàng"
-                                                name="customerName"
-                                                style={{ fontWeight: '500' }}
-                                                rules={[{ required: true, message: "" }]}
-                                            >
-                                                <Input placeholder="" type="text" value={userModel && userModel.fullName} onChange={(e) => setFullName(e.target.value)} />
-                                            </Form.Item>
-                                        </Col>
-
-                                        <Col span={12}>
-                                            <Form.Item
-                                                label="Số điện thoại khách hàng"
-                                                name="phoneNumber"
-                                                style={{ fontWeight: '500' }}
-                                                rules={[{ required: true, message: "" }]}
-                                            >
-                                                <Input placeholder="" type="text" value={userModel && userModel.phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
-                                            </Form.Item>
-                                        </Col>
-                                        <Col span={24}>
-                                            <Form.Item
-                                                label="Email khách hàng"
-                                                name="email"
-                                                style={{ fontWeight: '500' }}
-                                                rules={[{ required: true, message: "" }]}
-                                            >
-                                                <Input placeholder="" type="text" value={userModel && userModel.email} onChange={(e) => setEmail(e.target.value)} />
-                                            </Form.Item>
-                                        </Col>
-                                        {deleveryId > 0 && deleveryId !== 1 && <>
-
-                                            {
-                                                userModel === null && <>
-                                                    {/* <Col span={8}>
-                                                        <Form.Item
-                                                            label="Tỉnh/Thành phố"
-                                                            name="provinceId"
-                                                            style={{ fontWeight: '500' }}
-                                                            rules={[{ required: true, message: "Please select province" }]}
-                                                        >
-                                                            <Select
-                                                                value={provinceId}
-                                                                placeholder="Please select"
-                                                                onChange={(e) => handleSelectProvince(e)}
-                                                                style={{
-                                                                    width: '100%',
-                                                                }}
-                                                            >   <Option value={0}>Chọn Tỉnh/Thành phố</Option>
-                                                                {province && province.map((e) => {
-                                                                    return <Option value={e.code}>{e.name}</Option>
-                                                                })
-                                                                }
-                                                            </Select>
-
-                                                        </Form.Item>
-                                                    </Col>
-                                                    <Col span={8}>
-                                                        <Form.Item
-                                                            label="Quận/Huyện"
-                                                            name="districtId"
-                                                            style={{ fontWeight: '500' }}
-                                                            rules={[{ required: true, message: "Please select district" }]}
-                                                        >
-                                                            <Select
-                                                                value={districtId}
-                                                                placeholder="Please select"
-                                                                onChange={(e) => handleSelectDistrict(e)}
-                                                                style={{
-                                                                    width: '100%',
-                                                                }}
-                                                            >   <Option value={0}>Chọn Quận/Huyện</Option>
-                                                                {district && district.map((e) => {
-                                                                    return <Option value={e.code}>{e.name}</Option>
-                                                                })
-                                                                }
-                                                            </Select>
-
-                                                        </Form.Item>
-                                                    </Col>
-                                                    <Col span={8}>
-                                                        <Form.Item
-                                                            label="Xã/Phường"
-                                                            name="wardId"
-                                                            style={{ fontWeight: '500' }}
-                                                            rules={[{ required: true, message: "Please select wards" }]}
-                                                        >
-                                                            <Select
-                                                                value={wardId}
-                                                                placeholder="Please select"
-                                                                onChange={(e) => handleSelectWard(e)}
-                                                                style={{
-                                                                    width: '100%',
-                                                                }}
-                                                            >   <Option value={0}>Chọn Xã/Phường</Option>
-                                                                {Array.isArray(ward) && ward.map((e) => {
-                                                                    return <Option value={e.code}>{e.name}</Option>
-                                                                })
-                                                                }
-                                                            </Select>
-
-                                                        </Form.Item>
-                                                    </Col> */}
-                                                </>
-                                            }
-
+                                <Row gutter={[25, 25]} style={{ justifyContent: 'space-between' }}>
+                                    <Col span={24}>
+                                        <Row gutter={[16, 16]} justify={'space-between'}>
                                             <Col span={24}>
-                                                <Form.Item
-                                                    label="Địa chỉ chi tiết"
-                                                    name="addressDetail"
-                                                    style={{ fontWeight: '500' }}
-                                                    rules={[{ required: true, message: "" }]}
-                                                >
-                                                    <Input placeholder="" type="text" onChange={(e) => handleChangeAddress(e)} />
-                                                </Form.Item>
-                                            </Col></>}
-                                    </Row>
-                                </Col>
-                                <Col span={11}>
-                                    <Row gutter={[16, 16]}>
-                                        <Col span={24}>
-                                            <span class="hide-menu" style={{ fontSize: "13px", color: "black", fontWeight: "bold" }}>Thông tin thanh toán</span>
-                                        </Col>
-                                        <br />
-                                        <Col span={24}>
-                                            <Row>
-                                                <Col span={6}>
-                                                    <p style={{ fontWeight: '500' }}>Mã khuyến mại: </p>
-                                                </Col>
-                                                <Col span={10}>
-                                                    <Input placeholder="" value={couponModel && couponModel.code} type="text" onBlur={handleChange} readOnly={true} /></Col>
-                                                {/* <Col span={8} style={{ textAlign: 'right' }}>
-                                                    <VoucherPopup handlePopupSelected={handleSelectCounpon} model={couponModel} />
-                                                </Col> */}
-                                            </Row>
-                                        </Col>
-                                        <br />
-                                        <Col span={24}>
-                                            <Row>
-                                                <Col span={6}>
-                                                    <p style={{ fontWeight: '500' }}>Thanh toán: </p>
-                                                </Col>
-                                                <Col span={18}>
+                                                <span class="hide-menu" style={{ fontSize: "13px", color: "black", fontWeight: "bold" }}>Thông tin khách hàng</span>
+                                            </Col>
+                                            <Divider orientation="left" plain />
+                                            <br />
+                                            <Col span={12}>
+                                                <Row>
+                                                    <Col span={5}>
+                                                        <p style={{ fontWeight: 'bold' }}>Họ tên khách hàng: </p>
+                                                    </Col>
+                                                    <Col span={12} style={{ textAlign: 'left' }}>
+                                                        <p style={{ fontWeight: '500' }}>{orderModel && orderModel.userModel && orderModel.userModel.fullName}</p></Col>
+                                                </Row>
+                                                <Row>
+                                                    <Col span={5}>
+                                                        <p style={{ fontWeight: 'bold' }}>Số điện thoại: </p>
+                                                    </Col>
+                                                    <Col span={12} style={{ textAlign: 'left' }}>
+                                                        <p style={{ fontWeight: '500' }}>{orderModel && orderModel.userModel && orderModel.userModel.phoneNumber}</p></Col>
+                                                </Row>
+                                                <Row>
+                                                    <Col span={5}>
+                                                        <p style={{ fontWeight: 'bold' }}>Email: </p>
+                                                    </Col>
+                                                    <Col span={12} style={{ textAlign: 'left' }}>
+                                                        <p style={{ fontWeight: '500' }}>{orderModel && orderModel.userModel && orderModel.userModel.email}</p></Col>
+                                                </Row>
+                                                <Row>
+                                                    <Col span={5}>
+                                                        <p style={{ fontWeight: 'bold' }}>Địa chỉ: </p>
+                                                    </Col>
+                                                    <Col span={12} style={{ textAlign: 'left' }}>
+                                                        <p style={{ fontWeight: '500' }}>{orderModel && orderModel.addressModel && orderModel.addressModel.fullInfo}</p></Col>
+                                                </Row>
+                                            </Col>
+                                            <Col span={12}>
+                                                <Row>
+                                                    <Col span={5}>
+                                                        <p style={{ fontWeight: 'bold' }}>Mã đơn hàng: </p>
+                                                    </Col>
+                                                    <Col span={12} style={{ textAlign: 'left' }}>
+                                                        <p style={{ fontWeight: '500' }}>{orderModel && orderModel.code}</p></Col>
+                                                </Row>
+                                                <Row>
+                                                    <Col span={5}>
+                                                        <p style={{ fontWeight: 'bold' }}>Trạng thái: </p>
+                                                    </Col>
+                                                    <Col span={12} style={{ textAlign: 'left' }}>
+                                                        <p style={{ fontWeight: '500' }}>{orderModel && orderModel.statusString}</p></Col>
+                                                </Row>
+                                                <Row>
+                                                    <Col span={5}>
+                                                        <p style={{ fontWeight: 'bold' }}>Loại đơn hàng: </p>
+                                                    </Col>
+                                                    <Col span={12} style={{ textAlign: 'left' }}>
+                                                        <p style={{ fontWeight: '500' }}>{orderModel && orderModel.typeString}</p></Col>
+                                                </Row>
+                                            </Col>
+                                        </Row>
+                                    </Col>
+                                </Row>
+                            </Card>
+                            <br />
+                            <Card>
 
-                                                    <Select
-                                                        value={paymentId}
-                                                        placeholder="Please select"
-                                                        onChange={handlePaymentId}
-                                                        style={{
-                                                            width: '100%',
-                                                        }}
-                                                        options={payments}
-                                                    /></Col>
-                                            </Row>
-                                        </Col>
-                                        <br />
-                                        <Col span={24}>
-                                            <Row>
-                                                <Col span={6}>
-                                                    <p style={{ fontWeight: '500' }}>Giao hàng: </p>
-                                                </Col>
-                                                <Col span={18}>
-                                                    <Select
-                                                        value={deleveryId}
-                                                        placeholder="Please select"
-                                                        onChange={(e) => handleSelectDelivery(e)}
-                                                        style={{
-                                                            width: '100%',
-                                                        }}
-                                                        options={optionDelivery}
-                                                    /></Col>
-                                            </Row>
+                                <Row gutter={[16, 16]}>
+                                    <Col span={12}>
+                                        <span class="hide-menu" style={{ fontSize: "13px", color: "black", fontWeight: "bold" }}>Thông tin đơn hàng</span>
+                                    </Col>
 
-                                        </Col>
-                                        <br />
-                                        <Col span={24}>
-                                            <Row>
-                                                <Col span={6}>
-                                                    <p style={{ fontWeight: '500' }}>Tiền hàng: </p>
-                                                </Col>
-                                                <Col span={18} style={{ textAlign: 'right' }}>
-                                                    <p style={{ fontWeight: '500' }}>{formatCurrencyVND(totalPrice)}</p></Col>
-                                            </Row>
-
-                                        </Col>
-                                        <Col span={24}>
-                                            <Row>
-                                                <Col span={6}>
-                                                    <p style={{ fontWeight: '500' }}>Phí vận chuyển: </p>
-                                                </Col>
-                                                <Col span={18} style={{ textAlign: 'right' }}>
-                                                    <p style={{ fontWeight: '500' }}>{feeDelivery && formatCurrencyVND(feeDelivery ?? 0)}</p></Col>
-                                            </Row>
-
-                                        </Col>
-                                        <Col span={24}>
-                                            <Row>
-                                                <Col span={8}>
-                                                    <p style={{ fontWeight: '500' }}>Tiền giảm giá voucher: </p>
-                                                </Col>
-                                                <Col span={16} style={{ textAlign: 'right' }}>
-                                                    <p style={{ fontWeight: '500' }}>{discount && formatCurrencyVND(discount ?? 0)}</p></Col>
-                                            </Row>
-
-                                        </Col>
-                                        <Col span={24}>
-                                            <Row>
-                                                <Col span={8}>
-                                                    <p style={{ fontWeight: '500' }}>Tổng thanh toán: </p>
-                                                </Col>
-                                                <Col span={16} style={{ textAlign: 'right' }}>
-                                                    <p style={{ fontWeight: '500' }}>{discount && formatCurrencyVND(totalPrice + feeDelivery - discount)}</p></Col>
-                                            </Row>
-                                        </Col>
-                                    </Row>
-                                </Col>
-                            </Row>
+                                    <Col span={12} style={{ textAlign: 'right' }}>
+                                        <ProductPopUp handleProductSelected={handleProductSelected} modelProduct={tab.products} tabIndex={index} />
+                                    </Col>
+                                </Row>
+                                <Divider orientation="left" plain />
+                                <Table
+                                    dataSource={tab.products} columns={columns}
+                                    pagination={false}
+                                    loading={false}
+                                    onChange={null}
+                                />
+                            </Card>
                             <br />
                             <Col span={24} style={{ textAlign: 'right' }}>
-                                  <Button type="primary" onClick={null}>
-                                              Cập nhật
-                                          </Button>
+                                <Button type="primary" onClick={null}>
+                                    Cập nhật
+                                </Button>
                             </Col>
                         </Form>
                     )
