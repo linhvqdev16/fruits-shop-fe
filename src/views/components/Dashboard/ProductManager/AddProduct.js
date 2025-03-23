@@ -188,20 +188,23 @@ const AddProduct = ({ fetchData, modelItem, textButton, isStyle }) => {
         stock: values.stock,
         description: values.description,
         code: values.code,
-        datePublic: datePublic, 
+        datePublic: datePublic,
         authorPublish: values.authorPublic,
-        publisher: values.authorPublish, 
+        publisher: values.authorPublish,
         author: values.author,
         series: values.series,
-        datePublish: datePublish, 
+        datePublish: datePublish,
         id: modelItem && modelItem.id,
         status: 1
       }
+      debugger;
+      var jsonObject = JSON.stringify(product);
+
       formData.append("productModel", JSON.stringify(product));
       fileList.forEach((file) => {
         formData.append(`files`, file.originFileObj);
       });
-      const { success, data } = await addOrChange(formData, { "Content-Type": "multipart/form-data" });
+      const { success, data } = await addOrChange(formData, { "Content-Type": "multipart/form-data;" });
       if (data.status != 'Error' && success) {
         setModal2Open(false);
         toast.success(data.message);
@@ -237,7 +240,7 @@ const AddProduct = ({ fetchData, modelItem, textButton, isStyle }) => {
         } : null}
         onClick={() => showModel()}
       >
-     {textButton}
+        {textButton}
       </Button>
 
       <Modal
@@ -364,7 +367,7 @@ const AddProduct = ({ fetchData, modelItem, textButton, isStyle }) => {
                 label="Ngày xuất bản"
                 name="datePublish"
               >
-                <DatePicker onChange={handleSetDatePublish} placeholder={datePublish && format(datePublish, "dd-MM-yyyy")}  style={{ width: '100%' }} />
+                <DatePicker onChange={handleSetDatePublish} placeholder={datePublish && format(datePublish, "dd-MM-yyyy")} style={{ width: '100%' }} />
               </Form.Item>
             </Col>
 
@@ -376,7 +379,7 @@ const AddProduct = ({ fetchData, modelItem, textButton, isStyle }) => {
                   { required: true, message: "Please input product quantity!" },
                 ]}
               >
-                <DatePicker onChange={handleSetDatePublic} placeholder={datePublic && format(datePublic, "dd-MM-yyyy")}  style={{ width: '100%' }} />
+                <DatePicker onChange={handleSetDatePublic} placeholder={datePublic && format(datePublic, "dd-MM-yyyy")} style={{ width: '100%' }} />
               </Form.Item>
             </Col>
 

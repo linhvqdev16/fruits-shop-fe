@@ -22,12 +22,17 @@ const useUser = () => {
 		data: params, 
 		headers: header
 	})
+	const createShortUser = (params) => createPostRequest({
+		endpoint: '/create-short-user',
+		data: params
+	})
 	return {
 		getListUser, 
         getUserById, 
         generateCode, 
         changeStatus, 
-        addOrChange
+        addOrChange,
+		createShortUser
 	}
 }
 

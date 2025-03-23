@@ -312,13 +312,13 @@ const OrderDetail = () => {
     }
 
     useEffect(() => {
-        if (tableParams.pagination && tableParams.pagination.keySearch.length > 0) {
-            fetchData();
-        }
+        // if (tableParams.pagination && tableParams.pagination.keySearch.length > 0) {
+        //     fetchData();
+        // }
         fetchOrderDetail();
-        fetchDelivery();
-        fetchPayment();
-        fetchProvince();
+        // fetchDelivery();
+        // fetchPayment();
+        // fetchProvince();
     }, [JSON.stringify(tableParams), loading])
     const handleInputQuantity = (index, value) => {
         const tabIndex = tabs.findIndex((e) => e.id === activeTab);
@@ -383,7 +383,7 @@ const OrderDetail = () => {
             key: 'stock',
             width: 150,
             render: (_, record, index) => {
-                return <Input style={{ textAlign: 'center' }} type="number" value={record.quantity}
+                return <Input style={{ textAlign: 'center' }} type="number" value={record.quantity} readOnly={orderModel && orderModel.status !== 1}
                     onChange={(e) => handleInputQuantity(index, e.target.value)}
                 >
                 </Input>
@@ -392,8 +392,9 @@ const OrderDetail = () => {
         {
             title: 'Action',
             key: 'action',
+            hidden: orderModel && orderModel.status !== 1,
             render: (_, record, index) => (
-                <Space style={{ textAlign: 'center' }}>
+                    <Space style={{ textAlign: 'center' }}>
                     <Trash2 style={{ color: "gray" }} onClick={(e) => handleRemoveProd(index)} />
                 </Space>
             ),
@@ -402,33 +403,6 @@ const OrderDetail = () => {
     function formatCurrencyVND(amount) {
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
     }
-    const handlePaymentId = (e) => {
-        setPaymentId(e);
-        if (delivery && delivery.length > 0) {
-            const deliveryModel = delivery.find((m) => m.id === e);
-            setFeeDelivery(deliveryModel ? deliveryModel.fee : 0);
-        }
-    }
-    const handleSelectDelivery = (e) => {
-        setDeleveryId(e);
-        if (delivery && delivery.length > 0) {
-            const deliveryModel = delivery.find((m) => m.id === e);
-            setFeeDelivery(deliveryModel ? deliveryModel.fee : 0);
-        }
-    }
-
-    const fetchProvince = async () => {
-        var request = {
-            name: null
-        };
-        const { success, data } = await getProvince(request);
-        if (!success || data.status == 'Error') {
-            toast.error(data.message);
-        } else {
-            setProvince(data.data);
-        }
-    };
-
     const fetchDistrict = async (provinceId) => {
         setDistrictId(0);
         var request = {
@@ -457,48 +431,6 @@ const OrderDetail = () => {
         }
     };
 
-    const handleSelectProvince = (e) => {
-        setProvinceId(e);
-        fetchDistrict(e);
-        const addressModel = [...address];
-        addressModel[0] = { ...addressModel[0], provinceId: e, districtId: 0, wardId: 0 };
-        setListAddress(addressModel);
-    }
-
-    const handleSelectDistrict = (e) => {
-        setDistrictId(e);
-        fetchWard(e);
-        const addressModel = [...address];
-        addressModel[0] = { ...addressModel[0], districtId: e, wardId: 0 };
-        setListAddress(addressModel);
-    }
-
-    const handleSelectWard = (e) => {
-        setWardId(e);
-        const addressModel = [...address];
-        addressModel[0] = { ...addressModel[0], wardId: e };
-        setListAddress(addressModel);
-    }
-
-    const handleSelectUser = (e) => {
-        form.setFieldsValue({ customerName: e.fullName, phoneNumber: e.phoneNumber, email: e.email, addressDetail: e.address && e.address.length > 0 && e.address[0].fullInfo });
-        setUserModel(e);
-    }
-
-    const handleSelectCounpon = (e) => {
-        if (e.minValue <= totalPrice && e.maxValue >= totalPrice) {
-            var discountNumber = 0;
-            if (e.type === 1) {
-                discountNumber = (totalPrice * e.couponAmount / 100);
-            } else {
-                discountNumber = e.couponAmount;
-            }
-            setDiscount(discountNumber);
-            setCouponModel(e);
-        } else {
-            toast.warning("Giá trị đơn hàng không đủ để sử dụng khuyến mại");
-        }
-    }
     const [isModalAccept, setIsModalAccept] = useState(false);
     const [isModalDelivery, setIsModalDelivery] = useState(false);
     const [isModalFinish, setIsModalFinish] = useState(false);
@@ -665,9 +597,11 @@ const OrderDetail = () => {
                                         <span class="hide-menu" style={{ fontSize: "13px", color: "black", fontWeight: "bold" }}>Thông tin đơn hàng</span>
                                     </Col>
 
-                                    <Col span={12} style={{ textAlign: 'right' }}>
+                                    {
+                                        orderModel && orderModel.status === 1 && <Col span={12} style={{ textAlign: 'right' }}>
                                         <ProductPopUp handleProductSelected={handleProductSelected} modelProduct={tab.products} tabIndex={index} />
                                     </Col>
+                                    }
                                 </Row>
                                 <Divider orientation="left" plain />
                                 <Table

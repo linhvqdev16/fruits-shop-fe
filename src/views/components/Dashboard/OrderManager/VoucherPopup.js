@@ -178,7 +178,7 @@ const VoucherPopup = ({ handlePopupSelected, model }) => {
                             <Input placeholder="Enter code, name to search" onChange={handleChangeKeySearch} />
                         </Form.Item>
                     </Col>
-                    <Col span={6} style={{ textAlign: 'right' }}>
+                    {/* <Col span={6} style={{ textAlign: 'right' }}>
                         <Button
                             type="button"
                             value="small"
@@ -192,7 +192,7 @@ const VoucherPopup = ({ handlePopupSelected, model }) => {
                         >
                             Áp dụng
                         </Button>
-                    </Col>
+                    </Col> */}
                 </Row>
                 <Table
                     dataSource={coupons} columns={columns}

@@ -5,9 +5,10 @@ import useUser from '@api/useUser';
 import { toast } from 'react-toastify';
 import { format } from 'date-fns';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faCircleInfo, faCheckDouble } from "@fortawesome/free-solid-svg-icons"
+import { faCheckDouble } from "@fortawesome/free-solid-svg-icons"
+import QuickCreateCustomer from "./QuickCreateCustomer"
 
-const CustomerPopup = ({ handlePopupSelected, model }) => {
+const CustomerPopup = ({ handlePopupSelected, index }) => {
 
     const [modal2Open, setModal2Open] = useState(false);
     const { getListUser } = useUser();
@@ -25,6 +26,11 @@ const CustomerPopup = ({ handlePopupSelected, model }) => {
         },
     });
 
+    const handleCreateCustomer =  (e) => {
+        handlePopupSelected(e, index);
+        setModal2Open(false);
+    }
+
     const fetchData = async () => {
         const { success, data } = await getListUser(tableParams.pagination);
         if (!success || data.status == 'Error') {
@@ -40,11 +46,6 @@ const CustomerPopup = ({ handlePopupSelected, model }) => {
         setModal2Open(true);
         fetchData();
     }
-
-    const onFinish = () => {
-        setModal2Open(false);
-    }
-
     useEffect(() => {
         if (modal2Open) {
             fetchData();
@@ -75,7 +76,6 @@ const CustomerPopup = ({ handlePopupSelected, model }) => {
         setUser([]);
     }
     const handleSeletecCoupon = (model) => {
-        debugger;
         handlePopupSelected(model); 
         setModal2Open(false);
     }
@@ -174,19 +174,7 @@ const CustomerPopup = ({ handlePopupSelected, model }) => {
                         </Form.Item>
                     </Col>
                     <Col span={6} style={{ textAlign: 'right' }}>
-                        <Button
-                            type="button"
-                            value="small"
-                            style={{
-                                alignItems: "center",
-                                background: "#2596be",
-                                marginBottom: "20px",
-                                color: "white"
-                            }}
-                            onClick={() => onFinish()}
-                        >
-                            Chọn khách hàng
-                        </Button>
+                       <QuickCreateCustomer handlePopupSelected={handleCreateCustomer}/>
                     </Col>
                 </Row>
                 <Table

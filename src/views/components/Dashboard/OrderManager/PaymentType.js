@@ -26,8 +26,15 @@ const PaymentType = ({ callback, amount, deliveryId, paymentId, products, tabIds
 
     return (
         <div style={{ padding: '20px' }}>
-            <Button type="primary" onClick={showModal}>
-                Payment
+            <Button  type="button"
+                value="small"
+                style={{
+                    alignItems: "center",
+                    background: "#2596be",
+                    marginBottom: "20px",
+                    color: 'white'
+                }} onClick={showModal}>
+                Thanh toán
             </Button>
 
             <Modal

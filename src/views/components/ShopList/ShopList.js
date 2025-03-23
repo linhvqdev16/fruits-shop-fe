@@ -200,7 +200,7 @@ const ShopList = () => {
                                             </div>
                                         </li>
 
-                                        {branchProduct.map((items, key) => {
+                                        {branchProduct && branchProduct.map((items, key) => {
                                             return (
                                                 <li
                                                     id="item-product"

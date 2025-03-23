@@ -175,6 +175,19 @@ const EmployeeAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
 
     const onFinish = async (values) => {
         try {
+            const addressModel = address.map((e) => {
+                return {
+                    provinceId: e.provinceId,
+                    districtId: e.districtId,
+                    wardId: e.wardId,
+                    addressDetail: e.addressDetail,
+                    stage: 1,
+                    provinceName: e.provinceName,
+                    districtName: e.districtName,
+                    wardName: e.wardName,
+                    id: e.id
+                }
+            });
             const formData = new FormData()
             const model = {
                 code: values.code,
@@ -184,7 +197,7 @@ const EmployeeAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
                 dateBirth:  birthDate,
                 userName: values.userName,
                 gender: gender === "male" ? true : false,
-                address: address,
+                address: addressModel,
                 roleId: values.roleId,
                 description: values.description,
                 status: 1, 

@@ -172,7 +172,6 @@ const UserAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
     const onFinish = async (values) => {
         try {
             const formData = new FormData()
-            debugger;
             const addressModel = address.map((e) => {
                 return {
                     provinceId: e.provinceId,
