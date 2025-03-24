@@ -1,5 +1,5 @@
 import { PlusSquareOutlined } from "@ant-design/icons";
-import { Button, Col, Form, Input, Modal, Row, Select, Table, DatePicker, Checkbox } from "antd";
+import { Button, Col, Form, Input, Modal, Row, Select, Table, DatePicker, Checkbox, Pagination } from "antd";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import useDiscount from "@api/useDiscount";
@@ -26,11 +26,8 @@ const DiscountAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
   const { RangePicker } = DatePicker;
   const [dates, setDates] = useState([]);
 
-
-
   const [startDate, setStartDate] = useState();
   const [endDate, setEndDate] = useState();
-
 
   const [tableParams, setTableParams] = useState({
     pagination: {
@@ -81,14 +78,18 @@ const DiscountAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
       form.setFieldsValue({ code: modelItem.code, name: modelItem.name, description: modelItem.description, typeId: modelItem.type, couponAmount: modelItem.type === 1 ? modelItem.percent : modelItem.moneyDiscount });
       setStartDate(new Date(modelItem.startDate));
       setEndDate(new Date(modelItem.endDate));
+      if (modelItem && modelItem.productIds) {
+        setProductIdSelected(modelItem.productIds);
+      }
     } else {
       fetchGenerateCode();
       setTypeProductDiscount(1);
     }
+    fetchProduct();
     setModal2Open(true);
   }
   useEffect(() => {
-    if (typeProductDiscount === 3) {
+    if (modal2Open) {
       fetchProduct();
     }
   }, [tableParams, typeProductDiscount]);
@@ -100,11 +101,13 @@ const DiscountAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
   const handleSetStartDate = date => {
     setStartDate(date.format());
   }
-
-
   const onFinish = async (values) => {
-    var date = dates;
     try {
+      debugger;
+      if (productIdSelected === null || productIdSelected.length === 0) {
+        toast.error("Vui lòng chọn sản phẩm cho trương chình khuyến mại");
+        return;
+      }
       var objectModel = {
         name: values.name,
         description: values.description,
@@ -118,7 +121,8 @@ const DiscountAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
         code: values.code,
         percent: values.couponAmount,
         status: 1,
-        isDeleted: 0
+        isDeleted: 0,
+        productIds: productIdSelected
       }
       const { success, data } = await addOrChange(objectModel);
       if (data.status != 'Error' && success) {
@@ -147,11 +151,13 @@ const DiscountAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
     }
   };
   const handleChangeSelected = (event, id) => {
+    var models = [...productIdSelected];
     if (event.target.checked) {
-      setProductIdSelected([...productIdSelected].push(id));
+      models.push(id);
     } else {
-      setProductIdSelected([...productIdSelected].filter((e) => e != id));
+      models.filter((e) => e != id);
     }
+    setProductIdSelected(models);
   }
   const handleChangeSearchNameProd = (e) => {
     setTableParams((prevPrams) => ({
@@ -168,7 +174,7 @@ const DiscountAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
       dataIndex: 'number',
       key: 'number',
       render: (_, record) => {
-        return <Checkbox checked={productIdSelected && productIdSelected.includes(record.id)}></Checkbox>
+        return <Checkbox onChange={(e) => handleChangeSelected(e, record.id)} checked={productIdSelected && productIdSelected.length > 0 && productIdSelected.includes(record.id)}></Checkbox>
       },
     },
     {
@@ -269,8 +275,8 @@ const DiscountAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
                     width: '100%'
                   }}
                 >
-                  <Option value={1}>Giảm phần trăm đơn hàng</Option>
-                  <Option value={2}>Giảm tiền đơn hàng</Option>
+                  <Option value={1}>Giảm phần trăm sản phẩm</Option>
+                  <Option value={2}>Giảm tiền sản phẩm</Option>
                 </Select>
               </Form.Item>
             </Col>
@@ -297,7 +303,7 @@ const DiscountAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
               <Form.Item
                 label="Ngày kết thúc"
                 name="dateEnd"
-               
+
               >
                 <DatePicker onChange={handleSetEndDate} placeholder={endDate && format(endDate, "dd-MM-yyyy")} style={{ width: '100%' }} />
               </Form.Item>
@@ -311,14 +317,14 @@ const DiscountAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
               </Form.Item>
             </Col>
           </Row>
-          {/* <br />
+          <br />
           <Row gutter={[5, 5]}>
             <Col span={16}>
-              <span class="hide-menu" style={{ fontSize: "13px", color: "black", fontWeight: "bold" }}>Thông tin sản phẩm</span>
+              <span class="hide-menu" style={{ fontSize: "13px", color: "black", fontWeight: "bold" }}>Thông tin sản phẩm khuyến mại</span>
             </Col>
           </Row>
           <br />
-          <Row>
+          {/* <Row>
             <Col span={6}>
               <span class="hide-menu" style={{ fontSize: "13px", color: "black", fontWeight: "normal" }}>Chọn sản phẩm khuyến mại</span>
             </Col>
@@ -337,74 +343,31 @@ const DiscountAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
               </Select>
 
             </Col>
-          </Row>
-          {typeProductDiscount && typeProductDiscount === 1 && <>
-            <br />
-            <Row> <Col span={24}>
+          </Row> */}
+
+          <Row gutter={[5, 5]}>
+            <Col span={24}>
               <Form.Item
-                label="Loại sản phẩm"
-                name="categoryId"
-                rules={[{ required: true }]}
-              >
-                <Select
-                  placeholder=""
-                  onChange={null}
-                  style={{
-                    width: '100%'
-                  }}
-                  options={category}
-                />
+                name="searchProduct"
+                rules={[{ required: false, message: "" }]}>
+                <Input placeholder="Enter code, product name.." onChange={(e) => handleChangeSearchNameProd(e)} />
               </Form.Item>
             </Col>
-            </Row></>}
-          {typeProductDiscount && typeProductDiscount === 2 && <>
-            <br />
-            <Row gutter={[10, 10]}>
-              <Col span={12}>
-                <Form.Item
-                  label="Giá trị bắt đầu"
-                  name="minValue"
-                  rules={[{ required: true }]}
-                >
-                  <Input placeholder="" type="number" />
-                </Form.Item>
-              </Col>
+          </Row>
+          <Table
+            dataSource={product} columns={columns}
+            pagination={false}
+            loading={false}
+            onChange={null}
+          />
+          <Pagination
+            showSizeChanger
+            onChange={onShowSizeChange}
+            style={{ textAlign: 'center', marginTop: '24px' }}
+            defaultCurrent={tableParams.pagination.pageIndex}
+            total={total}
+          />
 
-              <Col span={12}>
-                <Form.Item
-                  label="Giá trị kết thúc"
-                  name="maxValue"
-                  rules={[{ required: true }]}
-                >
-                  <Input placeholder="" type="number" />
-                </Form.Item>
-              </Col>
-            </Row>
-          </>}
-          {typeProductDiscount && typeProductDiscount === 3 && <>
-            <br />
-            <Row gutter={[5, 5]}>
-              <Col span={24}>
-                <Form.Item
-                  name="searchProduct"
-                  rules={[{ required: false, message: "" }]}>
-                  <Input placeholder="Enter code, product name.." onChange={(e) => handleChangeSearchNameProd(e)} />
-                </Form.Item>
-              </Col>
-            </Row>
-            <Table
-              dataSource={product} columns={columns}
-              pagination={false}
-              loading={false}
-              onChange={null}
-            />
-            <Pagination
-              showSizeChanger
-              onChange={onShowSizeChange}
-              style={{ textAlign: 'center', marginTop: '24px' }}
-              defaultCurrent={tableParams.pagination.pageIndex}
-              total={total}
-            /></>} */}
           <Form.Item>
             <Button type="primary" htmlType="submit" >
               Lưu thông tin

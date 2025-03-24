@@ -246,7 +246,7 @@ const OrderCounter = () => {
             }
         }
         setTotalPrice(sum);
-        modelTabs[index] = { ...modelTabs[index], products: products, totalPrice: sum};
+        modelTabs[index] = { ...modelTabs[index], products: products, totalPrice: sum };
         setTabs(modelTabs);
     }
     const handleInputQuantity = (index, value) => {
@@ -272,7 +272,13 @@ const OrderCounter = () => {
         const tabModel = [...tabs];
         const addressModel = tabModel[index].address;
         addressModel[0] = { ...addressModel[0], addressDetail: e.target.value };
-        tabModel[index] = { ...tabModel[index], address: addressModel[0] };
+        tabModel[index] = { ...tabModel[index], address: addressModel[0], addressDetail: e.target.value };
+        setTabs(tabModel);
+    }
+
+    const handleChangeFeeDelivery = (e, index) => {
+        const tabModel = [...tabs];
+        tabModel[index] = { ...tabModel[index], feeDelivery: parseInt(e.target.value) };
         setTabs(tabModel);
     }
     const columns = [
@@ -393,11 +399,12 @@ const OrderCounter = () => {
         }
     };
     const handleSelectProvince = (e, index) => {
+        debugger;
         fetchDistrict(e);
         const tabModel = [...tabs];
         const addressModel = tabModel[index].address;
-        addressModel[0] = { ...addressModel[0], provinceId: e, districtId: 0, wardId: 0 };
-        tabModel[index].address = { ...tabModel[index], address: addressModel };
+        addressModel[0] = { ...addressModel[0], provinceId: e, districtId: 0, provinceId: 0 };
+        tabModel[index] = { ...tabModel[index], address: addressModel,  provinceId: e};
         setTabs(tabModel);
     }
     const handleSelectDistrict = (e, index) => {
@@ -405,7 +412,7 @@ const OrderCounter = () => {
         const tabModel = [...tabs];
         const addressModel = tabModel[index].address;
         addressModel[0] = { ...addressModel[0], districtId: e, wardId: 0 };
-        tabModel[index].address = { ...tabModel[index], address: addressModel };
+        tabModel[index] = { ...tabModel[index], address: addressModel, districtId: e };
         setTabs(tabModel);
     }
 
@@ -413,13 +420,12 @@ const OrderCounter = () => {
         const tabModel = [...tabs];
         const addressModel = tabModel[index].address;
         addressModel[0] = { ...addressModel[0], wardId: e };
-        tabModel[index].address = { ...tabModel[index], address: addressModel };
+        tabModel[index] = { ...tabModel[index], address: addressModel, wardId: e };
         setTabs(tabModel);
     }
     const handleSelectUser = (e, index) => {
         const tabModel = [...tabs];
-        debugger;
-        tabModel[index] = { ...tabModel[index], userModel: {id: e.id, fullName: e.fullName, phoneNumber: e.phoneNumber, email: e.email, addressDetail: e.address && e.address.length > 0 && e.address[0].fullInfo, address: e.address }, address: e.address, addressDetail:  e.address && e.address.length > 0 && e.address[0].fullInfo };
+        tabModel[index] = { ...tabModel[index], userModel: { id: e.id, fullName: e.fullName, phoneNumber: e.phoneNumber, email: e.email, addressDetail: e.address && e.address.length > 0 && e.address[0].fullInfo, address: e.address }, address: e.address, addressDetail: e.address && e.address.length > 0 && e.address[0].fullInfo };
         setUserModel(e);
         setTabs(tabModel);
     }
@@ -442,17 +448,23 @@ const OrderCounter = () => {
     }
     const handleSetFullName = (e, index) => {
         const tabModel = [...tabs];
-        tabModel[index] = { ...tabModel[index], fullName: e };
+        var userModel = tabModel[index].userModel;
+        userModel= { ...userModel, fullName: e };
+        tabModel[index] = { ...tabModel[index], userModel: userModel };
         setTabs(tabModel);
     }
     const handleSetEmail = (e, index) => {
         const tabModel = [...tabs];
-        tabModel[index] = { ...tabModel[index], email: e };
+        var userModel = tabModel[index].userModel;
+        userModel= { ...userModel, email: e };
+        tabModel[index] = { ...tabModel[index], userModel: userModel };
         setTabs(tabModel);
     }
     const handleSetPhone = (e, index) => {
         const tabModel = [...tabs];
-        tabModel[index] = { ...tabModel[index], phoneNumber: e };
+        var userModel = tabModel[index].userModel;
+        userModel= { ...userModel, phoneNumber: e };
+        tabModel[index] = { ...tabModel[index], userModel: userModel };
         setTabs(tabModel);
     }
     function formatCurrencyVND(amount) {
@@ -534,8 +546,7 @@ const OrderCounter = () => {
                                         <Input placeholder="" type="text" value={tab.userModel && tab.userModel.email} onChange={(e) => handleSetEmail(e.target.value, index)} />
                                     </Col>
                                     {tab.delevryId > 0 && tab.delevryId !== 1 && <>
-                                        {
-                                            tab.userModel === null && <>
+                                        <>
                                                 <Col span={8}>
                                                     <p style={{ fontWeight: '500' }}>Tỉnh/Thành phố: <span style={{ color: 'red' }}>(*)</span> </p>
                                                     <Select
@@ -585,7 +596,6 @@ const OrderCounter = () => {
                                                     </Select>
                                                 </Col>
                                             </>
-                                        }
 
                                         <Col span={24}>
                                             <p style={{ fontWeight: '500' }}>Địa chỉ chi tiết: <span style={{ color: 'red' }}>(*)</span> </p>
@@ -660,12 +670,13 @@ const OrderCounter = () => {
 
                                         </Col>
                                         <Col span={24}>
-                                            <Row>
+                                            <Row justify={'space-between'}>
                                                 <Col span={6}>
                                                     <p style={{ fontWeight: '500' }}>Phí vận chuyển: </p>
                                                 </Col>
-                                                <Col span={18} style={{ textAlign: 'right' }}>
-                                                    <p style={{ fontWeight: '500' }}>{tab.feeDelivery && formatCurrencyVND(tab.feeDelivery ?? 0)}</p></Col>
+                                                <Col span={6} style={{ textAlign: 'right' }}>
+                                                    <Input placeholder="" type="text" value={tab.feeDelivery ?? 0} onChange={(e) => handleChangeFeeDelivery(e, index)} />
+                                                    {/* <p style={{ fontWeight: '500' }}>{tab.feeDelivery && formatCurrencyVND(tab.feeDelivery ?? 0)}</p></Col> */}</Col>
                                             </Row>
 
                                         </Col>

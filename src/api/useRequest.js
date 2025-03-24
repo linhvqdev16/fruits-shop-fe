@@ -18,7 +18,6 @@ const useRequest = (prefixPath = '') => {
 		timeout: 8000,
 		headers: {
 			Accept: 'application/json; charset=utf-8',
-			'Content-Type': 'application/json, charset=UTF-8',
 			'Access-Control-Allow-Origin': '*',
 			Authorization: `Bearer ${token}`
 		},
@@ -26,14 +25,11 @@ const useRequest = (prefixPath = '') => {
 	})
 	const [request, setRequest] = useState(() => createRequest())
 	const createGetRequest = useCallback(({ endpoint, params, query, headers, successCallback }) => {
-
-		debugger;
 		console.log(endpoint, params);
 		return (
 			request
 				.get(endpoint, { params, headers })
 				.then(res => {
-					debugger;
 					if(isFunction(successCallback)) successCallback()
 					return {
 						success: true,
@@ -41,7 +37,6 @@ const useRequest = (prefixPath = '') => {
 					}
 				})
 				.catch(err => {
-					debugger;
 					const data = handleError(err)
 					return {
 						success: false,
@@ -49,7 +44,6 @@ const useRequest = (prefixPath = '') => {
 					}
 				})
 				.finally(() => {
-					debugger;
 				})
 		)
 	}, [request, t])

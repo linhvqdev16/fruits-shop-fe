@@ -386,7 +386,8 @@ function ProductManager() {
                 </Row>
             </Form>
             <Table
-                dataSource={product} columns={columns}
+                dataSource={product} 
+                columns={columns}
                 pagination={false}
                 loading={loading}
                 onChange={handleTableChange}
@@ -394,7 +395,7 @@ function ProductManager() {
             <Pagination
                 showSizeChanger
                 onChange={onShowSizeChange}
-                style={{ textAlign: 'center', marginTop: '24px' }}
+                style={{ textAlign: 'center',marginTop: '1.5rem'  }}
                 defaultCurrent={tableParams.pagination.pageIndex}
                 total={total}
             />
