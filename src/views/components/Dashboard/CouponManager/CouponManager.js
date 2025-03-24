@@ -25,7 +25,7 @@ function CouponManager() {
             minValue: null,
             maxValue: null,
             keySearch: null,
-            status: 1
+            status: null
         },
     });
     const { RangePicker } = DatePicker;
@@ -214,13 +214,13 @@ function CouponManager() {
             title: 'Thời gian bắt đầu',
             dataIndex: 'dateStart',
             key: 'dateStart',
-            render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{format(record.dateStart, 'dd-MM-yyyy')}</p>
+            render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{} {format(record.dateStartEpochTime, 'dd-MM-yyyy HH:mm:ss')}</p>
         },
         {
             title: 'Thời gian kết thúc',
             dataIndex: 'dateEnd',
             key: 'dateEnd',
-            render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{format(record.dateEnd, 'dd-MM-yyyy')}</p>
+            render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{format(record.dateEndEpochTime, 'dd-MM-yyyy HH:mm:ss')}</p>
         },
         {
             title: 'Trạng thái',

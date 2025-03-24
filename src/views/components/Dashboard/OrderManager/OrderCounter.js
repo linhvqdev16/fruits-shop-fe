@@ -12,6 +12,7 @@ import CustomerPopup from "./CustomerPopup";
 import { Option } from "antd/es/mentions";
 import useAddress from "@api/useAddress";
 import useOrder from '@api/useOrder';
+import { useNavigate, useLocation } from "react-router-dom";
 const Tab = ({ label, activeTab, setActiveTab, closeTab }) => {
     return (
         <div
@@ -48,24 +49,25 @@ const Tab = ({ label, activeTab, setActiveTab, closeTab }) => {
     );
 };
 const OrderCounter = () => {
-    const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
-    const [tabs, setTabs] = useState([{ id: 'Đơn hàng 1', active: true, user: null, products: [], userModel: null, fullName: '', phoneNumber: '', email: '', provinceId: null, districtId: null, wardId: null, addressDetail: '', totalPrice: null, paymentId: null, delevryId: null, couponModel: null, discount: null, feeDelivery: null, address: [] }]);
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [tabs, setTabs] = useState(() => {
+        var models = localStorage.getItem("orderForms");
+        setIsLoaded(true);
+        if (models) {
+            return JSON.parse(models);
+        }
+        return [{ id: 'Đơn hàng 1', active: true, user: null, products: [], userModel: null, fullName: '', phoneNumber: '', email: '', provinceId: null, districtId: null, wardId: null, addressDetail: '', totalPrice: null, paymentId: null, delevryId: null, couponModel: null, discount: null, feeDelivery: null, address: [], provinces: [], wards: [], districts: [] }];
+    });
     const [activeTab, setActiveTab] = useState('Đơn hàng 1');
-    const [user, setUsers] = useState([]);
-    const { getListUser } = useUser();
     const [payments, setPayments] = useState([]);
     const [delivery, setDelivery] = useState([]);
     const [optionDelivery, setOptionDelivery] = useState([]);
     const { getListPayment } = usePayment();
     const { getListDelivery } = useDelivery();
     const [totalPrice, setTotalPrice] = useState(0);
-    const [feeDelivery, setFeeDelivery] = useState(0);
-    const [paymentId, setPaymentId] = useState(0);
-    const [deleveryId, setDeleveryId] = useState(0);
     const [discount, setDiscount] = useState(0);
     const [couponModel, setCouponModel] = useState(null);
-    const [userModel, setUserModel] = useState(null);
     const { createOrder } = useOrder();
     const [tableParams, setTableParams] = useState({
         pagination: {
@@ -80,11 +82,10 @@ const OrderCounter = () => {
     const [province, setProvince] = useState([]);
     const [district, setDistrict] = useState([]);
     const [ward, setWard] = useState([]);
-
     const addTab = () => {
         if (tabs.length < 5) {
             const newTabId = `Đơn hàng ${tabs.length + 1}`;
-            setTabs([...tabs, { id: newTabId, active: false, user: null, products: [], userModel: null, fullName: '', phoneNumber: '', email: '', provinceId: null, districtId: null, wardId: null, addressDetail: '', totalPrice: null, paymentId: null, delevryId: null, couponModel: null, address: [] }]);
+            setTabs([...tabs, { id: newTabId, active: false, user: null, products: [], userModel: null, fullName: '', phoneNumber: '', email: '', provinceId: null, districtId: null, wardId: null, addressDetail: '', totalPrice: null, paymentId: null, delevryId: null, couponModel: null, address: [],  provinces: [], wards: [], districts: [], productSeletedIds: [] }]);
             setActiveTab(newTabId);
         } else {
             toast.error("Only can create 5 order in one time!");
@@ -128,7 +129,6 @@ const OrderCounter = () => {
     }
     const onCreateOrder = async (modelProducts, tabIds) => {
         try {
-            debugger;
             const tabInfoModel = tabs[tabs.findIndex(e => e.id === tabIds)];
             const addressModel = tabInfoModel.address.map((e) => {
                 return {
@@ -174,7 +174,7 @@ const OrderCounter = () => {
                 feeDelivery: tabInfoModel.feeDelivery,
                 deliveryType: tabInfoModel.delevryId,
                 description: null,
-                status: tabInfoModel.delevryId === 1 ? 4 : 1,
+                status: tabInfoModel.delevryId === 1 ? 4 : 2,
                 stage: 1,
                 type: 1,
                 realPrice: tabInfoModel.totalPrice,
@@ -200,36 +200,23 @@ const OrderCounter = () => {
             toast.error(error)
         }
     };
-    const fetchData = async () => {
-        const { success, data } = await getListUser(tableParams.pagination);
-        console.log(data);
-        if (success && data.status != 'Error') {
-            setUsers(data.data);
-            setLoading(false)
-            toast.success(data.message);
-            const model = data.data.map((e) => {
-                return {
-                    value: e.id,
-                    label: e.code + " - " + e.phoneNumber + " - " + e.fullName,
-                    key: e.id,
-                    fullName: e.fullName
-                }
-            });
-        } else {
-            toast.error(data.message)
-        }
-    }
-
     useEffect(() => {
-        if (tableParams.pagination && tableParams.pagination.keySearch.length > 0) {
-            fetchData();
+        if (isLoaded && isLoaded === true) {
+            const models = [...tabs];
+            const saveData = () => {
+                localStorage.setItem("orderForms", JSON.stringify(models));
+            };
+            return saveData;
         }
+    }, [tabs]);
+    useEffect(() => {
         fetchDelivery();
         fetchPayment();
         fetchProvince();
     }, [JSON.stringify(tableParams), loading])
 
     const handleProductSelected = (products, index) => {
+        debugger;
         const modelTabs = [...tabs];
         const sum = products.reduce((accumulator, currentItem) => accumulator + (currentItem.price * currentItem.quantity), 0);
         if (couponModel !== undefined && couponModel !== null) {
@@ -331,10 +318,8 @@ const OrderCounter = () => {
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
     }
     const handlePaymentId = (e, index) => {
-        setPaymentId(e);
         if (e !== 3) {
             fetchDelivery();
-            setDeleveryId(1);
             const tabModel = [...tabs];
             tabModel[index] = { ...tabModel[index], paymentId: e, delevryId: 1 };
             setTabs(tabModel);
@@ -353,10 +338,8 @@ const OrderCounter = () => {
         }
     }
     const handleSelectDelivery = (e, index) => {
-        setDeleveryId(e);
         if (delivery && delivery.length > 0) {
             const deliveryModel = delivery.find((m) => m.id === e);
-            setFeeDelivery(deliveryModel ? deliveryModel.fee : 0);
             const tabModel = [...tabs];
             tabModel[index] = { ...tabModel[index], feeDelivery: deliveryModel.fee, delevryId: e };
             setTabs(tabModel);
@@ -399,12 +382,11 @@ const OrderCounter = () => {
         }
     };
     const handleSelectProvince = (e, index) => {
-        debugger;
         fetchDistrict(e);
         const tabModel = [...tabs];
         const addressModel = tabModel[index].address;
         addressModel[0] = { ...addressModel[0], provinceId: e, districtId: 0, provinceId: 0 };
-        tabModel[index] = { ...tabModel[index], address: addressModel,  provinceId: e};
+        tabModel[index] = { ...tabModel[index], address: addressModel, provinceId: e, provinces: province };
         setTabs(tabModel);
     }
     const handleSelectDistrict = (e, index) => {
@@ -412,7 +394,7 @@ const OrderCounter = () => {
         const tabModel = [...tabs];
         const addressModel = tabModel[index].address;
         addressModel[0] = { ...addressModel[0], districtId: e, wardId: 0 };
-        tabModel[index] = { ...tabModel[index], address: addressModel, districtId: e };
+        tabModel[index] = { ...tabModel[index], address: addressModel, districtId: e, districts: district };
         setTabs(tabModel);
     }
 
@@ -420,13 +402,12 @@ const OrderCounter = () => {
         const tabModel = [...tabs];
         const addressModel = tabModel[index].address;
         addressModel[0] = { ...addressModel[0], wardId: e };
-        tabModel[index] = { ...tabModel[index], address: addressModel, wardId: e };
+        tabModel[index] = { ...tabModel[index], address: addressModel, wardId: e, wards: ward };
         setTabs(tabModel);
     }
     const handleSelectUser = (e, index) => {
         const tabModel = [...tabs];
         tabModel[index] = { ...tabModel[index], userModel: { id: e.id, fullName: e.fullName, phoneNumber: e.phoneNumber, email: e.email, addressDetail: e.address && e.address.length > 0 && e.address[0].fullInfo, address: e.address }, address: e.address, addressDetail: e.address && e.address.length > 0 && e.address[0].fullInfo };
-        setUserModel(e);
         setTabs(tabModel);
     }
     const handleSelectCounpon = (e, index) => {
@@ -449,21 +430,21 @@ const OrderCounter = () => {
     const handleSetFullName = (e, index) => {
         const tabModel = [...tabs];
         var userModel = tabModel[index].userModel;
-        userModel= { ...userModel, fullName: e };
+        userModel = { ...userModel, fullName: e };
         tabModel[index] = { ...tabModel[index], userModel: userModel };
         setTabs(tabModel);
     }
     const handleSetEmail = (e, index) => {
         const tabModel = [...tabs];
         var userModel = tabModel[index].userModel;
-        userModel= { ...userModel, email: e };
+        userModel = { ...userModel, email: e };
         tabModel[index] = { ...tabModel[index], userModel: userModel };
         setTabs(tabModel);
     }
     const handleSetPhone = (e, index) => {
         const tabModel = [...tabs];
         var userModel = tabModel[index].userModel;
-        userModel= { ...userModel, phoneNumber: e };
+        userModel = { ...userModel, phoneNumber: e };
         tabModel[index] = { ...tabModel[index], userModel: userModel };
         setTabs(tabModel);
     }
@@ -547,55 +528,55 @@ const OrderCounter = () => {
                                     </Col>
                                     {tab.delevryId > 0 && tab.delevryId !== 1 && <>
                                         <>
-                                                <Col span={8}>
-                                                    <p style={{ fontWeight: '500' }}>Tỉnh/Thành phố: <span style={{ color: 'red' }}>(*)</span> </p>
-                                                    <Select
-                                                        value={tab.provinceId}
-                                                        placeholder="Please select"
-                                                        onChange={(e) => handleSelectProvince(e, index)}
-                                                        style={{
-                                                            width: '100%',
-                                                        }}
-                                                    >   <Option value={0}>Chọn Tỉnh/Thành phố</Option>
-                                                        {province && province.map((e) => {
-                                                            return <Option value={e.code}>{e.name}</Option>
-                                                        })
-                                                        }
-                                                    </Select>
-                                                </Col>
-                                                <Col span={8}>
-                                                    <p style={{ fontWeight: '500' }}>Quận/Huyện: <span style={{ color: 'red' }}>(*)</span> </p>
-                                                    <Select
-                                                        value={tab.districtId}
-                                                        placeholder="Please select"
-                                                        onChange={(e) => handleSelectDistrict(e, index)}
-                                                        style={{
-                                                            width: '100%',
-                                                        }}
-                                                    >   <Option value={0}>Chọn Quận/Huyện</Option>
-                                                        {district && district.map((e) => {
-                                                            return <Option value={e.code}>{e.name}</Option>
-                                                        })
-                                                        }
-                                                    </Select>
-                                                </Col>
-                                                <Col span={8}>
-                                                    <p style={{ fontWeight: '500' }}>Xã/Phường: <span style={{ color: 'red' }}>(*)</span> </p>
-                                                    <Select
-                                                        value={tab.wardId}
-                                                        placeholder="Please select"
-                                                        onChange={(e) => handleSelectWard(e, index)}
-                                                        style={{
-                                                            width: '100%',
-                                                        }}
-                                                    >   <Option value={0}>Chọn Xã/Phường</Option>
-                                                        {Array.isArray(ward) && ward.map((e) => {
-                                                            return <Option value={e.code}>{e.name}</Option>
-                                                        })
-                                                        }
-                                                    </Select>
-                                                </Col>
-                                            </>
+                                            <Col span={8}>
+                                                <p style={{ fontWeight: '500' }}>Tỉnh/Thành phố: <span style={{ color: 'red' }}>(*)</span> </p>
+                                                <Select
+                                                    value={tab.provinceId}
+                                                    placeholder="Please select"
+                                                    onChange={(e) => handleSelectProvince(e, index)}
+                                                    style={{
+                                                        width: '100%',
+                                                    }}
+                                                >   <Option value={0}>Chọn Tỉnh/Thành phố</Option>
+                                                    {tab.provinces && tab.provinces.map((e) => {
+                                                        return <Option value={e.code}>{e.name}</Option>
+                                                    })
+                                                    }
+                                                </Select>
+                                            </Col>
+                                            <Col span={8}>
+                                                <p style={{ fontWeight: '500' }}>Quận/Huyện: <span style={{ color: 'red' }}>(*)</span> </p>
+                                                <Select
+                                                    value={tab.districtId}
+                                                    placeholder="Please select"
+                                                    onChange={(e) => handleSelectDistrict(e, index)}
+                                                    style={{
+                                                        width: '100%',
+                                                    }}
+                                                >   <Option value={0}>Chọn Quận/Huyện</Option>
+                                                    {tab.districts && tab.districts.map((e) => {
+                                                        return <Option value={e.code}>{e.name}</Option>
+                                                    })
+                                                    }
+                                                </Select>
+                                            </Col>
+                                            <Col span={8}>
+                                                <p style={{ fontWeight: '500' }}>Xã/Phường: <span style={{ color: 'red' }}>(*)</span> </p>
+                                                <Select
+                                                    value={tab.wardId}
+                                                    placeholder="Please select"
+                                                    onChange={(e) => handleSelectWard(e, index)}
+                                                    style={{
+                                                        width: '100%',
+                                                    }}
+                                                >   <Option value={0}>Chọn Xã/Phường</Option>
+                                                    {Array.isArray(tab.wards) && tab.wards.map((e) => {
+                                                        return <Option value={e.code}>{e.name}</Option>
+                                                    })
+                                                    }
+                                                </Select>
+                                            </Col>
+                                        </>
 
                                         <Col span={24}>
                                             <p style={{ fontWeight: '500' }}>Địa chỉ chi tiết: <span style={{ color: 'red' }}>(*)</span> </p>
@@ -631,6 +612,7 @@ const OrderCounter = () => {
                                                 <Col span={18}>
 
                                                     <Select
+                                                        value={tab.paymentId}
                                                         placeholder="Please select"
                                                         onChange={(e) => handlePaymentId(e, index)}
                                                         style={{
@@ -648,6 +630,7 @@ const OrderCounter = () => {
                                                 </Col>
                                                 <Col span={18}>
                                                     <Select
+                                                        value={tab.delevryId}
                                                         placeholder="Please select"
                                                         onChange={(e) => handleSelectDelivery(e, index)}
                                                         style={{

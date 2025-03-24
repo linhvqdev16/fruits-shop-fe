@@ -35,16 +35,26 @@ const ProductPopUp = ({ handleProductSelected, modelProduct, tabIndex }) => {
     const showModel = () => {
         if(!modelProduct || modelProduct.length === 0){
             modelProduct = [];
-            setProductIdSelected([]);
-        }else{
-            setProductIdSelected(modelProduct);
         }
         setModal2Open(true);
         fetchData();
+        setProductIdSelected([]);
     }
 
     const onFinish = () => {
-        handleProductSelected(productSelecteds, tabIndex);    
+        var modelProductSeleted = [...productSelecteds];
+        if(modelProductSeleted && modelProductSeleted.length > 0){
+            modelProductSeleted.forEach(item => {
+                var index = modelProduct.findIndex(m => m.id === item.id); 
+                if(index !== -1){
+                    modelProduct[index].quantity =  modelProduct[index].quantity  +  modelProductSeleted[index].quantity;
+                }else{
+                    modelProduct.push(item);
+                }
+            });
+        handleProductSelected(modelProduct, tabIndex);    
+        }else{
+        }
         setModal2Open(false);
     }
 
@@ -82,18 +92,25 @@ const ProductPopUp = ({ handleProductSelected, modelProduct, tabIndex }) => {
     }
     const handleSelectedAll = (event) => {
         if (event.target.checked) {
-            const rusult = product.map((item) => {
+            const result = product.map((item) => {
                 return {
                     id: item.id, image: item.images && item.images.length > 0 ? item.images[0] : null, name: item.name, price: item.price, code: item.code, priceDiscount: item.priceDiscount, quantity: 1 
                 }
             });
-            setProductIdSelected(rusult);
+            setProductIdSelected(result);
         } else {
             setProductIdSelected([]);
         }
     };
     const handleChangeSelected = (event, item) => {
         if (event.target.checked) {
+            debugger;
+            var quantityChosing = productSelecteds.findIndex(e => e.id === item.id) !== -1 ? productSelecteds.find(e => e.id === item.id).quantity : 0; 
+            var quantityChosed = modelProduct.findIndex(e => e.id === item.id) !== -1 ? modelProduct.find(e => e.id === item.id).quantity : 0; 
+            if(item.stock - quantityChosed  - quantityChosing - 1 < 0){
+                toast.error("Hết hàng");
+                return; 
+            }
             setProductIdSelected([...productSelecteds, { id: item.id, image: item.images && item.images.length > 0 ? item.images[0] : null, name: item.name, price: item.price, code: item.code, priceDiscount: item.priceDiscount, quantity: 1 }]);
         } else {
             setProductIdSelected([...productSelecteds].filter((e) => e.id != item.id));
@@ -110,7 +127,7 @@ const ProductPopUp = ({ handleProductSelected, modelProduct, tabIndex }) => {
 
     const columns = [
         {
-            title: (<Checkbox onClick={(e) => handleSelectedAll(e)} checked={productSelecteds.length === product.length}></Checkbox>),
+            title: (<Checkbox onClick={(e) => handleSelectedAll(e)} ></Checkbox>),
             dataIndex: 'number',
             key: 'number',
             render: (_, record) => {
@@ -144,8 +161,11 @@ const ProductPopUp = ({ handleProductSelected, modelProduct, tabIndex }) => {
             title: 'Số lượng',
             dataIndex: 'stock',
             key: 'stock',
-            render: (_, record) => <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{record.stock}</p>,
-
+            render: (_, record) => {
+                var quantityChosing = productSelecteds.findIndex(e => e.id === record.id) !== -1 ? productSelecteds.find(e => e.id === record.id).quantity : 0; 
+                var quantityChosed = modelProduct.findIndex(e => e.id === record.id) !== -1 ? modelProduct.find(e => e.id === record.id).quantity : 0; 
+                return <p style={{ fontSize: "13px", color: "black", fontWeight: "300" }}>{record.stock - (quantityChosing ?? 0) - (quantityChosed ?? 0)}</p>;
+            },
         },
         {
             title: 'Mô tả',

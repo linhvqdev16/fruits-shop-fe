@@ -2,10 +2,6 @@ import React from "react";
 import "./assets/css/styles.min.css";
 import SidebarDashboard from "../SidebarDashboard/SidebarDashboard";
 import SidebarTop from "../SidebarTop/SidebarTop";
-import SaleOverview from "../SaleOverview/SaleOverview";
-import RecentTransactionsLeft from "../RecentTransactionsLeft/RecentTransactionsLeft";
-import RecentTransactionsRight from "../RecentTransactionsRight/RecentTransactionsRight";
-import TableDataDashboard from "../TableDataDashboard/TableDataDashboard";
 import SastisfyManager from "./SastisfyManager/SastisfyManager";
 
 const Dashboard = () => {
@@ -21,7 +17,7 @@ const Dashboard = () => {
         <SidebarDashboard />
         <div class="body-wrapper">
           <SidebarTop />
-          <div class="container-fluid">
+          <div class="container-fluid" style={{maxWidth: '100%'}}>
             <SastisfyManager />
           </div>
         </div>

@@ -1,5 +1,5 @@
 import { PlusSquareOutlined } from "@ant-design/icons";
-import { Button, Col, Form, Input, Modal, Row, Select, DatePicker } from "antd";
+import { Button, Col, Form, Input, Modal, Row, Select,DatePicker } from "antd";
 import React, { useEffect, useState } from "react";
 import useCategory from "@api/useCategory";
 import useType from "@api/useType";
@@ -8,6 +8,7 @@ import useCoupon from "@api/useCoupons";
 import { Option } from 'antd/es/mentions';
 import TextArea from "antd/es/input/TextArea";
 import { format } from 'date-fns';
+import dayjs from "dayjs";
 
 const CouponAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
 
@@ -69,11 +70,10 @@ const CouponAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
   const showModel = () => {
     fetchCategory();
     fetchTypes();
-    debugger;
     if (modelItem) {
       form.setFieldsValue({ code: modelItem.code, name: modelItem.name, description: modelItem.description, typeId: modelItem.type, couponAmount: modelItem.couponAmount, minValue: modelItem.minValue, maxValue: modelItem.maxValue, quantity: modelItem.quantity });
-      setStartDate(new Date(modelItem.dateStart));
-      setEndDate(new Date(modelItem.dateEnd));
+      setStartDate(new Date(modelItem.dateStartEpochTime));
+      setEndDate(new Date(modelItem.dateEndEpochTime));
     } else {
       fetchGenerateCode();
     }
@@ -82,6 +82,7 @@ const CouponAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
 
   const onFinish = async (values) => {
     try {
+      debugger;
       var objectModel = {
         name: values.name,
         price: values.price,
@@ -89,8 +90,8 @@ const CouponAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
         type: values.typeId,
         minValue: values.minValue,
         maxValue: values.maxValue,
-        dateStart: startDate,
-        dateEnd: endDate,
+        dateStart: dayjs(startDate).toISOString(),
+        dateEnd: dayjs(endDate).toISOString(),
         quantity: values.quantity,
         couponAmount: values.couponAmount,
         status: 1,
@@ -226,7 +227,12 @@ const CouponAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
                 label="Ngày bắt đầu"
                 name="dateStart"
               >
-                <DatePicker onChange={handleSetStartDate} placeholder={startDate && format(startDate, "dd-MM-yyyy")} style={{ width: '100%' }} />
+                <DatePicker 
+                      showTime={{ format: "HH:mm:ss" }} // Enables time selection
+                      onChange={handleSetStartDate} 
+                      placeholder={startDate && format(startDate, "dd-MM-yyyy HH:mm:ss")}  
+                      format={"DD-MM-YYYY HH:mm:ss"}  
+                      style={{ width: '100%' }} />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -234,7 +240,12 @@ const CouponAddOrChange = ({ fetchData, modelItem, textButton, isStyle }) => {
                 label="Ngày kết thúc"
                 name="dateEnd"
               >
-                <DatePicker onChange={handleSetEndDate} placeholder={endDate && format(endDate, "dd-MM-yyyy")} style={{ width: '100%' }} />
+                <DatePicker 
+                    showTime={{ format: "HH:mm:ss" }} // Enables time selection
+                    onChange={handleSetEndDate} 
+                    placeholder={endDate && format(endDate, "dd-MM-yyyy HH:mm:ss")} 
+                    format={"DD-MM-YYYY HH:mm:ss"} 
+                    style={{ width: '100%' }} />
               </Form.Item>
             </Col>
 

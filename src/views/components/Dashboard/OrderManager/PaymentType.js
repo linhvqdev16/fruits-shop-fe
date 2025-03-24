@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Modal, Button, Image } from 'antd';
+import { Button, Col, Image, Input, Modal, Row } from "antd";
 
 function formatCurrencyVND(amount) {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
 }
 
 
-const PaymentType = ({ callback, amount, deliveryId, paymentId, products, tabIds}) => {
+const PaymentType = ({ callback, amount, deliveryId, paymentId, products, tabIds }) => {
     const [isModalVisible, setIsModalVisible] = useState(false);
 
     // Function to show the modal
@@ -26,7 +26,7 @@ const PaymentType = ({ callback, amount, deliveryId, paymentId, products, tabIds
 
     return (
         <div style={{ padding: '20px' }}>
-            <Button  type="button"
+            <Button type="button"
                 value="small"
                 style={{
                     alignItems: "center",
@@ -43,28 +43,36 @@ const PaymentType = ({ callback, amount, deliveryId, paymentId, products, tabIds
                 onOk={handleOk} // Button to confirm payment
                 onCancel={handleCancel} // Button to close the modal
             >
-               {paymentId && paymentId === 1 && <>
-                        <p>Số tiền cần phải thanh toán: </p>
-                        <h2>{formatCurrencyVND(amount)}</h2>
-                    </>}
+                {paymentId && paymentId === 1 && <>
+                    <p>Số tiền cần phải thanh toán: </p>
+                    <h2>{formatCurrencyVND(amount)}</h2>
+                    <br/>
+                    <Row>
+                        <Col span={12}>
+                            <p style={{ fontWeight: '500' }}>Số tiền khách đưa: </p>
+                        </Col>
+                        <Col span={12}>
+                            <Input placeholder="" type="number" /></Col>
+                    </Row>
+                </>}
 
-                    {paymentId && paymentId !== 1 && <>
-                        <p>Quét QR Code để thanh toán: <h2>{formatCurrencyVND(amount)}</h2></p>
-                        <div style={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            height: '50vh', // Makes the parent container full height
-                            textAlign: 'center' // Ensures text is also centered
-                        }}>
-                            <Image
-                                width={350}  // Set the width of the image
-                                src='https://hexdocs.pm/qr_code/docs/qrcode.svg'  // Image source (URL)
-                                alt="Example Image"  // Alt text for the image
-                                preview={true}  // Enable the lightbox preview feature
-                            />
-                        </div>
-                    </>}
+                {paymentId && paymentId !== 1 && <>
+                    <p>Quét QR Code để thanh toán: <h2>{formatCurrencyVND(amount)}</h2></p>
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        height: '50vh', // Makes the parent container full height
+                        textAlign: 'center' // Ensures text is also centered
+                    }}>
+                        <Image
+                            width={350}  // Set the width of the image
+                            src='https://hexdocs.pm/qr_code/docs/qrcode.svg'  // Image source (URL)
+                            alt="Example Image"  // Alt text for the image
+                            preview={true}  // Enable the lightbox preview feature
+                        />
+                    </div>
+                </>}
                 {/* {deliveryId && deliveryId !== 1 && <>
                     <p>Xác nhận đơn hàng giao cho đơn vị vận chuyển: </p>
                     <h2>Giá trị: {formatCurrencyVND(amount)}</h2>
